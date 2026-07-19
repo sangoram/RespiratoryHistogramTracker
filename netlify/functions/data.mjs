@@ -13,6 +13,11 @@ export default async (req) => {
     try { op = await req.json(); } catch (e) { return new Response('Bad JSON', { status: 400 }); }
     const d = await load();
     d.rooms = d.rooms || {}; d.meta = d.meta || {};
+    if (op.op === 'import' && op.data && typeof op.data === 'object') {
+      const nd = { rooms: op.data.rooms || {}, meta: op.data.meta || {} };
+      await store.setJSON(KEY, nd);
+      return Response.json(nd);
+    }
     const k = String(op.room || '');
     if (!k) return new Response('Missing room', { status: 400 });
 
@@ -24,6 +29,13 @@ export default async (req) => {
       if (!d.rooms[k].length) delete d.rooms[k];
     } else if (op.op === 'reset') {
       delete d.rooms[k]; delete d.meta[k];
+    } else if (op.op === 'edit' && op.entry && typeof op.entry === 'object' && op.entry.id) {
+      d.rooms[k] = (d.rooms[k] || []).map(e => (e.id === op.entry.id ? op.entry : e));
+    } else if (op.op === 'move' && op.to) {
+      const to = String(op.to);
+      if (d.rooms[to] && d.rooms[to].length) return new Response('Target room occupied', { status: 409 });
+      if (d.rooms[k]) { d.rooms[to] = d.rooms[k]; delete d.rooms[k]; }
+      if (d.meta[k]) { d.meta[to] = d.meta[k]; delete d.meta[k]; }
     } else if (op.op === 'meta' && op.patch && typeof op.patch === 'object') {
       const patch = {};
       if ('name' in op.patch) patch.name = String(op.patch.name).slice(0, 80);

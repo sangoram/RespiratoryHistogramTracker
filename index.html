@@ -26,7 +26,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   <div data-noprint="1" style="position:sticky;top:0;z-index:40;background:rgba(255,255,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #E2E8EE">
     <div style="max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
-        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">NICU · Respiratory Status</div>
+        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">San Leandro NICU Histogram Tracking Digital Binder</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ todayStr }}</div>
         <sc-if value="{{ showSync }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:2.5px 8px 2.5px 6px;letter-spacing:0.03em">
@@ -35,13 +35,16 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         </sc-if>
       </div>
       <div style="flex:1"></div>
-      <button onClick="{{ openReport }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490">PDF report</button>
-      <div style="display:flex;gap:5px;flex-wrap:wrap">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
         <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="0">
           <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:3px 8px 3px 6px">
             <span style="width:9px;height:9px;border-radius:3px;background:{{ lg.color }};display:inline-block"></span>{{ lg.label }} {{ lg.count }}
           </div>
         </sc-for>
+        <button onClick="{{ exportJson }}" title="Download a JSON backup of all data" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Backup</button>
+        <button onClick="{{ importJson }}" title="Restore from a JSON backup" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Import</button>
+        <button onClick="{{ openSnapshot }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#EAF4F7">Current NICU Snapshot Report</button>
+        <button onClick="{{ openReport }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#0B5C73">Complete Histogram Log Report</button>
       </div>
     </div>
   </div>
@@ -81,27 +84,31 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               </sc-if>
             </div>
             <sc-if value="{{ r.hasHisto }}" hint-placeholder-val="{{ true }}">
-              <div style="background:#FFFFFF;border-radius:10px;padding:7px 10px 5px;display:flex;gap:10px;align-items:stretch">
-                <div style="flex:1;display:flex;gap:8px">
-                  <sc-for list="{{ r.bins }}" as="b" hint-placeholder-count="3">
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">
-                      <div style="display:flex;gap:4px;align-items:baseline;font-family:'IBM Plex Mono',monospace">
-                        <span style="font-size:12.5px;font-weight:600;color:#0891B2">{{ b.aV }}</span>
-                        <span style="font-size:10px;color:#7C3AED">{{ b.pV }}</span>
-                      </div>
-                      <div style="position:relative;width:100%;height:52px;border-bottom:1.5px solid #D5DEE6">
-                        <div style="position:absolute;bottom:0;left:8%;width:84%;height:{{ b.pH }}%;background:#A78BFA;opacity:0.5;border-radius:3px 3px 0 0"></div>
-                        <div style="position:absolute;bottom:0;left:27%;width:46%;height:{{ b.aH }}%;background:#06B6D4;border-radius:3px 3px 0 0"></div>
-                      </div>
-                      <div style="font-size:9px;font-weight:600;letter-spacing:0.04em;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ b.lbl }}</div>
+              <div style="background:#FFFFFF;border-radius:10px;padding:8px 10px 6px">
+                <div style="display:grid;grid-template-columns:34px repeat(4,1fr);column-gap:4px;align-items:end">
+                  <div></div>
+                  <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
+                    <div style="display:flex;gap:3px;align-items:flex-end;height:44px;justify-content:center">
+                      <div style="width:14px;height:{{ c.pH }};background:#A78BFA;opacity:0.55;border-radius:3px 3px 0 0"></div>
+                      <div style="width:14px;height:{{ c.aH }};background:#06B6D4;border-radius:3px 3px 0 0"></div>
                     </div>
                   </sc-for>
                 </div>
-                <div style="width:1px;background:#E2E8EE"></div>
-                <div style="display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:52px">
-                  <div style="font-size:9px;font-weight:700;color:#7A8A98;letter-spacing:0.04em;font-family:'IBM Plex Mono',monospace">{{ rrLbl }}</div>
-                  <div style="font-family:'IBM Plex Mono',monospace;font-size:14.5px;font-weight:600;color:#0891B2">{{ r.rrCur }}</div>
-                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C3AED">{{ r.rrPrev }}</div>
+                <div style="display:grid;grid-template-columns:34px repeat(4,1fr);column-gap:4px;border-top:1.5px solid #D5DEE6;padding-top:3px;align-items:center">
+                  <div></div>
+                  <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
+                    <div style="text-align:center;font-size:9px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.lbl }}</div>
+                  </sc-for>
+                  <div style="font-size:9px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace">NOW</div>
+                  <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
+                    <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:{{ c.fw }};color:#0891B2">{{ c.aV }}</div>
+                  </sc-for>
+                  <sc-if value="{{ r.hasPrevBand }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:9px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace">PREV</div>
+                    <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
+                      <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C3AED">{{ c.pV }}</div>
+                    </sc-for>
+                  </sc-if>
                 </div>
               </div>
             </sc-if>
@@ -148,6 +155,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6B7A">{{ rvAgo }}</div>
           </sc-if>
           <div style="flex:1"></div>
+          <button onClick="{{ rvMove }}" title="Move this patient's data to another room" style="min-height:40px;background:rgba(255,255,255,0.75);border:1.5px solid {{ rvBd }};border-radius:10px;color:{{ rvTx }};font-size:13px;font-weight:600;cursor:pointer;padding:0 14px" style-hover="background:#FFFFFF">Move room…</button>
           <button onClick="{{ rvAdd }}" style="min-height:40px;background:#0E7490;border:none;border-radius:10px;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">+ New entry</button>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
@@ -169,31 +177,33 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
               <div style="font-size:10.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#7A8A98">Saturation histogram</div>
               <div style="flex:1"></div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Latest</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Previous</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Current — {{ rvCurLeg }}</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Previous — {{ rvPrevLeg }}</div>
             </div>
-            <div style="display:flex;gap:14px;align-items:stretch">
-              <div style="flex:1;display:flex;gap:10px">
-                <sc-for list="{{ rvBins }}" as="b" hint-placeholder-count="3">
-                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0">
-                    <div style="display:flex;gap:5px;align-items:baseline;font-family:'IBM Plex Mono',monospace">
-                      <span style="font-size:15px;font-weight:600;color:#0891B2">{{ b.aV }}</span>
-                      <span style="font-size:11.5px;color:#7C3AED">{{ b.pV }}</span>
-                    </div>
-                    <div style="position:relative;width:100%;height:84px;border-bottom:1.5px solid #D5DEE6">
-                      <div style="position:absolute;bottom:0;left:10%;width:80%;height:{{ b.pH }}%;background:#A78BFA;opacity:0.5;border-radius:3px 3px 0 0"></div>
-                      <div style="position:absolute;bottom:0;left:29%;width:42%;height:{{ b.aH }}%;background:#06B6D4;border-radius:3px 3px 0 0"></div>
-                    </div>
-                    <div style="font-size:10px;font-weight:600;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ b.lbl }}</div>
-                  </div>
+            <div style="display:grid;grid-template-columns:42px repeat(4,1fr);column-gap:6px;align-items:end">
+              <div></div>
+              <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
+                <div style="display:flex;gap:4px;align-items:flex-end;height:72px;justify-content:center">
+                  <div style="width:20px;height:{{ c.pH }};background:#A78BFA;opacity:0.55;border-radius:3px 3px 0 0"></div>
+                  <div style="width:20px;height:{{ c.aH }};background:#06B6D4;border-radius:3px 3px 0 0"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:42px repeat(4,1fr);column-gap:6px;border-top:1.5px solid #D5DEE6;padding-top:4px;align-items:center;row-gap:2px">
+              <div></div>
+              <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
+                <div style="text-align:center;font-size:10px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.lbl }}</div>
+              </sc-for>
+              <div style="font-size:10px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace">NOW</div>
+              <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
+                <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:{{ c.fw }};color:#0891B2">{{ c.aV }}</div>
+              </sc-for>
+              <sc-if value="{{ rvHasPrevBand }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:10px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace">PREV</div>
+                <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
+                  <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#7C3AED">{{ c.pV }}</div>
                 </sc-for>
-              </div>
-              <div style="width:1px;background:#E2E8EE"></div>
-              <div style="display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:60px">
-                <div style="font-size:10px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace">{{ rrLbl }}</div>
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#0891B2">{{ rvRrCur }}</div>
-                <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#7C3AED">{{ rvRrPrev }}</div>
-              </div>
+              </sc-if>
             </div>
           </div>
         </sc-if>
@@ -209,10 +219,10 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
       </div>
       <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;overflow-x:auto">
         <div style="min-width:990px">
-          <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 40px;border-bottom:1.5px solid #D5DEE6">
+          <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 64px;border-bottom:1.5px solid #D5DEE6">
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
-            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Int hr</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Hist hr</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm limits</div>
@@ -226,7 +236,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div></div>
           </div>
           <sc-for list="{{ rvEntries }}" as="e" hint-placeholder-count="3">
-            <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 40px;border-bottom:1px solid #EDF1F4;background:{{ e.rowBg }};box-shadow:inset 3px 0 0 {{ e.rowEdge }};align-items:center">
+            <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 64px;border-bottom:1px solid #EDF1F4;background:{{ e.rowBg }};box-shadow:inset 3px 0 0 {{ e.rowEdge }};align-items:center">
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4A5865">{{ e.date }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.time }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4A5865">{{ e.intv }}</div>
@@ -240,7 +250,10 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.ha }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hrr }}</div>
               <div style="padding:8px;font-size:11px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
-              <button onClick="{{ e.del }}" title="Delete entry" style="margin:4px;width:26px;height:26px;border-radius:7px;border:1px solid #E2E8EE;background:#FFFFFF;color:#94A3AF;font-size:13px;cursor:pointer;line-height:1" style-hover="color:#B42318;border-color:#E5B7B0">×</button>
+              <div style="display:flex;gap:3px;align-items:center;padding:4px">
+                <button onClick="{{ e.edit }}" title="Edit entry" style="width:26px;height:26px;border-radius:7px;border:1px solid #E2E8EE;background:#FFFFFF;color:#0E7490;font-size:11px;cursor:pointer;line-height:1" style-hover="border-color:#0E7490">✎</button>
+                <button onClick="{{ e.del }}" title="Delete entry" style="width:26px;height:26px;border-radius:7px;border:1px solid #E2E8EE;background:#FFFFFF;color:#94A3AF;font-size:13px;cursor:pointer;line-height:1" style-hover="color:#B42318;border-color:#E5B7B0">×</button>
+              </div>
             </div>
           </sc-for>
         </div>
@@ -261,7 +274,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
       </div>
       <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:16px 16px 12px">
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-          <div style="font-size:18px;font-weight:700">NICU Respiratory Status — Unit Summary</div>
+          <div style="font-size:18px;font-weight:700">{{ rptTitle }}</div>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6B7A">{{ todayStr }}</div>
           <div style="flex:1"></div>
           <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Latest</div>
@@ -300,7 +313,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           <div style="display:grid;grid-template-columns:58px 48px 44px minmax(130px,1.2fr) 52px 60px 56px minmax(130px,1.4fr) 42px 42px 46px 56px 44px;border-bottom:1.5px solid #D5DEE6">
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
-            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Int hr</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Hist hr</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm</div>
@@ -346,6 +359,10 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           <label style="flex:2;min-width:180px;display:flex;flex-direction:column;gap:4px">
             <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</span>
             <input type="datetime-local" value="{{ eTs }}" onChange="{{ onTs }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+          </label>
+          <label style="flex:1;min-width:110px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Histogram interval (h)</span>
+            <input type="number" inputMode="decimal" min="0.5" max="48" step="0.5" value="{{ eIntv }}" onChange="{{ onIntv }}" placeholder="8" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
           </label>
           <label style="flex:1;min-width:110px;display:flex;flex-direction:column;gap:4px">
             <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Initials (RT/RN/MD)</span>
@@ -444,8 +461,23 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         </sc-if>
         <div style="display:flex;gap:8px;margin-top:2px">
           <button onClick="{{ closeEditor }}" style="flex:1;min-height:46px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:11px;color:#3D4C59;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
-          <button onClick="{{ saveEntry }}" style="flex:2;min-height:46px;background:#0E7490;border:none;border-radius:11px;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#0B5C73">Save entry</button>
+          <button onClick="{{ saveEntry }}" style="flex:2;min-height:46px;background:#0E7490;border:none;border-radius:11px;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#0B5C73">{{ saveLabel }}</button>
         </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ moveOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelMove }}" style="position:fixed;inset:0;z-index:110;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Move room dialog" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(420px,100%);max-height:88vh;overflow-y:auto;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
+        <div style="font-size:15.5px;font-weight:700">Move {{ moveFrom }} to…</div>
+        <div style="font-size:12.5px;color:#4A5865;line-height:1.5">All entries and patient info move with the baby. Occupied rooms are disabled.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px">
+          <sc-for list="{{ moveTargets }}" as="t" hint-placeholder-count="8">
+            <button onClick="{{ t.pick }}" disabled="{{ t.dis }}" style="min-height:44px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:{{ t.cur }};background:{{ t.bg }};color:{{ t.tx }};border:1.5px solid {{ t.bd }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ cancelMove }}" style="min-height:44px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
       </div>
     </div>
   </sc-if>
@@ -473,7 +505,7 @@ class Component extends DCLogic {
     try { const raw = localStorage.getItem(this.KEY); if (raw) { const p = JSON.parse(raw); if (p && p.rooms) data = p; } } catch (e) {}
     let li = ''; try { li = localStorage.getItem('nicu_resp_initials') || ''; } catch (e) {}
     this.lastInit = li;
-    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '' };
+    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null };
     this.API = '/api/data'; this.remote = false; this.lastWrite = 0;
     this.onStorage = (ev) => {
       if (ev.key === this.KEY && ev.newValue) { try { const p = JSON.parse(ev.newValue); if (p && p.rooms) this.setState({ data: p }); } catch (e) {} }
@@ -517,6 +549,13 @@ class Component extends DCLogic {
     else if (op.op === 'del') { d.rooms[k] = (d.rooms[k] || []).filter(e => e.id !== op.id); if (!d.rooms[k].length) delete d.rooms[k]; }
     else if (op.op === 'reset') { delete d.rooms[k]; delete d.meta[k]; }
     else if (op.op === 'meta') { d.meta[k] = { ...(d.meta[k] || {}), ...op.patch }; }
+    else if (op.op === 'edit') { d.rooms[k] = (d.rooms[k] || []).map(e => (e.id === op.entry.id ? op.entry : e)); }
+    else if (op.op === 'move') {
+      const to = String(op.to);
+      if (d.rooms[k]) { d.rooms[to] = d.rooms[k]; delete d.rooms[k]; }
+      if (d.meta[k]) { d.meta[to] = d.meta[k]; delete d.meta[k]; }
+    }
+    else if (op.op === 'import') { d.rooms = op.data.rooms || {}; d.meta = op.data.meta || {}; }
   }
   sendOp(op) {
     this.setState(s => {
@@ -567,7 +606,7 @@ class Component extends DCLogic {
   entryRow(e, older) {
     const MODES = this.modes(), TG = this.targets();
     const EM = MODES[e.mode] || MODES.RA, ET = TG[e.target] || TG.std;
-    const hrs = older ? (new Date(e.ts).getTime() - new Date(older.ts).getTime()) / 3600000 : null;
+    const hrs = e.intv != null ? e.intv : (older ? (new Date(e.ts).getTime() - new Date(older.ts).getTime()) / 3600000 : null);
     return {
       date: this.fmtDate(e.ts), time: this.fmtTime(e.ts),
       intv: hrs == null ? '—' : (hrs >= 9.5 ? String(Math.round(hrs)) : String(Math.round(hrs * 10) / 10)),
@@ -579,6 +618,23 @@ class Component extends DCLogic {
       hb: e.h ? String(e.h[0]) : '—', hi2: e.h ? String(e.h[1]) : '—', ha: e.h ? String(e.h[2]) : '—',
       hrr: e.rr != null ? String(e.rr) : '—',
       init: e.init || '—'
+    };
+  }
+  bandsFor(latest, prev) {
+    if (!latest || !latest.h) return null;
+    const T = this.targets()[latest.target] || this.targets().std;
+    const hasPrev = !!(prev && prev.h);
+    const clamp = v => Math.max(1.5, Math.min(100, v)) + '%';
+    const aVals = [latest.h[0], latest.h[1], latest.h[2], latest.rr != null ? latest.rr : null];
+    const pVals = hasPrev ? [prev.h[0], prev.h[1], prev.h[2], prev.rr != null ? prev.rr : null] : [null, null, null, null];
+    const lbls = [`<${T.lo}`, `${T.lo}–${T.hi}`, `>${T.hi}`, `RR>${this.rrT()}`];
+    return {
+      hasPrevBand: hasPrev,
+      cols: lbls.map((lbl, ix) => ({
+        lbl, fw: ix === 1 ? 700 : 600,
+        aV: aVals[ix] != null ? String(aVals[ix]) : '–', aH: aVals[ix] != null ? clamp(aVals[ix]) : '0%',
+        pV: pVals[ix] != null ? String(pVals[ix]) : '', pH: pVals[ix] != null ? clamp(pVals[ix]) : '0%'
+      }))
     };
   }
   binsFor(latest, prev) {
@@ -597,10 +653,24 @@ class Component extends DCLogic {
     this.setState({
       err: '',
       form: {
-        room: n, ts: this.nowLocal(), init: this.lastInit,
+        room: n, ts: this.nowLocal(), init: this.lastInit, intv: '8',
         mode: last ? last.mode : null, s: last && last.s ? { ...last.s } : {},
         fLo: last && last.f ? String(last.f[0]) : '', fHi: last && last.f ? String(last.f[1]) : '',
         target: last ? last.target : 'std', b: '', i: '', a: '', rr: '', md: false, iv: ''
+      }
+    });
+  }
+  openEdit(n, e) {
+    this.setState({
+      err: '',
+      form: {
+        editId: e.id, room: n, ts: this.toLocalInput(e.ts), init: e.init || '',
+        intv: e.intv != null ? String(e.intv) : '8',
+        mode: e.mode, s: e.s ? { ...e.s } : {},
+        fLo: e.f ? String(e.f[0]) : '', fHi: e.f ? String(e.f[1]) : '',
+        target: e.target || 'std',
+        b: e.h ? String(e.h[0]) : '', i: e.h ? String(e.h[1]) : '', a: e.h ? String(e.h[2]) : '',
+        rr: e.rr != null ? String(e.rr) : '', md: !!e.md, iv: e.iv || ''
       }
     });
   }
@@ -640,9 +710,11 @@ class Component extends DCLogic {
         fio = [L, H];
       }
     }
+    let intv = f.intv === '' ? 8 : Number(f.intv);
+    if (isNaN(intv) || intv <= 0 || intv > 48) return err('Histogram interval must be 0.5–48 hours.');
     const init = (f.init || '').trim().toUpperCase().slice(0, 4);
-    const entry = { id: Date.now() + '' + Math.floor(Math.random() * 1000), ts: this.isoFromLocal(f.ts), init, mode: f.mode, s: { ...f.s }, f: fio, target: f.target, h, rr, md: !!f.md, iv: (f.iv || '').trim() };
-    this.sendOp({ op: 'add', room: f.room, entry });
+    const entry = { id: f.editId || (Date.now() + '' + Math.floor(Math.random() * 1000)), ts: this.isoFromLocal(f.ts), init, intv, mode: f.mode, s: { ...f.s }, f: fio, target: f.target, h, rr, md: !!f.md, iv: (f.iv || '').trim() };
+    this.sendOp(f.editId ? { op: 'edit', room: f.room, entry } : { op: 'add', room: f.room, entry });
     if (init) { this.lastInit = init; try { localStorage.setItem('nicu_resp_initials', init); } catch (e) {} }
     this.setState({ form: null, err: '' });
   }
@@ -666,13 +738,14 @@ class Component extends DCLogic {
       counts[latest.mode] = (counts[latest.mode] || 0) + 1;
       if (latest.mode === 'RANF') { ranf.push({ label, ago: this.ago(latest.ts), open: () => this.openRoom(n) }); continue; }
       const prev = es[1] || null, M = MODES[latest.mode] || MODES.RA, T = TG[latest.target] || TG.std;
-      const bins = this.binsFor(latest, prev);
+      const band = this.bandsFor(latest, prev);
       live.push({
         label, bg: M.bg, bd: M.bd, tx: M.tx, solid: M.solid, modeLabel: M.label,
         targetRange: `${T.lo}–${T.hi}%`, ago: this.ago(latest.ts),
         curSet: this.concise(latest), curMeta: `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}`,
         hasPrev: !!prev, prevSet: prev ? this.concise(prev) : '', prevMeta: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '',
-        hasHisto: !!bins, bins: bins || [],
+        hasHisto: !!band,
+        cols: band ? band.cols : [], hasPrevBand: !!band && band.hasPrevBand,
         rrCur: latest.rr != null ? latest.rr + '%' : '–', rrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
         open: () => this.openRoom(n), add: ev => { ev.stopPropagation(); this.openEditor(n); }
       });
@@ -682,12 +755,12 @@ class Component extends DCLogic {
     if (empty.length) legend.push({ label: 'Empty', color: '#C9D2D9', count: empty.length });
 
     // room detail
-    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvBins: [], rvRrCur: '', rvRrPrev: '', rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9' };
+    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvCols: [], rvHasPrevBand: false, rvRrCur: '', rvRrPrev: '', rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9', rvMove: () => {}, rvCurLeg: '', rvPrevLeg: '' };
     if (view.t === 'room') {
       const n = view.r, es = this.entriesOf(n), latest = es[0] || null, prev = es[1] || null;
       const M = latest ? (MODES[latest.mode] || MODES.RA) : null;
       const T = latest ? (TG[latest.target] || TG.std) : TG.std;
-      const bins = this.binsFor(latest, prev);
+      const band = this.bandsFor(latest, prev);
       const meta = (this.state.data.meta || {})[String(n)] || {};
       const c24 = es.filter(e => Date.now() - new Date(e.ts).getTime() <= 24 * 3600000).length;
       rv = {
@@ -695,17 +768,22 @@ class Component extends DCLogic {
         rvBg: M ? M.bg : '#FFFFFF', rvBd: M ? M.bd : '#E2E8EE', rvTx: M ? M.tx : '#3D4C59', rvSolid: M ? M.solid : '#8895A0',
         rvModeLabel: M ? M.label : '', rvTarget: latest && latest.mode !== 'RANF' ? `${T.lo}–${T.hi}%` : '—',
         rvAgo: latest ? this.ago(latest.ts) : '', rvHasLatest: !!latest,
-        rvHasHisto: !!bins, rvBins: bins || [],
+        rvHasHisto: !!band,
+        rvCols: band ? band.cols : [], rvHasPrevBand: !!band && band.hasPrevBand,
         rvRrCur: latest && latest.rr != null ? latest.rr + '%' : '–', rvRrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
         rvCount: es.length, rvIsEmpty: !es.length, rvHasEntries: !!es.length,
         rvEntries: es.map((e, ix) => ({
           ...this.entryRow(e, es[ix + 1]),
           rowBg: ix === 0 ? '#F0FAFC' : (ix === 1 ? '#F6F3FD' : '#FFFFFF'),
           rowEdge: ix === 0 ? '#06B6D4' : (ix === 1 ? '#A78BFA' : '#E2E8EE'),
+          edit: () => this.openEdit(n, e),
           del: () => this.setState({ confirm: { type: 'del', room: n, id: e.id, when: this.fmtWhen(e.ts) } })
         })),
         rvAdd: () => this.openEditor(n),
         rvReset: () => this.setState({ confirm: { type: 'reset', room: n } }),
+        rvMove: () => this.setState({ move: { from: n } }),
+        rvCurLeg: latest ? `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}` : '',
+        rvPrevLeg: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '—',
         rvName: meta.name || '', rvMrn: meta.mrn || '',
         onName: ev => this.sendOp({ op: 'meta', room: n, patch: { name: ev.target.value } }),
         onMrn: ev => this.sendOp({ op: 'meta', room: n, patch: { mrn: ev.target.value } }),
@@ -716,7 +794,7 @@ class Component extends DCLogic {
 
     // editor
     const eo = !!f;
-    let ed = { eTitle: '', eTs: '', eInit: '', modeChips: [], hasFields: false, eFields: [], showFio2: false, eFLo: '', eFHi: '', showHisto: false, targetChips: [], hBval: '', hBph: '', hIval: '', hIph: '', hAval: '', hAph: '', hBsub: '', hIsub: '', hAsub: '', sumMsg: '', sumColor: '#7A8A98', eRr: '', showRanfNote: false, eIv: '', mdNo: () => {}, mdYes: () => {}, mdNoBg: '#FFFFFF', mdNoTx: '#3D4C59', mdNoBd: '#C9D2D9', mdYesBg: '#FFFFFF', mdYesTx: '#3D4C59', mdYesBd: '#C9D2D9' };
+    let ed = { eTitle: '', eTs: '', eInit: '', modeChips: [], hasFields: false, eFields: [], showFio2: false, eFLo: '', eFHi: '', showHisto: false, targetChips: [], hBval: '', hBph: '', hIval: '', hIph: '', hAval: '', hAph: '', hBsub: '', hIsub: '', hAsub: '', sumMsg: '', sumColor: '#7A8A98', eRr: '', showRanfNote: false, eIv: '', eIntv: '', onIntv: () => {}, saveLabel: 'Save entry', mdNo: () => {}, mdYes: () => {}, mdNoBg: '#FFFFFF', mdNoTx: '#3D4C59', mdNoBd: '#C9D2D9', mdYesBg: '#FFFFFF', mdYesTx: '#3D4C59', mdYesBd: '#C9D2D9' };
     if (eo) {
       const T = TG[f.target] || TG.std;
       const r = this.resolveHisto(f);
@@ -724,8 +802,9 @@ class Component extends DCLogic {
       if (r.blanks === 0) { const s = r.b + r.i + r.a; if (s === 100) { sumMsg = 'Σ = 100 ✓'; sumColor = '#1B7A3D'; } else { sumMsg = `Σ = ${s} — must equal 100`; sumColor = '#B42318'; } }
       else if (r.blanks === 1) { const okAuto = r.b >= 0 && r.i >= 0 && r.a >= 0; sumMsg = okAuto ? `Σ = 100 ✓ (auto-filled ${r.auto === 'b' ? 'Below' : r.auto === 'i' ? 'In' : 'Above'})` : 'Values exceed 100%'; sumColor = okAuto ? '#1B7A3D' : '#B42318'; }
       ed = {
-        eTitle: `New entry — ${pfx}-${f.room}`,
-        eTs: f.ts, eInit: f.init,
+        eTitle: f.editId ? `Edit entry — ${pfx}-${f.room}` : `New entry — ${pfx}-${f.room}`,
+        saveLabel: f.editId ? 'Save changes' : 'Save entry',
+        eTs: f.ts, eInit: f.init, eIntv: f.intv, onIntv: this.uf('intv'),
         modeChips: Object.keys(MODES).map(k => {
           const m = MODES[k], on = f.mode === k;
           return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: k } })) };
@@ -766,6 +845,7 @@ class Component extends DCLogic {
           prv: prev && prev.h ? `${prev.h[0]} / ${prev.h[1]} / ${prev.h[2]} · ${prev.rr != null ? prev.rr : '–'}%` : '—',
           when: this.fmtWhen(latest.ts) + (latest.init ? ' · ' + latest.init : '')
         });
+        if (!view.full) continue;
         const meta = (this.state.data.meta || {})[String(n)] || {};
         rptPages.push({
           label: `${pfx}-${n}`, solid: M.solid, modeLabel: M.label,
@@ -775,10 +855,55 @@ class Component extends DCLogic {
       }
     }
 
+    const mv = this.state.move;
+    let moveTargets = [];
+    if (mv) {
+      for (let n = N; n >= 1; n--) {
+        if (n === mv.from) continue;
+        const occ = this.entriesOf(n).length > 0;
+        moveTargets.push({
+          label: `${pfx}-${n}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
+          bg: occ ? '#EDF0F2' : '#FFFFFF', tx: occ ? '#B4BEC7' : '#0E7490', bd: occ ? '#E2E8EE' : '#9CC3CF',
+          pick: () => { this.sendOp({ op: 'move', room: mv.from, to: n }); this.setState({ move: null, view: { t: 'room', r: n } }); }
+        });
+      }
+    }
+
     const c = this.state.confirm;
     return {
+      moveOpen: !!mv, moveFrom: mv ? `${pfx}-${mv.from}` : '', moveTargets,
+      cancelMove: () => this.setState({ move: null }),
+      exportJson: () => {
+        const d = new Date(), p = this.pad.bind(this);
+        const blob = new Blob([JSON.stringify(this.state.data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `nicu-histogram-backup-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.json`;
+        a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      },
+      importJson: () => {
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = '.json,application/json';
+        inp.onchange = () => {
+          const file = inp.files && inp.files[0]; if (!file) return;
+          const rd = new FileReader();
+          rd.onload = () => {
+            try {
+              const j = JSON.parse(rd.result);
+              if (!j || typeof j.rooms !== 'object') { alert('Not a valid backup file.'); return; }
+              if (confirm('Replace ALL current data with this backup? This overwrites every room for everyone.')) {
+                this.sendOp({ op: 'import', data: { rooms: j.rooms || {}, meta: j.meta || {} } });
+              }
+            } catch (e) { alert('Could not read that file as JSON.'); }
+          };
+          rd.readAsText(file);
+        };
+        inp.click();
+      },
       isReport: view.t === 'report', rptRooms, rptPages,
-      openReport: () => { this.setState({ view: { t: 'report' } }); window.scrollTo(0, 0); },
+      rptTitle: view.full ? 'Complete Histogram Log Report' : 'Current NICU Snapshot',
+      openReport: () => { this.setState({ view: { t: 'report', full: true } }); window.scrollTo(0, 0); },
+      openSnapshot: () => { this.setState({ view: { t: 'report', full: false } }); window.scrollTo(0, 0); },
       doPrint: () => window.print(),
       todayStr, legend, rrLbl,
       showSync: !!this.state.sync,
