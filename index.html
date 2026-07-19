@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#F3F5F7;color:#16232E;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#0E7490}a:hover{color:#155E75}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
+@media print{[data-noprint]{display:none !important}body{background:#FFFFFF}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:letter landscape;margin:10mm}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding-bottom:32px">
+  <div data-noprint="1" style="position:sticky;top:0;z-index:40;background:rgba(255,255,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #E2E8EE">
+    <div style="max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
+        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">NICU · Respiratory Status</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ todayStr }}</div>
+        <sc-if value="{{ showSync }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:2.5px 8px 2.5px 6px;letter-spacing:0.03em">
+            <span style="width:7px;height:7px;border-radius:50%;background:{{ syncDot }};display:inline-block"></span>{{ syncLabel }}
+          </div>
+        </sc-if>
+      </div>
+      <div style="flex:1"></div>
+      <button onClick="{{ openReport }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490">PDF report</button>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="0">
+          <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:3px 8px 3px 6px">
+            <span style="width:9px;height:9px;border-radius:3px;background:{{ lg.color }};display:inline-block"></span>{{ lg.label }} {{ lg.count }}
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Unit board" style="max-width:1180px;margin:0 auto;padding:14px 14px 0">
+      <sc-if value="{{ showIntro }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:18px 18px;margin-bottom:14px;max-width:560px">
+          <div style="font-size:15px;font-weight:700;margin-bottom:4px">No rooms tracked yet</div>
+          <div style="font-size:13px;color:#5A6B7A;line-height:1.5">Tap a room chip below to record its first respiratory entry — support mode, FiO₂, target SpO₂ and the saturation histogram. {{ introNote }}</div>
+        </div>
+      </sc-if>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:12px">
+        <sc-for list="{{ liveRooms }}" as="r" hint-placeholder-count="2">
+          <div onClick="{{ r.open }}" style="background:{{ r.bg }};border:1.5px solid {{ r.bd }};border-radius:14px;padding:11px 11px 10px;cursor:pointer;display:flex;flex-direction:column;gap:7px" style-hover="box-shadow:0 5px 16px rgba(22,35,46,0.13)">
+            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+              <div style="font-size:15.5px;font-weight:700">{{ r.label }}</div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#FFFFFF;background:{{ r.solid }};border-radius:6px;padding:2.5px 7px;text-transform:uppercase;white-space:nowrap">{{ r.modeLabel }}</div>
+              <div style="font-size:10.5px;font-weight:600;color:{{ r.tx }};border:1px solid {{ r.bd }};border-radius:6px;padding:2px 6px;white-space:nowrap">SpO₂ {{ r.targetRange }}</div>
+              <div style="flex:1"></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6B7A;white-space:nowrap">{{ r.ago }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;min-width:0">
+                <span style="width:8px;height:8px;border-radius:50%;background:#06B6D4;flex:none"></span>
+                <span style="font-weight:600;color:#1D2B36;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.curSet }}</span>
+                <span style="flex:1"></span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6B7A;white-space:nowrap">{{ r.curMeta }}</span>
+              </div>
+              <sc-if value="{{ r.hasPrev }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;min-width:0">
+                  <span style="width:8px;height:8px;border-radius:50%;background:#8B5CF6;flex:none"></span>
+                  <span style="font-weight:500;color:#4A5865;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.prevSet }}</span>
+                  <span style="flex:1"></span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7A8A98;white-space:nowrap">{{ r.prevMeta }}</span>
+                </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ r.hasHisto }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#FFFFFF;border-radius:10px;padding:7px 10px 5px;display:flex;gap:10px;align-items:stretch">
+                <div style="flex:1;display:flex;gap:8px">
+                  <sc-for list="{{ r.bins }}" as="b" hint-placeholder-count="3">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">
+                      <div style="display:flex;gap:4px;align-items:baseline;font-family:'IBM Plex Mono',monospace">
+                        <span style="font-size:12.5px;font-weight:600;color:#0891B2">{{ b.aV }}</span>
+                        <span style="font-size:10px;color:#7C3AED">{{ b.pV }}</span>
+                      </div>
+                      <div style="position:relative;width:100%;height:52px;border-bottom:1.5px solid #D5DEE6">
+                        <div style="position:absolute;bottom:0;left:8%;width:84%;height:{{ b.pH }}%;background:#A78BFA;opacity:0.5;border-radius:3px 3px 0 0"></div>
+                        <div style="position:absolute;bottom:0;left:27%;width:46%;height:{{ b.aH }}%;background:#06B6D4;border-radius:3px 3px 0 0"></div>
+                      </div>
+                      <div style="font-size:9px;font-weight:600;letter-spacing:0.04em;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ b.lbl }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="width:1px;background:#E2E8EE"></div>
+                <div style="display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:52px">
+                  <div style="font-size:9px;font-weight:700;color:#7A8A98;letter-spacing:0.04em;font-family:'IBM Plex Mono',monospace">{{ rrLbl }}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:14.5px;font-weight:600;color:#0891B2">{{ r.rrCur }}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C3AED">{{ r.rrPrev }}</div>
+                </div>
+              </div>
+            </sc-if>
+            <button onClick="{{ r.add }}" style="width:100%;min-height:36px;background:rgba(255,255,255,0.75);border:1px solid {{ r.bd }};border-radius:9px;color:{{ r.tx }};font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#FFFFFF">+ New entry</button>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hasRanf }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:20px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;margin-bottom:8px">Room air · not following</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ ranfRooms }}" as="c" hint-placeholder-count="0">
+              <button onClick="{{ c.open }}" style="display:flex;align-items:center;gap:7px;background:#EDF0F2;border:1px solid #C9D2D9;border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:600;color:#4A5560;cursor:pointer;min-height:38px" style-hover="background:#E3E8EC">
+                {{ c.label }} <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8895A0">{{ c.ago }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasEmpty }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:20px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;margin-bottom:8px">Empty rooms</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ emptyRooms }}" as="c" hint-placeholder-count="6">
+              <button onClick="{{ c.start }}" style="display:flex;align-items:center;gap:6px;background:#FFFFFF;border:1.5px dashed #C9D2D9;border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:600;color:#7A8A98;cursor:pointer;min-height:38px" style-hover="border-color:#0E7490;color:#0E7490">
+                {{ c.label }} <span style="font-size:11px;font-weight:500">· first entry</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isRoom }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Room detail" style="max-width:780px;margin:0 auto;padding:12px 14px 0">
+      <button onClick="{{ back }}" style="background:none;border:none;color:#0E7490;font-size:13px;font-weight:600;cursor:pointer;padding:8px 2px;margin-bottom:2px" style-hover="color:#155E75">← All rooms</button>
+      <div style="background:{{ rvBg }};border:1.5px solid {{ rvBd }};border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:20px;font-weight:700">{{ rvLabel }}</div>
+          <sc-if value="{{ rvHasLatest }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:#FFFFFF;background:{{ rvSolid }};border-radius:6px;padding:3px 8px;text-transform:uppercase">{{ rvModeLabel }}</div>
+            <div style="font-size:11px;font-weight:600;color:{{ rvTx }};border:1px solid {{ rvBd }};border-radius:6px;padding:2.5px 7px">SpO₂ {{ rvTarget }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6B7A">{{ rvAgo }}</div>
+          </sc-if>
+          <div style="flex:1"></div>
+          <button onClick="{{ rvAdd }}" style="min-height:40px;background:#0E7490;border:none;border-radius:10px;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">+ New entry</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <label style="flex:2;min-width:170px;display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">Patient name</span>
+            <input value="{{ rvName }}" onChange="{{ onName }}" placeholder="—" style="background:rgba(255,255,255,0.65);border:none;border-bottom:1.5px solid {{ rvBd }};padding:5px 8px;font-size:13px;font-weight:600;border-radius:7px 7px 0 0;min-height:34px;box-sizing:border-box;width:100%">
+          </label>
+          <label style="flex:1;min-width:110px;display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">MRN #</span>
+            <input value="{{ rvMrn }}" onChange="{{ onMrn }}" placeholder="—" style="background:rgba(255,255,255,0.65);border:none;border-bottom:1.5px solid {{ rvBd }};padding:5px 8px;font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace;border-radius:7px 7px 0 0;min-height:34px;box-sizing:border-box;width:100%">
+          </label>
+          <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-start">
+            <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">Compliance</span>
+            <div style="font-size:11.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:{{ rvCompTx }};background:{{ rvCompBg }};border:1px solid {{ rvCompBd }};border-radius:7px;padding:7px 10px">{{ rvComp }}</div>
+          </div>
+        </div>
+        <sc-if value="{{ rvHasHisto }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#FFFFFF;border-radius:12px;padding:10px 14px 8px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
+              <div style="font-size:10.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#7A8A98">Saturation histogram</div>
+              <div style="flex:1"></div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Latest</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Previous</div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:stretch">
+              <div style="flex:1;display:flex;gap:10px">
+                <sc-for list="{{ rvBins }}" as="b" hint-placeholder-count="3">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0">
+                    <div style="display:flex;gap:5px;align-items:baseline;font-family:'IBM Plex Mono',monospace">
+                      <span style="font-size:15px;font-weight:600;color:#0891B2">{{ b.aV }}</span>
+                      <span style="font-size:11.5px;color:#7C3AED">{{ b.pV }}</span>
+                    </div>
+                    <div style="position:relative;width:100%;height:84px;border-bottom:1.5px solid #D5DEE6">
+                      <div style="position:absolute;bottom:0;left:10%;width:80%;height:{{ b.pH }}%;background:#A78BFA;opacity:0.5;border-radius:3px 3px 0 0"></div>
+                      <div style="position:absolute;bottom:0;left:29%;width:42%;height:{{ b.aH }}%;background:#06B6D4;border-radius:3px 3px 0 0"></div>
+                    </div>
+                    <div style="font-size:10px;font-weight:600;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ b.lbl }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="width:1px;background:#E2E8EE"></div>
+              <div style="display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:60px">
+                <div style="font-size:10px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace">{{ rrLbl }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#0891B2">{{ rvRrCur }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#7C3AED">{{ rvRrPrev }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ rvIsEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px;color:#5A6B7A;padding:4px 2px">No entries yet — add the first one.</div>
+        </sc-if>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin:18px 2px 10px;flex-wrap:wrap">
+        <div style="font-size:13px;font-weight:700">Histogram log</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A98">{{ rvCount }} entries · newest first</div>
+        <div style="flex:1"></div>
+        <div style="font-size:10.5px;color:#7A8A98">Compliance = 3 log entries / 24 h</div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;overflow-x:auto">
+        <div style="min-width:990px">
+          <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 40px;border-bottom:1.5px solid #D5DEE6">
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Int hr</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm limits</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">MD notified</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% Left</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% Right</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% {{ rrLbl }}</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
+            <div></div>
+          </div>
+          <sc-for list="{{ rvEntries }}" as="e" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 40px;border-bottom:1px solid #EDF1F4;background:{{ e.rowBg }};box-shadow:inset 3px 0 0 {{ e.rowEdge }};align-items:center">
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4A5865">{{ e.date }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.time }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4A5865">{{ e.intv }}</div>
+              <div style="padding:8px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#1D2B36;min-width:0"><span style="width:8px;height:8px;border-radius:3px;background:{{ e.solid }};flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.support }}</span></div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ e.fio2 }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ e.alarm }}</div>
+              <div style="padding:8px;font-size:11.5px;font-weight:600;color:#4A5865">{{ e.md }}</div>
+              <div style="padding:8px;font-size:11.5px;color:#1D2B36;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.iv }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hb }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.hi2 }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.ha }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hrr }}</div>
+              <div style="padding:8px;font-size:11px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
+              <button onClick="{{ e.del }}" title="Delete entry" style="margin:4px;width:26px;height:26px;border-radius:7px;border:1px solid #E2E8EE;background:#FFFFFF;color:#94A3AF;font-size:13px;cursor:pointer;line-height:1" style-hover="color:#B42318;border-color:#E5B7B0">×</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ rvHasEntries }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ rvReset }}" style="margin-top:20px;min-height:42px;width:100%;background:#FFFFFF;border:1.5px solid #E5B7B0;border-radius:10px;color:#B42318;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#FBEEEC">Reset room — clear all data…</button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isReport }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="PDF report" style="max-width:1080px;margin:0 auto;padding:12px 14px 0">
+      <div data-noprint="1" style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+        <button onClick="{{ back }}" style="background:none;border:none;color:#0E7490;font-size:13px;font-weight:600;cursor:pointer;padding:8px 2px" style-hover="color:#155E75">← All rooms</button>
+        <div style="flex:1"></div>
+        <div style="font-size:11px;color:#7A8A98">Prints landscape — choose "Save as PDF" in the dialog</div>
+        <button onClick="{{ doPrint }}" style="min-height:40px;background:#0E7490;border:none;border-radius:10px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 18px" style-hover="background:#0B5C73">Print / Save PDF</button>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:16px 16px 12px">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <div style="font-size:18px;font-weight:700">NICU Respiratory Status — Unit Summary</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6B7A">{{ todayStr }}</div>
+          <div style="flex:1"></div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Latest</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Previous</div>
+        </div>
+        <div style="display:grid;grid-template-columns:66px minmax(150px,1.3fr) 64px 74px minmax(150px,1fr) minmax(150px,1fr) minmax(110px,0.9fr);border-bottom:1.5px solid #D5DEE6">
+          <div style="padding:7px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Room</div>
+          <div style="padding:7px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Support · settings</div>
+          <div style="padding:7px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂</div>
+          <div style="padding:7px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">SpO₂ tgt</div>
+          <div style="padding:7px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Latest B / In / A · {{ rrLbl }}</div>
+          <div style="padding:7px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Previous B / In / A · {{ rrLbl }}</div>
+          <div style="padding:7px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Last entry</div>
+        </div>
+        <sc-for list="{{ rptRooms }}" as="r" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:66px minmax(150px,1.3fr) 64px 74px minmax(150px,1fr) minmax(150px,1fr) minmax(110px,0.9fr);border-bottom:1px solid #EDF1F4;align-items:center;break-inside:avoid">
+            <div style="padding:6px 8px;font-size:11.5px;font-weight:700">{{ r.label }}</div>
+            <div style="padding:6px 8px;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;min-width:0"><span style="width:8px;height:8px;border-radius:3px;background:{{ r.solid }};flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.support }}</span></div>
+            <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ r.fio2 }}</div>
+            <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ r.tgt }}</div>
+            <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0891B2">{{ r.cur }}</div>
+            <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C3AED">{{ r.prv }}</div>
+            <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6B7A">{{ r.when }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-for list="{{ rptPages }}" as="p" hint-placeholder-count="2">
+        <div style="break-before:page;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:16px 16px 12px;margin-top:14px">
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+            <div style="font-size:17px;font-weight:700">{{ p.label }}</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#FFFFFF;background:{{ p.solid }};border-radius:6px;padding:2.5px 7px;text-transform:uppercase">{{ p.modeLabel }}</div>
+            <div style="font-size:11.5px;color:#4A5865">Patient: <span style="font-weight:600">{{ p.name }}</span> · MRN: <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ p.mrn }}</span></div>
+            <div style="flex:1"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ p.count }} entries · newest first</div>
+          </div>
+          <div style="display:grid;grid-template-columns:58px 48px 44px minmax(130px,1.2fr) 52px 60px 56px minmax(130px,1.4fr) 42px 42px 46px 56px 44px;border-bottom:1.5px solid #D5DEE6">
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Int hr</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">MD notif</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% L</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% R</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% {{ rrLbl }}</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
+          </div>
+          <sc-for list="{{ p.rows }}" as="e" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:58px 48px 44px minmax(130px,1.2fr) 52px 60px 56px minmax(130px,1.4fr) 42px 42px 46px 56px 44px;border-bottom:1px solid #EDF1F4;align-items:center;break-inside:avoid">
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.date }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.time }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.intv }}</div>
+              <div style="padding:5px 6px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;min-width:0"><span style="width:7px;height:7px;border-radius:2px;background:{{ e.solid }};flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.support }}</span></div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px">{{ e.fio2 }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px">{{ e.alarm }}</div>
+              <div style="padding:5px 6px;font-size:10.5px;font-weight:600;color:#4A5865">{{ e.md }}</div>
+              <div style="padding:5px 6px;font-size:10.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.iv }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hb }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hi2 }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.ha }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hrr }}</div>
+              <div style="padding:5px 6px;font-size:10.5px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ editorOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeEditor }}" style="position:fixed;inset:0;z-index:100;background:rgba(22,35,46,0.45);display:flex;align-items:center;justify-content:center;padding:12px">
+      <div data-screen-label="Entry editor" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(560px,100%);max-height:92vh;overflow-y:auto;border-radius:16px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:16px;font-weight:700">{{ eTitle }}</div>
+          <div style="flex:1"></div>
+          <button onClick="{{ closeEditor }}" style="width:34px;height:34px;border-radius:9px;border:1px solid #E2E8EE;background:#FFFFFF;color:#5A6B7A;font-size:17px;cursor:pointer;line-height:1">×</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <label style="flex:2;min-width:180px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</span>
+            <input type="datetime-local" value="{{ eTs }}" onChange="{{ onTs }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+          </label>
+          <label style="flex:1;min-width:110px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Initials (RT/RN/MD)</span>
+            <input value="{{ eInit }}" onChange="{{ onInit }}" maxLength="4" placeholder="e.g. JS" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;text-transform:uppercase;min-height:42px;box-sizing:border-box;width:100%">
+          </label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ modeChips }}" as="m" hint-placeholder-count="8">
+              <button onClick="{{ m.pick }}" style="padding:8px 12px;min-height:38px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.tx }};border:1.5px solid {{ m.bd }}">{{ m.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ hasFields }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Settings</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ eFields }}" as="f" hint-placeholder-count="0">
+                <label style="flex:1;min-width:96px;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:11px;font-weight:600;color:#5A6B7A">{{ f.label }}</span>
+                  <input type="number" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.on }}" placeholder="{{ f.ph }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+                </label>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showFio2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ range (%) — if above 21</div>
+            <div style="display:flex;gap:8px">
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Low</span>
+                <input type="number" inputMode="numeric" min="21" max="100" value="{{ eFLo }}" onChange="{{ onFLo }}" placeholder="21" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">High</span>
+                <input type="number" inputMode="numeric" min="21" max="100" value="{{ eFHi }}" onChange="{{ onFHi }}" placeholder="21" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showHisto }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Target SpO₂</div>
+            <div style="display:flex;gap:6px">
+              <sc-for list="{{ targetChips }}" as="t" hint-placeholder-count="3">
+                <button onClick="{{ t.pick }}" style="flex:1;padding:7px 4px;min-height:46px;border-radius:10px;cursor:pointer;background:{{ t.bg }};border:1.5px solid {{ t.bd }};color:{{ t.tx }}">
+                  <div style="font-size:11.5px;font-weight:700">{{ t.name }}</div>
+                  <div style="font-size:11px;font-family:'IBM Plex Mono',monospace">{{ t.range }}</div>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Saturation histogram (% of time)</div>
+            <div style="display:flex;gap:8px">
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Below <span style="font-family:'IBM Plex Mono',monospace">{{ hBsub }}</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ hBval }}" placeholder="{{ hBph }}" onChange="{{ hBon }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">In <span style="font-family:'IBM Plex Mono',monospace">{{ hIsub }}</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ hIval }}" placeholder="{{ hIph }}" onChange="{{ hIon }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Above <span style="font-family:'IBM Plex Mono',monospace">{{ hAsub }}</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ hAval }}" placeholder="{{ hAph }}" onChange="{{ hAon }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
+            <div style="font-size:11.5px;font-weight:600;color:{{ sumColor }}">{{ sumMsg }}</div>
+            <label style="display:flex;flex-direction:column;gap:4px;max-width:220px">
+              <span style="font-size:11px;font-weight:600;color:#5A6B7A">{{ rrFieldLabel }}</span>
+              <input type="number" inputMode="numeric" min="0" max="100" value="{{ eRr }}" onChange="{{ onRr }}" placeholder="0" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+            </label>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+          <div style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">MD notified?</span>
+            <div style="display:flex;gap:6px">
+              <button onClick="{{ mdNo }}" style="flex:1;min-height:42px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:700;background:{{ mdNoBg }};color:{{ mdNoTx }};border:1.5px solid {{ mdNoBd }}">No</button>
+              <button onClick="{{ mdYes }}" style="flex:1;min-height:42px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:700;background:{{ mdYesBg }};color:{{ mdYesTx }};border:1.5px solid {{ mdYesBd }}">Yes</button>
+            </div>
+          </div>
+          <label style="flex:2;min-width:200px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention / note</span>
+            <input value="{{ eIv }}" onChange="{{ onIv }}" placeholder="e.g. Wean to CPAP 4" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;min-height:42px;box-sizing:border-box;width:100%">
+          </label>
+        </div>
+        <sc-if value="{{ showRanfNote }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:#5A6B7A;background:#F3F5F7;border-radius:9px;padding:9px 11px;line-height:1.45">Room air, not following — no histogram is recorded and the room collapses to a small chip on the board.</div>
+        </sc-if>
+        <sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12.5px;font-weight:600;color:#B42318;background:#FBEEEC;border:1px solid #E5B7B0;border-radius:9px;padding:9px 11px">{{ errMsg }}</div>
+        </sc-if>
+        <div style="display:flex;gap:8px;margin-top:2px">
+          <button onClick="{{ closeEditor }}" style="flex:1;min-height:46px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:11px;color:#3D4C59;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
+          <button onClick="{{ saveEntry }}" style="flex:2;min-height:46px;background:#0E7490;border:none;border-radius:11px;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#0B5C73">Save entry</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelConfirm }}" style="position:fixed;inset:0;z-index:120;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Confirm dialog" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(380px,100%);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
+        <div style="font-size:15.5px;font-weight:700">{{ cTitle }}</div>
+        <div style="font-size:13px;color:#4A5865;line-height:1.5">{{ cMsg }}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button onClick="{{ cancelConfirm }}" style="flex:1;min-height:44px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
+          <button onClick="{{ doConfirm }}" style="flex:1;min-height:44px;background:#B42318;border:none;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#9A1E14">{{ cBtn }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;roomCount&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 20, &quot;min&quot;: 4, &quot;max&quot;: 40, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Unit&quot;}, &quot;unitPrefix&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;ICN&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Unit&quot;}, &quot;rrThreshold&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 70, &quot;min&quot;: 40, &quot;max&quot;: 100, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Clinical&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.KEY = 'nicu_resp_v1';
+    let data = { rooms: {} };
+    try { const raw = localStorage.getItem(this.KEY); if (raw) { const p = JSON.parse(raw); if (p && p.rooms) data = p; } } catch (e) {}
+    let li = ''; try { li = localStorage.getItem('nicu_resp_initials') || ''; } catch (e) {}
+    this.lastInit = li;
+    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '' };
+    this.API = '/api/data'; this.remote = false; this.lastWrite = 0;
+    this.onStorage = (ev) => {
+      if (ev.key === this.KEY && ev.newValue) { try { const p = JSON.parse(ev.newValue); if (p && p.rooms) this.setState({ data: p }); } catch (e) {} }
+    };
+  }
+  componentDidMount() {
+    window.addEventListener('storage', this.onStorage);
+    fetch(this.API).then(r => (r.ok ? r.json() : Promise.reject())).then(j => {
+      this.remote = true;
+      this.setState(j && j.rooms ? { data: j, sync: 'live' } : { sync: 'live' });
+      this.pollId = setInterval(() => {
+        if (Date.now() - this.lastWrite < 4000) return;
+        fetch(this.API).then(r => (r.ok ? r.json() : null)).then(j2 => {
+          if (j2 && j2.rooms && JSON.stringify(j2) !== JSON.stringify(this.state.data)) this.setState({ data: j2 });
+        }).catch(() => {});
+      }, 5000);
+    }).catch(() => this.setState({ sync: 'local' }));
+  }
+  componentWillUnmount() { window.removeEventListener('storage', this.onStorage); if (this.pollId) clearInterval(this.pollId); }
+
+  modes() {
+    return {
+      HFOV: { label: 'HFOV', bg: '#F1E7FB', bd: '#B583E3', tx: '#6B21A8', solid: '#8A46CF', fields: [['map','MAP cmH₂O','12'],['amp','Amplitude ΔP','28'],['hz','Frequency Hz','8']] },
+      SIMV: { label: 'SIMV', bg: '#FBE8E8', bd: '#E08585', tx: '#A32222', solid: '#D14848', fields: [['rate','Rate /min','40'],['pip','PIP cmH₂O','18'],['peep','PEEP cmH₂O','6']] },
+      NAVA: { label: 'NIV NAVA', bg: '#FCF0E2', bd: '#E0A268', tx: '#98510F', solid: '#E07C26', fields: [['level','NAVA level','1.5'],['peep','PEEP cmH₂O','6']] },
+      CPAP: { label: 'CPAP', bg: '#FCF0E2', bd: '#E0A268', tx: '#98510F', solid: '#E07C26', fields: [['press','Pressure cmH₂O (4–8)','6']] },
+      HFNC: { label: 'HFNC', bg: '#FAF4D9', bd: '#CFB64A', tx: '#7A600A', solid: '#BFA10E', fields: [['flow','Flow L/min (2–6)','4']] },
+      NC:   { label: 'NC', bg: '#E3F1FA', bd: '#6FB2DE', tx: '#0B5E88', solid: '#3E97CE', fields: [['flow','Flow L/min (0.125–2)','0.5']] },
+      RA:   { label: 'Room air', bg: '#E6F5EA', bd: '#6BC488', tx: '#136B31', solid: '#33A35C', fields: [] },
+      RANF: { label: 'RA · not following', bg: '#EDF0F2', bd: '#BFC9D0', tx: '#4A5560', solid: '#8895A0', fields: [] }
+    };
+  }
+  targets() { return { std: { name: 'Standard', lo: 90, hi: 95 }, bpd: { name: 'BPD', lo: 94, hi: 98 }, pphn: { name: 'PPHN', lo: 92, hi: 97 } }; }
+  rrT() { return this.props.rrThreshold ?? 70; }
+  prefix() { return this.props.unitPrefix ?? 'ICN'; }
+  count() { return Math.max(1, Math.min(60, this.props.roomCount ?? 20)); }
+
+  applyOp(d, op) {
+    const k = String(op.room); d.rooms = d.rooms || {}; d.meta = d.meta || {};
+    if (op.op === 'add') { d.rooms[k] = d.rooms[k] || []; d.rooms[k].push(op.entry); }
+    else if (op.op === 'del') { d.rooms[k] = (d.rooms[k] || []).filter(e => e.id !== op.id); if (!d.rooms[k].length) delete d.rooms[k]; }
+    else if (op.op === 'reset') { delete d.rooms[k]; delete d.meta[k]; }
+    else if (op.op === 'meta') { d.meta[k] = { ...(d.meta[k] || {}), ...op.patch }; }
+  }
+  sendOp(op) {
+    this.setState(s => {
+      const d = JSON.parse(JSON.stringify(s.data)); this.applyOp(d, op);
+      if (!this.remote) { try { localStorage.setItem(this.KEY, JSON.stringify(d)); } catch (e) {} }
+      return { data: d };
+    });
+    if (this.remote) {
+      this.lastWrite = Date.now();
+      fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(op) })
+        .then(r => (r.ok ? r.json() : null)).then(j => { if (j && j.rooms) this.setState({ data: j }); }).catch(() => {});
+    }
+  }
+  entriesOf(n) { return (this.state.data.rooms[String(n)] || []).slice().sort((a, b) => (a.ts < b.ts ? 1 : -1)); }
+  pad(n) { return String(n).padStart(2, '0'); }
+  nowLocal() { const d = new Date(); return `${d.getFullYear()}-${this.pad(d.getMonth()+1)}-${this.pad(d.getDate())}T${this.pad(d.getHours())}:${this.pad(d.getMinutes())}`; }
+  isoFromLocal(v) { const d = v ? new Date(v) : new Date(); return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString(); }
+  toLocalInput(iso) { const d = new Date(iso); return `${d.getFullYear()}-${this.pad(d.getMonth()+1)}-${this.pad(d.getDate())}T${this.pad(d.getHours())}:${this.pad(d.getMinutes())}`; }
+  mos() { return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; }
+  fmtTime(iso) { const d = new Date(iso); return `${this.pad(d.getHours())}:${this.pad(d.getMinutes())}`; }
+  fmtDate(iso) { const d = new Date(iso); return `${this.mos()[d.getMonth()]} ${d.getDate()}`; }
+  fmtWhen(iso) { const d = new Date(iso), now = new Date(); const sameDay = d.toDateString() === now.toDateString(); return sameDay ? this.fmtTime(iso) : `${this.fmtDate(iso)} ${this.fmtTime(iso)}`; }
+  ago(iso) { const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); if (m < 60) return m + 'm ago'; const h = Math.floor(m / 60); if (h < 48) return h + 'h ago'; return Math.floor(h / 24) + 'd ago'; }
+  concise(e) {
+    const s = e.s || {}, v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : '–');
+    let parts = [];
+    if (e.mode === 'HFOV') parts = [`MAP ${v('map')}`, `Δ${v('amp')}`, `${v('hz')} Hz`];
+    else if (e.mode === 'SIMV') parts = [`R ${v('rate')}`, `PIP ${v('pip')}`, `PEEP ${v('peep')}`];
+    else if (e.mode === 'NAVA') parts = [`Lvl ${v('level')}`, `PEEP ${v('peep')}`];
+    else if (e.mode === 'CPAP') parts = [`${v('press')} cmH₂O`];
+    else if (e.mode === 'HFNC' || e.mode === 'NC') parts = [`${v('flow')} L`];
+    else if (e.mode === 'RA') parts = ['Room air'];
+    else if (e.mode === 'RANF') parts = ['Not following'];
+    if (e.f) parts.push(e.f[0] === e.f[1] ? `FiO₂ ${e.f[0]}%` : `FiO₂ ${e.f[0]}–${e.f[1]}%`);
+    return parts.join(' · ');
+  }
+  modeShort(e) {
+    const s = e.s || {}, v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : '–');
+    if (e.mode === 'HFOV') return `HFOV ${v('map')}/Δ${v('amp')}/${v('hz')}`;
+    if (e.mode === 'SIMV') return `SIMV ${v('rate')} · ${v('pip')}/${v('peep')}`;
+    if (e.mode === 'NAVA') return `NAVA ${v('level')}/${v('peep')}`;
+    if (e.mode === 'CPAP') return `CPAP ${v('press')}`;
+    if (e.mode === 'HFNC') return `HFNC ${v('flow')}`;
+    if (e.mode === 'NC') return `NC ${v('flow')}`;
+    if (e.mode === 'RANF') return 'RA · not following';
+    return 'Room air';
+  }
+  entryRow(e, older) {
+    const MODES = this.modes(), TG = this.targets();
+    const EM = MODES[e.mode] || MODES.RA, ET = TG[e.target] || TG.std;
+    const hrs = older ? (new Date(e.ts).getTime() - new Date(older.ts).getTime()) / 3600000 : null;
+    return {
+      date: this.fmtDate(e.ts), time: this.fmtTime(e.ts),
+      intv: hrs == null ? '—' : (hrs >= 9.5 ? String(Math.round(hrs)) : String(Math.round(hrs * 10) / 10)),
+      support: this.modeShort(e), solid: EM.solid,
+      fio2: e.f ? (e.f[0] === e.f[1] ? String(e.f[0]) : `${e.f[0]}–${e.f[1]}`) : '21',
+      alarm: e.mode === 'RANF' ? '—' : `${ET.lo}–${ET.hi}`,
+      md: e.md === true ? 'Yes' : (e.md === false ? 'No' : '—'),
+      iv: e.iv ? e.iv : '—',
+      hb: e.h ? String(e.h[0]) : '—', hi2: e.h ? String(e.h[1]) : '—', ha: e.h ? String(e.h[2]) : '—',
+      hrr: e.rr != null ? String(e.rr) : '—',
+      init: e.init || '—'
+    };
+  }
+  binsFor(latest, prev) {
+    if (!latest || !latest.h) return null;
+    const T = this.targets()[latest.target] || this.targets().std;
+    const lbls = [`<${T.lo}`, `${T.lo}–${T.hi}`, `>${T.hi}`];
+    const ph = prev && prev.h ? prev.h : null;
+    return latest.h.map((val, ix) => ({
+      lbl: lbls[ix], aV: String(val), aH: Math.max(2, Math.min(100, val)),
+      pV: ph ? String(ph[ix]) : '', pH: ph ? Math.max(2, Math.min(100, ph[ix])) : 0
+    }));
+  }
+  openRoom(n) { this.setState({ view: { t: 'room', r: n } }); window.scrollTo(0, 0); }
+  openEditor(n) {
+    const last = this.entriesOf(n)[0];
+    this.setState({
+      err: '',
+      form: {
+        room: n, ts: this.nowLocal(), init: this.lastInit,
+        mode: last ? last.mode : null, s: last && last.s ? { ...last.s } : {},
+        fLo: last && last.f ? String(last.f[0]) : '', fHi: last && last.f ? String(last.f[1]) : '',
+        target: last ? last.target : 'std', b: '', i: '', a: '', rr: '', md: false, iv: ''
+      }
+    });
+  }
+  uf(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, [k]: val } })); }; }
+  us(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, s: { ...s.form.s, [k]: val } } })); }; }
+  resolveHisto(f) {
+    const num = x => (x === '' || x === null || x === undefined ? null : Number(x));
+    let b = num(f.b), i = num(f.i), a = num(f.a);
+    const blanks = [b, i, a].filter(x => x === null).length;
+    let auto = null;
+    if (blanks === 1) {
+      const fill = 100 - ((b ?? 0) + (i ?? 0) + (a ?? 0));
+      if (b === null) { b = fill; auto = 'b'; } else if (i === null) { i = fill; auto = 'i'; } else { a = fill; auto = 'a'; }
+    }
+    return { b, i, a, blanks, auto };
+  }
+  saveEntry() {
+    const f = this.state.form; if (!f) return;
+    const err = m => this.setState({ err: m });
+    if (!f.mode) return err('Pick a respiratory support mode.');
+    let h = null, rr = null;
+    if (f.mode !== 'RANF') {
+      const r = this.resolveHisto(f);
+      if (r.blanks > 1) return err('Enter at least two of the three histogram values — the third auto-fills.');
+      const bad = [r.b, r.i, r.a].some(x => x === null || isNaN(x) || x < 0 || x > 100);
+      if (bad || r.b + r.i + r.a !== 100) return err('Histogram values must be 0–100 and total exactly 100%.');
+      rr = f.rr === '' ? null : Number(f.rr);
+      if (rr === null || isNaN(rr) || rr < 0 || rr > 100) return err(`Enter tachypnea % (time with RR>${this.rrT()}), 0–100.`);
+      h = [r.b, r.i, r.a];
+    }
+    let fio = null;
+    if (f.mode !== 'RA' && f.mode !== 'RANF') {
+      const lo = f.fLo === '' ? null : Number(f.fLo), hi = f.fHi === '' ? null : Number(f.fHi);
+      if (lo !== null || hi !== null) {
+        const L = lo ?? hi, H = hi ?? lo;
+        if (isNaN(L) || isNaN(H) || L < 21 || H > 100 || L > H) return err('FiO₂ range must be 21–100 with low ≤ high.');
+        fio = [L, H];
+      }
+    }
+    const init = (f.init || '').trim().toUpperCase().slice(0, 4);
+    const entry = { id: Date.now() + '' + Math.floor(Math.random() * 1000), ts: this.isoFromLocal(f.ts), init, mode: f.mode, s: { ...f.s }, f: fio, target: f.target, h, rr, md: !!f.md, iv: (f.iv || '').trim() };
+    this.sendOp({ op: 'add', room: f.room, entry });
+    if (init) { this.lastInit = init; try { localStorage.setItem('nicu_resp_initials', init); } catch (e) {} }
+    this.setState({ form: null, err: '' });
+  }
+  doConfirm() {
+    const c = this.state.confirm; if (!c) return;
+    if (c.type === 'reset') { this.sendOp({ op: 'reset', room: c.room }); this.setState({ confirm: null, view: { t: 'grid' } }); return; }
+    if (c.type === 'del') { this.sendOp({ op: 'del', room: c.room, id: c.id }); }
+    this.setState({ confirm: null });
+  }
+
+  renderVals() {
+    const MODES = this.modes(), TG = this.targets(), pfx = this.prefix(), N = this.count(), rrLbl = 'RR>' + this.rrT();
+    const view = this.state.view, f = this.state.form;
+    const now = new Date();
+    const todayStr = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][now.getDay()]} · ${this.mos()[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+    const live = [], ranf = [], empty = [], counts = {};
+    for (let n = N; n >= 1; n--) {
+      const es = this.entriesOf(n), latest = es[0];
+      const label = `${pfx}-${n}`;
+      if (!latest) { empty.push({ label, start: () => this.openEditor(n) }); continue; }
+      counts[latest.mode] = (counts[latest.mode] || 0) + 1;
+      if (latest.mode === 'RANF') { ranf.push({ label, ago: this.ago(latest.ts), open: () => this.openRoom(n) }); continue; }
+      const prev = es[1] || null, M = MODES[latest.mode] || MODES.RA, T = TG[latest.target] || TG.std;
+      const bins = this.binsFor(latest, prev);
+      live.push({
+        label, bg: M.bg, bd: M.bd, tx: M.tx, solid: M.solid, modeLabel: M.label,
+        targetRange: `${T.lo}–${T.hi}%`, ago: this.ago(latest.ts),
+        curSet: this.concise(latest), curMeta: `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}`,
+        hasPrev: !!prev, prevSet: prev ? this.concise(prev) : '', prevMeta: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '',
+        hasHisto: !!bins, bins: bins || [],
+        rrCur: latest.rr != null ? latest.rr + '%' : '–', rrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
+        open: () => this.openRoom(n), add: ev => { ev.stopPropagation(); this.openEditor(n); }
+      });
+    }
+    const order = ['HFOV','SIMV','NAVA','CPAP','HFNC','NC','RA','RANF'];
+    const legend = order.filter(k => counts[k]).map(k => ({ label: k === 'RANF' ? 'RA·NF' : (k === 'NAVA' ? 'NAVA' : MODES[k].label), color: MODES[k].solid, count: counts[k] }));
+    if (empty.length) legend.push({ label: 'Empty', color: '#C9D2D9', count: empty.length });
+
+    // room detail
+    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvBins: [], rvRrCur: '', rvRrPrev: '', rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9' };
+    if (view.t === 'room') {
+      const n = view.r, es = this.entriesOf(n), latest = es[0] || null, prev = es[1] || null;
+      const M = latest ? (MODES[latest.mode] || MODES.RA) : null;
+      const T = latest ? (TG[latest.target] || TG.std) : TG.std;
+      const bins = this.binsFor(latest, prev);
+      const meta = (this.state.data.meta || {})[String(n)] || {};
+      const c24 = es.filter(e => Date.now() - new Date(e.ts).getTime() <= 24 * 3600000).length;
+      rv = {
+        rvLabel: `${pfx}-${n}`,
+        rvBg: M ? M.bg : '#FFFFFF', rvBd: M ? M.bd : '#E2E8EE', rvTx: M ? M.tx : '#3D4C59', rvSolid: M ? M.solid : '#8895A0',
+        rvModeLabel: M ? M.label : '', rvTarget: latest && latest.mode !== 'RANF' ? `${T.lo}–${T.hi}%` : '—',
+        rvAgo: latest ? this.ago(latest.ts) : '', rvHasLatest: !!latest,
+        rvHasHisto: !!bins, rvBins: bins || [],
+        rvRrCur: latest && latest.rr != null ? latest.rr + '%' : '–', rvRrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
+        rvCount: es.length, rvIsEmpty: !es.length, rvHasEntries: !!es.length,
+        rvEntries: es.map((e, ix) => ({
+          ...this.entryRow(e, es[ix + 1]),
+          rowBg: ix === 0 ? '#F0FAFC' : (ix === 1 ? '#F6F3FD' : '#FFFFFF'),
+          rowEdge: ix === 0 ? '#06B6D4' : (ix === 1 ? '#A78BFA' : '#E2E8EE'),
+          del: () => this.setState({ confirm: { type: 'del', room: n, id: e.id, when: this.fmtWhen(e.ts) } })
+        })),
+        rvAdd: () => this.openEditor(n),
+        rvReset: () => this.setState({ confirm: { type: 'reset', room: n } }),
+        rvName: meta.name || '', rvMrn: meta.mrn || '',
+        onName: ev => this.sendOp({ op: 'meta', room: n, patch: { name: ev.target.value } }),
+        onMrn: ev => this.sendOp({ op: 'meta', room: n, patch: { mrn: ev.target.value } }),
+        rvComp: `${c24}/3 in 24 h`,
+        rvCompBg: c24 >= 3 ? '#E6F5EA' : '#FCF0E2', rvCompTx: c24 >= 3 ? '#136B31' : '#98510F', rvCompBd: c24 >= 3 ? '#6BC488' : '#E0A268'
+      };
+    }
+
+    // editor
+    const eo = !!f;
+    let ed = { eTitle: '', eTs: '', eInit: '', modeChips: [], hasFields: false, eFields: [], showFio2: false, eFLo: '', eFHi: '', showHisto: false, targetChips: [], hBval: '', hBph: '', hIval: '', hIph: '', hAval: '', hAph: '', hBsub: '', hIsub: '', hAsub: '', sumMsg: '', sumColor: '#7A8A98', eRr: '', showRanfNote: false, eIv: '', mdNo: () => {}, mdYes: () => {}, mdNoBg: '#FFFFFF', mdNoTx: '#3D4C59', mdNoBd: '#C9D2D9', mdYesBg: '#FFFFFF', mdYesTx: '#3D4C59', mdYesBd: '#C9D2D9' };
+    if (eo) {
+      const T = TG[f.target] || TG.std;
+      const r = this.resolveHisto(f);
+      let sumMsg = 'Enter any two — the third fills in automatically.', sumColor = '#7A8A98';
+      if (r.blanks === 0) { const s = r.b + r.i + r.a; if (s === 100) { sumMsg = 'Σ = 100 ✓'; sumColor = '#1B7A3D'; } else { sumMsg = `Σ = ${s} — must equal 100`; sumColor = '#B42318'; } }
+      else if (r.blanks === 1) { const okAuto = r.b >= 0 && r.i >= 0 && r.a >= 0; sumMsg = okAuto ? `Σ = 100 ✓ (auto-filled ${r.auto === 'b' ? 'Below' : r.auto === 'i' ? 'In' : 'Above'})` : 'Values exceed 100%'; sumColor = okAuto ? '#1B7A3D' : '#B42318'; }
+      ed = {
+        eTitle: `New entry — ${pfx}-${f.room}`,
+        eTs: f.ts, eInit: f.init,
+        modeChips: Object.keys(MODES).map(k => {
+          const m = MODES[k], on = f.mode === k;
+          return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: k } })) };
+        }),
+        hasFields: !!f.mode && MODES[f.mode].fields.length > 0,
+        eFields: f.mode ? MODES[f.mode].fields.map(([k, label, ph]) => ({ label, ph, val: f.s[k] ?? '', on: this.us(k) })) : [],
+        showFio2: !!f.mode && f.mode !== 'RA' && f.mode !== 'RANF',
+        eFLo: f.fLo, eFHi: f.fHi,
+        showHisto: !!f.mode && f.mode !== 'RANF',
+        targetChips: Object.keys(TG).map(k => {
+          const t = TG[k], on = f.target === k;
+          return { name: t.name, range: `${t.lo}–${t.hi}%`, bg: on ? '#0E7490' : '#FFFFFF', tx: on ? '#FFFFFF' : '#3D4C59', bd: on ? '#0E7490' : '#C9D2D9', pick: () => this.setState(s => ({ form: { ...s.form, target: k } })) };
+        }),
+        hBval: f.b, hIval: f.i, hAval: f.a,
+        hBph: r.auto === 'b' && r.b >= 0 ? String(r.b) : '', hIph: r.auto === 'i' && r.i >= 0 ? String(r.i) : '', hAph: r.auto === 'a' && r.a >= 0 ? String(r.a) : '',
+        hBsub: `<${T.lo}%`, hIsub: `${T.lo}–${T.hi}%`, hAsub: `>${T.hi}%`,
+        sumMsg, sumColor, eRr: f.rr,
+        showRanfNote: f.mode === 'RANF',
+        eIv: f.iv || '',
+        mdNo: () => this.setState(s2 => ({ form: { ...s2.form, md: false } })),
+        mdYes: () => this.setState(s2 => ({ form: { ...s2.form, md: true } })),
+        mdNoBg: !f.md ? '#3D4C59' : '#FFFFFF', mdNoTx: !f.md ? '#FFFFFF' : '#3D4C59', mdNoBd: !f.md ? '#3D4C59' : '#C9D2D9',
+        mdYesBg: f.md ? '#0E7490' : '#FFFFFF', mdYesTx: f.md ? '#FFFFFF' : '#3D4C59', mdYesBd: f.md ? '#0E7490' : '#C9D2D9'
+      };
+    }
+
+    // PDF report
+    const rptRooms = [], rptPages = [];
+    if (view.t === 'report') {
+      for (let n = N; n >= 1; n--) {
+        const es = this.entriesOf(n); if (!es.length) continue;
+        const latest = es[0], prev = es[1] || null, M = MODES[latest.mode] || MODES.RA, T = TG[latest.target] || TG.std;
+        rptRooms.push({
+          label: `${pfx}-${n}`, solid: M.solid, support: this.modeShort(latest),
+          fio2: latest.f ? (latest.f[0] === latest.f[1] ? latest.f[0] + '%' : `${latest.f[0]}–${latest.f[1]}%`) : '21%',
+          tgt: latest.mode === 'RANF' ? '—' : `${T.lo}–${T.hi}%`,
+          cur: latest.h ? `${latest.h[0]} / ${latest.h[1]} / ${latest.h[2]} · ${latest.rr != null ? latest.rr : '–'}%` : '—',
+          prv: prev && prev.h ? `${prev.h[0]} / ${prev.h[1]} / ${prev.h[2]} · ${prev.rr != null ? prev.rr : '–'}%` : '—',
+          when: this.fmtWhen(latest.ts) + (latest.init ? ' · ' + latest.init : '')
+        });
+        const meta = (this.state.data.meta || {})[String(n)] || {};
+        rptPages.push({
+          label: `${pfx}-${n}`, solid: M.solid, modeLabel: M.label,
+          name: meta.name || '—', mrn: meta.mrn || '—', count: es.length,
+          rows: es.map((e, ix) => this.entryRow(e, es[ix + 1]))
+        });
+      }
+    }
+
+    const c = this.state.confirm;
+    return {
+      isReport: view.t === 'report', rptRooms, rptPages,
+      openReport: () => { this.setState({ view: { t: 'report' } }); window.scrollTo(0, 0); },
+      doPrint: () => window.print(),
+      todayStr, legend, rrLbl,
+      showSync: !!this.state.sync,
+      syncLabel: this.state.sync === 'live' ? 'Shared · live' : 'This device only',
+      syncDot: this.state.sync === 'live' ? '#33A35C' : '#BFA10E',
+      introNote: this.state.sync === 'live' ? 'Entries are shared live with everyone using this site.' : 'Data saves in this browser.',
+      isGrid: view.t === 'grid', isRoom: view.t === 'room',
+      showIntro: view.t === 'grid' && !live.length && !ranf.length,
+      liveRooms: live, hasRanf: ranf.length > 0, ranfRooms: ranf, hasEmpty: empty.length > 0, emptyRooms: empty,
+      back: () => { this.setState({ view: { t: 'grid' } }); window.scrollTo(0, 0); },
+      ...rv,
+      editorOpen: eo, ...ed,
+      onTs: this.uf('ts'), onInit: this.uf('init'), onFLo: this.uf('fLo'), onFHi: this.uf('fHi'),
+      hBon: this.uf('b'), hIon: this.uf('i'), hAon: this.uf('a'), onRr: this.uf('rr'), onIv: this.uf('iv'),
+      rrFieldLabel: `Tachypnea — % time RR>${this.rrT()}`,
+      hasErr: !!this.state.err, errMsg: this.state.err,
+      saveEntry: () => this.saveEntry(),
+      closeEditor: () => this.setState({ form: null, err: '' }),
+      swallow: ev => ev.stopPropagation(),
+      confirmOpen: !!c,
+      cTitle: c ? (c.type === 'reset' ? `Reset ${pfx}-${c.room}?` : 'Delete this entry?') : '',
+      cMsg: c ? (c.type === 'reset' ? 'This permanently clears every entry for this room. This cannot be undone.' : `The entry from ${c.when || ''} will be permanently deleted.`) : '',
+      cBtn: c ? (c.type === 'reset' ? 'Yes, clear room' : 'Delete') : '',
+      doConfirm: () => this.doConfirm(),
+      cancelConfirm: () => this.setState({ confirm: null })
+    };
+  }
+}
+</script>
+</body>
+</html>
