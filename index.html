@@ -250,7 +250,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C3AED;white-space:nowrap">{{ rvHCmpTxt }}</span>
                 </div>
               </sc-if>
-              <div style="font-size:9.5px;color:#7A8A98;font-family:'IBM Plex Mono',monospace;padding-left:84px">red = below · green = in target · blue = above</div>
+              <div style="font-size:9.5px;color:#7A8A98;font-family:'IBM Plex Mono',monospace;padding-left:84px">blue = below (hypoxia) · green = in target · red = above (hyperoxia)</div>
             </div>
           </div>
         </sc-if>
@@ -851,7 +851,7 @@ class Component extends DCLogic {
   segs(e) {
     if (!e || !e.h) return null;
     const t = v => Math.max(0, Math.min(100, v));
-    return [{ w: t(e.h[0]) + '%', bg: '#D14848' }, { w: t(e.h[1]) + '%', bg: '#33A35C' }, { w: t(e.h[2]) + '%', bg: '#3E97CE' }];
+    return [{ w: t(e.h[0]) + '%', bg: '#3E97CE' }, { w: t(e.h[1]) + '%', bg: '#33A35C' }, { w: t(e.h[2]) + '%', bg: '#D14848' }];
   }
 
   applyOp(d, op) {
