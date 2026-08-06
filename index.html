@@ -26,7 +26,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   <div data-noprint="1" style="position:sticky;top:0;z-index:40;background:rgba(255,255,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #E2E8EE">
     <div style="max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
-        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">San Leandro NICU Histogram Tracking Digital Binder</div>
+        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">NICU Histogram Tracking Digital Binder</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ todayStr }}</div>
         <sc-if value="{{ showSync }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:2.5px 8px 2.5px 6px;letter-spacing:0.03em">
@@ -43,6 +43,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         </sc-for>
         <button onClick="{{ exportJson }}" title="Download a JSON backup of all data" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Backup</button>
         <button onClick="{{ importJson }}" title="Restore from a JSON backup" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Import</button>
+        <button onClick="{{ openArchive }}" title="Archived room bundles" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ arLabel }}</button>
         <button onClick="{{ openSnapshot }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#EAF4F7">Current NICU Snapshot Report</button>
         <button onClick="{{ openReport }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#0B5C73">Complete Histogram Log Report</button>
       </div>
@@ -83,9 +84,12 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                 </div>
               </sc-if>
             </div>
+            <sc-if value="{{ r.isSprint }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11px;font-weight:600;color:{{ r.tx }};background:rgba(255,255,255,0.6);border-radius:7px;padding:4px 8px">{{ r.sprintLine }}</div>
+            </sc-if>
             <sc-if value="{{ r.hasHisto }}" hint-placeholder-val="{{ true }}">
               <div style="background:#FFFFFF;border-radius:10px;padding:8px 10px 6px">
-                <div style="display:grid;grid-template-columns:34px repeat(4,1fr);column-gap:4px;align-items:end">
+                <div style="display:grid;grid-template-columns:{{ r.gridCols }};column-gap:4px;align-items:end">
                   <div></div>
                   <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
                     <div style="display:flex;gap:3px;align-items:flex-end;height:44px;justify-content:center">
@@ -94,7 +98,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                     </div>
                   </sc-for>
                 </div>
-                <div style="display:grid;grid-template-columns:34px repeat(4,1fr);column-gap:4px;border-top:1.5px solid #D5DEE6;padding-top:3px;align-items:center">
+                <div style="display:grid;grid-template-columns:{{ r.gridCols }};column-gap:4px;border-top:1.5px solid #D5DEE6;padding-top:3px;align-items:center">
                   <div></div>
                   <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
                     <div style="text-align:center;font-size:9px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.lbl }}</div>
@@ -111,6 +115,9 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                   </sc-if>
                 </div>
               </div>
+            </sc-if>
+            <sc-if value="{{ r.hasPrevTgtNote }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:10px;font-weight:600;color:#98510F;background:#FCF0E2;border-radius:6px;padding:3px 7px">{{ r.prevTgtNote }}</div>
             </sc-if>
             <button onClick="{{ r.add }}" style="width:100%;min-height:36px;background:rgba(255,255,255,0.75);border:1px solid {{ r.bd }};border-radius:9px;color:{{ r.tx }};font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#FFFFFF">+ New entry</button>
           </div>
@@ -144,7 +151,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   </sc-if>
 
   <sc-if value="{{ isRoom }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="Room detail" style="max-width:780px;margin:0 auto;padding:12px 14px 0">
+    <div data-screen-label="Room detail" style="max-width:820px;margin:0 auto;padding:12px 14px 0">
       <button onClick="{{ back }}" style="background:none;border:none;color:#0E7490;font-size:13px;font-weight:600;cursor:pointer;padding:8px 2px;margin-bottom:2px" style-hover="color:#155E75">← All rooms</button>
       <div style="background:{{ rvBg }};border:1.5px solid {{ rvBd }};border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -172,15 +179,36 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="font-size:11.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:{{ rvCompTx }};background:{{ rvCompBg }};border:1px solid {{ rvCompBd }};border-radius:7px;padding:7px 10px">{{ rvComp }}</div>
           </div>
         </div>
+        <sc-if value="{{ rvIsSprint }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;font-weight:600;color:{{ rvTx }};background:rgba(255,255,255,0.6);border-radius:8px;padding:6px 10px">{{ rvSprintLine }}</div>
+        </sc-if>
         <sc-if value="{{ rvHasHisto }}" hint-placeholder-val="{{ true }}">
-          <div style="background:#FFFFFF;border-radius:12px;padding:10px 14px 8px">
+          <div style="background:#FFFFFF;border-radius:12px;padding:10px 14px 10px">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
               <div style="font-size:10.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#7A8A98">Saturation histogram</div>
               <div style="flex:1"></div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Current — {{ rvCurLeg }}</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Previous — {{ rvPrevLeg }}</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Newer — {{ rvCurLeg }}</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Older — {{ rvPrevLeg }}</div>
             </div>
-            <div style="display:grid;grid-template-columns:42px repeat(4,1fr);column-gap:6px;align-items:end">
+            <sc-if value="{{ rvHasCmpTgtNote }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11px;font-weight:600;color:#98510F;background:#FCF0E2;border:1px solid #EBDDC3;border-radius:8px;padding:5px 9px;margin:2px 0 8px">{{ rvCmpTgtNote }}</div>
+            </sc-if>
+            <sc-if value="{{ rvHasScrub }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:4px;margin:2px 0 8px;background:#F6F9FE;border:1px solid #DCE6F2;border-radius:9px;padding:7px 10px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:56px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;color:#0891B2;white-space:nowrap">NEWER</span>
+                  <input type="range" min="0" max="{{ scrubMax }}" step="1" value="{{ scrubPosA }}" onChange="{{ onScrubA }}" style="flex:1;accent-color:#06B6D4;min-height:22px;margin:0">
+                  <span style="width:88px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0891B2;white-space:nowrap">{{ rvAWhen }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:56px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;color:#7C3AED;white-space:nowrap">OLDER</span>
+                  <input type="range" min="0" max="{{ scrubMax }}" step="1" value="{{ scrubPosP }}" onChange="{{ onScrubP }}" style="flex:1;accent-color:#7C3AED;min-height:22px;margin:0">
+                  <span style="width:88px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#7C3AED;white-space:nowrap">{{ rvCmpWhen }}</span>
+                </div>
+                <div style="font-size:9.5px;color:#7A8A98">Drag either slider (left = older) or click log rows below to pick the two compared entries.</div>
+              </div>
+            </sc-if>
+            <div style="display:grid;grid-template-columns:{{ rvGridCols }};column-gap:6px;align-items:end">
               <div></div>
               <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                 <div style="display:flex;gap:4px;align-items:flex-end;height:72px;justify-content:center">
@@ -189,21 +217,40 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                 </div>
               </sc-for>
             </div>
-            <div style="display:grid;grid-template-columns:42px repeat(4,1fr);column-gap:6px;border-top:1.5px solid #D5DEE6;padding-top:4px;align-items:center;row-gap:2px">
+            <div style="display:grid;grid-template-columns:{{ rvGridCols }};column-gap:6px;border-top:1.5px solid #D5DEE6;padding-top:4px;align-items:center;row-gap:2px">
               <div></div>
               <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                 <div style="text-align:center;font-size:10px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.lbl }}</div>
               </sc-for>
-              <div style="font-size:10px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace">NOW</div>
+              <div style="font-size:8.5px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvALbl }}</div>
               <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                 <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:{{ c.fw }};color:#0891B2">{{ c.aV }}</div>
               </sc-for>
               <sc-if value="{{ rvHasPrevBand }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:10px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace">PREV</div>
+                <div style="font-size:8.5px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvPLbl }}</div>
                 <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                   <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#7C3AED">{{ c.pV }}</div>
                 </sc-for>
               </sc-if>
+            </div>
+            <div style="margin-top:10px;border-top:1px solid #EDF1F4;padding-top:8px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="width:76px;flex:none;font-size:8.5px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvALbl }}</span>
+                <div style="flex:1;display:flex;height:16px;border-radius:4px;overflow:hidden;border:1px solid #E2E8EE">
+                  <sc-for list="{{ rvHNow }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0891B2;white-space:nowrap">{{ rvHNowTxt }}</span>
+              </div>
+              <sc-if value="{{ rvHasHCmp }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="width:76px;flex:none;font-size:8.5px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvPLbl }}</span>
+                  <div style="flex:1;display:flex;height:16px;border-radius:4px;overflow:hidden;border:1px solid #E2E8EE;opacity:0.8">
+                    <sc-for list="{{ rvHCmp }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C3AED;white-space:nowrap">{{ rvHCmpTxt }}</span>
+                </div>
+              </sc-if>
+              <div style="font-size:9.5px;color:#7A8A98;font-family:'IBM Plex Mono',monospace;padding-left:84px">red = below · green = in target · blue = above</div>
             </div>
           </div>
         </sc-if>
@@ -214,12 +261,13 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
       <div style="display:flex;align-items:baseline;gap:8px;margin:18px 2px 10px;flex-wrap:wrap">
         <div style="font-size:13px;font-weight:700">Histogram log</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A98">{{ rvCount }} entries · newest first</div>
+        <div style="font-size:10.5px;color:#7C3AED">Click rows to pick the two compared entries (aqua = newer, purple = older)</div>
         <div style="flex:1"></div>
         <div style="font-size:10.5px;color:#7A8A98">Compliance = 3 log entries / 24 h</div>
       </div>
       <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;overflow-x:auto">
-        <div style="min-width:990px">
-          <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 64px;border-bottom:1.5px solid #D5DEE6">
+        <div style="min-width:1240px">
+          <div style="display:grid;grid-template-columns:64px 52px 46px minmax(140px,1.1fr) 56px 62px 60px minmax(140px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px 64px;border-bottom:1.5px solid #D5DEE6">
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Hist hr</div>
@@ -227,16 +275,19 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm limits</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">MD notified</div>
-            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes/Interventions</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Histogram</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% Left</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% Right</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% RR>60</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% {{ rrLbl }}</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% RR>80</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
             <div></div>
           </div>
           <sc-for list="{{ rvEntries }}" as="e" hint-placeholder-count="3">
-            <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 64px;border-bottom:1px solid #EDF1F4;background:{{ e.rowBg }};box-shadow:inset 3px 0 0 {{ e.rowEdge }};align-items:center">
+            <div onClick="{{ e.click }}" title="Click to compare this entry" style="display:grid;grid-template-columns:64px 52px 46px minmax(140px,1.1fr) 56px 62px 60px minmax(140px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px 64px;border-bottom:1px solid #EDF1F4;background:{{ e.rowBg }};box-shadow:inset 3px 0 0 {{ e.rowEdge }};align-items:center;cursor:{{ e.rowCur }}">
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4A5865">{{ e.date }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.time }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4A5865">{{ e.intv }}</div>
@@ -245,10 +296,19 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ e.alarm }}</div>
               <div style="padding:8px;font-size:11.5px;font-weight:600;color:#4A5865">{{ e.md }}</div>
               <div style="padding:8px;font-size:11.5px;color:#1D2B36;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.iv }}</div>
+              <div style="padding:8px 6px">
+                <sc-if value="{{ e.hasSeg }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;height:12px;border-radius:3px;overflow:hidden;width:84px;border:1px solid #E2E8EE">
+                    <sc-for list="{{ e.seg }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                  </div>
+                </sc-if>
+              </div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hb }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.hi2 }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.ha }}</div>
-              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hrr }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hr6 }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.hrr }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hr8 }}</div>
               <div style="padding:8px;font-size:11px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
               <div style="display:flex;gap:3px;align-items:center;padding:4px">
                 <button onClick="{{ e.edit }}" title="Edit entry" style="width:26px;height:26px;border-radius:7px;border:1px solid #E2E8EE;background:#FFFFFF;color:#0E7490;font-size:11px;cursor:pointer;line-height:1" style-hover="border-color:#0E7490">✎</button>
@@ -259,8 +319,89 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         </div>
       </div>
       <sc-if value="{{ rvHasEntries }}" hint-placeholder-val="{{ true }}">
-        <button onClick="{{ rvReset }}" style="margin-top:20px;min-height:42px;width:100%;background:#FFFFFF;border:1.5px solid #E5B7B0;border-radius:10px;color:#B42318;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#FBEEEC">Reset room — clear all data…</button>
+        <button onClick="{{ rvReset }}" style="margin-top:20px;min-height:42px;width:100%;background:#FFFFFF;border:1.5px solid #E5B7B0;border-radius:10px;color:#B42318;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#FBEEEC">Archive &amp; clear room — data moves to the Archive tab…</button>
       </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Archive" style="max-width:1000px;margin:0 auto;padding:12px 14px 0">
+      <button onClick="{{ back }}" style="background:none;border:none;color:#0E7490;font-size:13px;font-weight:600;cursor:pointer;padding:8px 2px" style-hover="color:#155E75">← All rooms</button>
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 2px 12px">
+        <div style="font-size:18px;font-weight:700">Archive</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A98">{{ arCountLbl }}</div>
+        <div style="flex:1"></div>
+        <div style="font-size:11px;color:#7A8A98">Bundles are created by "Archive &amp; clear room" and kept here until deleted.</div>
+      </div>
+      <sc-if value="{{ arEmpty }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:18px;max-width:560px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">No archived bundles yet</div>
+          <div style="font-size:12.5px;color:#5A6B7A;line-height:1.5">When a room is archived &amp; cleared, its full histogram log lands here — identified by room and archive date.</div>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ arList }}" as="a" hint-placeholder-count="1">
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:13px 14px">
+            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+              <div style="font-size:15px;font-weight:700">{{ a.label }}</div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#5B4A82;background:#F1EBFB;border:1px solid #D8C8F2;border-radius:6px;padding:2.5px 7px;text-transform:uppercase">Archived {{ a.when }}</div>
+              <div style="font-size:11.5px;color:#4A5865">Patient: <span style="font-weight:600">{{ a.name }}</span> · MRN <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ a.mrn }}</span></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ a.count }} entries · last entry {{ a.lastWhen }}</div>
+              <div style="flex:1"></div>
+              <button onClick="{{ a.toggle }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ a.toggleLbl }}</button>
+              <button onClick="{{ a.restore }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#EAF4F7">Restore to room…</button>
+              <button onClick="{{ a.exportA }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Export JSON</button>
+              <button onClick="{{ a.delA }}" style="min-height:34px;background:#FFFFFF;border:1px solid #E5B7B0;border-radius:9px;color:#B42318;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#FBEEEC">Delete…</button>
+            </div>
+            <sc-if value="{{ a.open }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;border:1px solid #E2E8EE;border-radius:10px;overflow-x:auto">
+                <div style="min-width:1080px">
+                  <div style="display:grid;grid-template-columns:62px 50px minmax(150px,1.2fr) 56px 64px minmax(150px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px;border-bottom:1.5px solid #D5DEE6">
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes/Interventions</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Histogram</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% L</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% R</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>60</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>70</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>80</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
+                  </div>
+                  <sc-for list="{{ a.rows }}" as="e" hint-placeholder-count="3">
+                    <div style="display:grid;grid-template-columns:62px 50px minmax(150px,1.2fr) 56px 64px minmax(150px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px;border-bottom:1px solid #EDF1F4;align-items:center">
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.date }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.time }}</div>
+                      <div style="padding:6px 8px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;min-width:0"><span style="width:7px;height:7px;border-radius:2px;background:{{ e.solid }};flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.support }}</span></div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px">{{ e.fio2 }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px">{{ e.alarm }}</div>
+                      <div style="padding:6px 8px;font-size:10.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.iv }}</div>
+                      <div style="padding:6px">
+                        <sc-if value="{{ e.hasSeg }}" hint-placeholder-val="{{ true }}">
+                          <div style="display:flex;height:11px;border-radius:3px;overflow:hidden;width:84px;border:1px solid #E2E8EE">
+                            <sc-for list="{{ e.seg }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                          </div>
+                        </sc-if>
+                      </div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hb }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hi2 }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.ha }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr6 }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hrr }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr8 }}</div>
+                      <div style="padding:6px 8px;font-size:10.5px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
     </div>
   </sc-if>
 
@@ -310,7 +451,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="flex:1"></div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ p.count }} entries · newest first</div>
           </div>
-          <div style="display:grid;grid-template-columns:58px 48px 44px minmax(130px,1.2fr) 52px 60px 56px minmax(130px,1.4fr) 42px 42px 46px 56px 44px;border-bottom:1.5px solid #D5DEE6">
+          <div style="display:grid;grid-template-columns:58px 48px 42px minmax(120px,1.1fr) 50px 56px 52px minmax(120px,1.1fr) 40px 40px 42px 44px 44px 44px 42px;border-bottom:1.5px solid #D5DEE6">
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Hist hr</div>
@@ -318,15 +459,17 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">MD notif</div>
-            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes/Interventions</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% L</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% R</div>
-            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% {{ rrLbl }}</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>60</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>70</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>80</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
           </div>
           <sc-for list="{{ p.rows }}" as="e" hint-placeholder-count="3">
-            <div style="display:grid;grid-template-columns:58px 48px 44px minmax(130px,1.2fr) 52px 60px 56px minmax(130px,1.4fr) 42px 42px 46px 56px 44px;border-bottom:1px solid #EDF1F4;align-items:center;break-inside:avoid">
+            <div style="display:grid;grid-template-columns:58px 48px 42px minmax(120px,1.1fr) 50px 56px 52px minmax(120px,1.1fr) 40px 40px 42px 44px 44px 44px 42px;border-bottom:1px solid #EDF1F4;align-items:center;break-inside:avoid">
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.date }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.time }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.intv }}</div>
@@ -338,7 +481,9 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hb }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hi2 }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.ha }}</div>
-              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hrr }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr6 }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hrr }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr8 }}</div>
               <div style="padding:5px 6px;font-size:10.5px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
             </div>
           </sc-for>
@@ -349,7 +494,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
 
   <sc-if value="{{ editorOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeEditor }}" style="position:fixed;inset:0;z-index:100;background:rgba(22,35,46,0.45);display:flex;align-items:center;justify-content:center;padding:12px">
-      <div data-screen-label="Entry editor" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(560px,100%);max-height:92vh;overflow-y:auto;border-radius:16px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
+      <div data-screen-label="Entry editor" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(580px,100%);max-height:92vh;overflow-y:auto;border-radius:16px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-size:16px;font-weight:700">{{ eTitle }}</div>
           <div style="flex:1"></div>
@@ -372,11 +517,60 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="display:flex;flex-direction:column;gap:6px">
           <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px">
-            <sc-for list="{{ modeChips }}" as="m" hint-placeholder-count="8">
+            <sc-for list="{{ modeChips }}" as="m" hint-placeholder-count="9">
               <button onClick="{{ m.pick }}" style="padding:8px 12px;min-height:38px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.tx }};border:1.5px solid {{ m.bd }}">{{ m.label }}</button>
             </sc-for>
           </div>
         </div>
+        <sc-if value="{{ isSprintForm }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px;background:#FCF9F2;border:1px solid #EBDDC3;border-radius:12px;padding:12px">
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <div style="flex:1;min-width:190px;display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Higher support</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ spHiChips }}" as="m" hint-placeholder-count="3">
+                    <button onClick="{{ m.pick }}" style="padding:7px 11px;min-height:36px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.tx }};border:1.5px solid {{ m.bd }}">{{ m.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="flex:1;min-width:190px;display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Lower support</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ spLoChips }}" as="m" hint-placeholder-count="4">
+                    <button onClick="{{ m.pick }}" style="padding:7px 11px;min-height:36px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.tx }};border:1.5px solid {{ m.bd }}">{{ m.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <label style="flex:1;min-width:100px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Hours on higher</span>
+                <input type="number" inputMode="decimal" min="0.5" max="23.5" step="0.5" value="{{ eSpHiH }}" onChange="{{ onSpHiH }}" placeholder="6" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;min-width:100px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Hours on lower</span>
+                <input type="number" inputMode="decimal" min="0.5" max="23.5" step="0.5" value="{{ eSpLoH }}" onChange="{{ onSpLoH }}" placeholder="6" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Higher starts at</span>
+                <input type="time" value="{{ eSpStart }}" onChange="{{ onSpStart }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
+            <sc-if value="{{ hasSpFields }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ spFields }}" as="f" hint-placeholder-count="0">
+                  <label style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:4px">
+                    <span style="font-size:11px;font-weight:600;color:#5A6B7A">{{ f.label }}</span>
+                    <input type="number" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.on }}" placeholder="{{ f.ph }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+                  </label>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasSpPreview }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px;font-weight:600;color:#98510F;background:#FCF0E2;border-radius:8px;padding:7px 10px;font-family:'IBM Plex Mono',monospace">{{ spPreview }}</div>
+            </sc-if>
+          </div>
+        </sc-if>
         <sc-if value="{{ hasFields }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:6px">
             <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Settings</div>
@@ -408,14 +602,26 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <sc-if value="{{ showHisto }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;flex-direction:column;gap:6px">
             <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Target SpO₂</div>
-            <div style="display:flex;gap:6px">
-              <sc-for list="{{ targetChips }}" as="t" hint-placeholder-count="3">
-                <button onClick="{{ t.pick }}" style="flex:1;padding:7px 4px;min-height:46px;border-radius:10px;cursor:pointer;background:{{ t.bg }};border:1.5px solid {{ t.bd }};color:{{ t.tx }}">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ targetChips }}" as="t" hint-placeholder-count="5">
+                <button onClick="{{ t.pick }}" style="flex:1;min-width:86px;padding:7px 4px;min-height:46px;border-radius:10px;cursor:pointer;background:{{ t.bg }};border:1.5px solid {{ t.bd }};color:{{ t.tx }}">
                   <div style="font-size:11.5px;font-weight:700">{{ t.name }}</div>
                   <div style="font-size:11px;font-family:'IBM Plex Mono',monospace">{{ t.range }}</div>
                 </button>
               </sc-for>
             </div>
+            <sc-if value="{{ showCustomTgt }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;max-width:280px">
+                <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:11px;font-weight:600;color:#5A6B7A">Custom low %</span>
+                  <input type="number" inputMode="numeric" min="50" max="100" value="{{ eTLo }}" onChange="{{ onTLo }}" placeholder="92" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+                </label>
+                <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:11px;font-weight:600;color:#5A6B7A">Custom high %</span>
+                  <input type="number" inputMode="numeric" min="50" max="100" value="{{ eTHi }}" onChange="{{ onTHi }}" placeholder="97" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+                </label>
+              </div>
+            </sc-if>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px">
             <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Saturation histogram (% of time)</div>
@@ -434,10 +640,21 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               </label>
             </div>
             <div style="font-size:11.5px;font-weight:600;color:{{ sumColor }}">{{ sumMsg }}</div>
-            <label style="display:flex;flex-direction:column;gap:4px;max-width:220px">
-              <span style="font-size:11px;font-weight:600;color:#5A6B7A">{{ rrFieldLabel }}</span>
-              <input type="number" inputMode="numeric" min="0" max="100" value="{{ eRr }}" onChange="{{ onRr }}" placeholder="0" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
-            </label>
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A;margin-top:4px">Tachypnea (% of time)</div>
+            <div style="display:flex;gap:8px">
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#7A8A98">RR&gt;60 <span style="font-weight:500">optional</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ eR6 }}" onChange="{{ onR6 }}" placeholder="—" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">RR&gt;{{ rrMid }} <span style="font-weight:700;color:#B42318">required</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ eRr }}" onChange="{{ onRr }}" placeholder="0" style="border:1.5px solid #9CB4C0;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#7A8A98">RR&gt;80 <span style="font-weight:500">optional</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ eR8 }}" onChange="{{ onR8 }}" placeholder="—" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
           </div>
         </sc-if>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
@@ -449,7 +666,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             </div>
           </div>
           <label style="flex:2;min-width:200px;display:flex;flex-direction:column;gap:4px">
-            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention / note</span>
+            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes / interventions</span>
             <input value="{{ eIv }}" onChange="{{ onIv }}" placeholder="e.g. Wean to CPAP 4" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;min-height:42px;box-sizing:border-box;width:100%">
           </label>
         </div>
@@ -482,6 +699,21 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
     </div>
   </sc-if>
 
+  <sc-if value="{{ restoreOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelRestore }}" style="position:fixed;inset:0;z-index:110;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Restore archive dialog" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(420px,100%);max-height:88vh;overflow-y:auto;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
+        <div style="font-size:15.5px;font-weight:700">Restore {{ restoreFrom }} to…</div>
+        <div style="font-size:12.5px;color:#4A5865;line-height:1.5">The archived entries and patient info move back into the room you pick. Occupied rooms are disabled.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px">
+          <sc-for list="{{ restoreTargets }}" as="t" hint-placeholder-count="8">
+            <button onClick="{{ t.pick }}" disabled="{{ t.dis }}" style="min-height:44px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:{{ t.cur }};background:{{ t.bg }};color:{{ t.tx }};border:1.5px solid {{ t.bd }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ cancelRestore }}" style="min-height:44px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ cancelConfirm }}" style="position:fixed;inset:0;z-index:120;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
       <div data-screen-label="Confirm dialog" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(380px,100%);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
@@ -489,7 +721,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="font-size:13px;color:#4A5865;line-height:1.5">{{ cMsg }}</div>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button onClick="{{ cancelConfirm }}" style="flex:1;min-height:44px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
-          <button onClick="{{ doConfirm }}" style="flex:1;min-height:44px;background:#B42318;border:none;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#9A1E14">{{ cBtn }}</button>
+          <button onClick="{{ doConfirm }}" style="flex:1;min-height:44px;background:{{ cBtnBg }};border:none;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer">{{ cBtn }}</button>
         </div>
       </div>
     </div>
@@ -505,7 +737,7 @@ class Component extends DCLogic {
     try { const raw = localStorage.getItem(this.KEY); if (raw) { const p = JSON.parse(raw); if (p && p.rooms) data = p; } } catch (e) {}
     let li = ''; try { li = localStorage.getItem('nicu_resp_initials') || ''; } catch (e) {}
     this.lastInit = li;
-    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null };
+    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null, restore: null, cmp: {}, arOpen: null };
     this.API = '/api/data'; this.remote = false; this.lastWrite = 0;
     this.onStorage = (ev) => {
       if (ev.key === this.KEY && ev.newValue) { try { const p = JSON.parse(ev.newValue); if (p && p.rooms) this.setState({ data: p }); } catch (e) {} }
@@ -538,16 +770,115 @@ class Component extends DCLogic {
       RANF: { label: 'RA · not following', bg: '#EDF0F2', bd: '#BFC9D0', tx: '#4A5560', solid: '#8895A0', fields: [] }
     };
   }
-  targets() { return { std: { name: 'Standard', lo: 90, hi: 95 }, bpd: { name: 'BPD', lo: 94, hi: 98 }, pphn: { name: 'PPHN', lo: 92, hi: 97 } }; }
+  targets() { return { std: { name: 'Standard', lo: 90, hi: 95 }, bpd: { name: 'BPD', lo: 94, hi: 98 }, pphn: { name: 'PPHN', lo: 92, hi: 97 }, rop: { name: 'ROP', lo: 97, hi: 99 } }; }
+  targetOf(e) {
+    const TG = this.targets();
+    if (e && e.target === 'custom') { const tg = e.tg || []; return { name: 'Custom', lo: tg[0] != null ? tg[0] : '–', hi: tg[1] != null ? tg[1] : '–' }; }
+    return TG[e && e.target] || TG.std;
+  }
   rrT() { return this.props.rrThreshold ?? 70; }
   prefix() { return this.props.unitPrefix ?? 'ICN'; }
   count() { return Math.max(1, Math.min(60, this.props.roomCount ?? 20)); }
 
+  sprintStyle(e) {
+    const M = this.modes(), sp = e.sp;
+    const A = M[sp.hi] || M.CPAP, B = M[sp.lo] || M.RA;
+    let schedX = Math.round(Number(sp.hiH) / (Number(sp.hiH) + Number(sp.loH)) * 100);
+    schedX = Math.max(0, Math.min(100, isNaN(schedX) ? 50 : schedX));
+    const split = this.sprintSplit(e);
+    let bg = `linear-gradient(90deg, ${A.bg} 0 ${schedX}%, ${B.bg} ${schedX}% 100%)`;
+    if (split && split.hiHrs + split.loHrs > 0) {
+      // chronological: earlier mode left, mode in effect at entry time right
+      const hiPct = Math.max(0, Math.min(100, Math.round(split.hiHrs / (split.hiHrs + split.loHrs) * 100)));
+      const endHi = this.sprintModeAtEnd(e);
+      const leftC = endHi ? B.bg : A.bg, rightC = endHi ? A.bg : B.bg;
+      const leftPct = endHi ? 100 - hiPct : hiPct;
+      bg = `linear-gradient(90deg, ${leftC} 0 ${leftPct}%, ${rightC} ${leftPct}% 100%)`;
+    }
+    return {
+      bg, bd: A.bd, tx: A.tx,
+      solid: `linear-gradient(90deg, ${A.solid} 0 ${schedX}%, ${B.solid} ${schedX}% 100%)`,
+      label: `Sprint ${sp.hi}/${sp.lo}`
+    };
+  }
+  sprintModeAtEnd(e) {
+    const sp = e.sp, cyc = (Number(sp.hiH) + Number(sp.loH)) * 60;
+    if (!cyc || isNaN(cyc)) return true;
+    const parts = String(sp.start || '06:00').split(':');
+    const startMin = (Number(parts[0]) || 0) * 60 + (Number(parts[1]) || 0);
+    const t = new Date(new Date(e.ts).getTime() - 60000); // sample 1 min before ts: entries logged exactly at a block transition belong to the block that just ended
+    const dayMin = t.getHours() * 60 + t.getMinutes();
+    const rel = ((dayMin - startMin) % cyc + cyc) % cyc;
+    return rel < Number(sp.hiH) * 60;
+  }
+  modeView(e) {
+    const M = this.modes();
+    if (e && e.mode === 'SPRINT' && e.sp) return this.sprintStyle(e);
+    const m = M[e && e.mode] || M.RA;
+    return { bg: m.bg, bd: m.bd, tx: m.tx, solid: m.solid, label: m.label };
+  }
+  setStr(mode, s) {
+    s = s || {}; const v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : null);
+    if (mode === 'CPAP') return v('press') != null ? `CPAP ${v('press')}` : 'CPAP';
+    if (mode === 'HFNC') return v('flow') != null ? `HFNC ${v('flow')}L` : 'HFNC';
+    if (mode === 'NC') return v('flow') != null ? `NC ${v('flow')}L` : 'NC';
+    if (mode === 'RA') return 'RA';
+    return mode || '';
+  }
+  sprintSplit(e) {
+    if (!e || e.mode !== 'SPRINT' || !e.sp) return null;
+    const sp = e.sp, cyc = (Number(sp.hiH) + Number(sp.loH)) * 60;
+    if (!cyc || isNaN(cyc)) return null;
+    const parts = String(sp.start || '06:00').split(':');
+    const startMin = (Number(parts[0]) || 0) * 60 + (Number(parts[1]) || 0);
+    const end = new Date(e.ts), intv = (e.intv != null ? e.intv : 8) * 60;
+    let hi = 0; const step = 5;
+    for (let m = step / 2; m < intv; m += step) {
+      const t = new Date(end.getTime() - m * 60000);
+      const dayMin = t.getHours() * 60 + t.getMinutes();
+      const rel = ((dayMin - startMin) % cyc + cyc) % cyc;
+      if (rel < Number(sp.hiH) * 60) hi += step;
+    }
+    const hiHrs = Math.round(hi / 60 * 10) / 10;
+    const loHrs = Math.round((intv / 60 - hi / 60) * 10) / 10;
+    return { hiHrs, loHrs };
+  }
+  sprintLine(e) {
+    const sp = e.sp, split = this.sprintSplit(e);
+    if (!sp || !split) return '';
+    return `Sprint ⇄ ≈ ${split.hiHrs}h ${sp.hi} · ${split.loHrs}h ${sp.lo} of this ${e.intv != null ? e.intv : 8}h histogram (${sp.hi} starts at ${sp.start})`;
+  }
+  segs(e) {
+    if (!e || !e.h) return null;
+    const t = v => Math.max(0, Math.min(100, v));
+    return [{ w: t(e.h[0]) + '%', bg: '#D14848' }, { w: t(e.h[1]) + '%', bg: '#33A35C' }, { w: t(e.h[2]) + '%', bg: '#3E97CE' }];
+  }
+
   applyOp(d, op) {
-    const k = String(op.room); d.rooms = d.rooms || {}; d.meta = d.meta || {};
+    const k = String(op.room || ''); d.rooms = d.rooms || {}; d.meta = d.meta || {}; d.archives = d.archives || {};
     if (op.op === 'add') { d.rooms[k] = d.rooms[k] || []; d.rooms[k].push(op.entry); }
     else if (op.op === 'del') { d.rooms[k] = (d.rooms[k] || []).filter(e => e.id !== op.id); if (!d.rooms[k].length) delete d.rooms[k]; }
     else if (op.op === 'reset') { delete d.rooms[k]; delete d.meta[k]; }
+    else if (op.op === 'archive') {
+      if (d.rooms[k] && d.rooms[k].length) {
+        const id = String(op.aid || (Date.now() + '' + Math.floor(Math.random() * 1000)));
+        const es = d.rooms[k].slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
+        d.archives[id] = { id, room: k, archivedAt: new Date().toISOString(), lastTs: es[0] ? es[0].ts : null, entries: d.rooms[k], meta: d.meta[k] || {} };
+      }
+      delete d.rooms[k]; delete d.meta[k];
+    }
+    else if (op.op === 'restoreArchive') {
+      const ar = d.archives[op.id];
+      if (ar) {
+        const to = String(op.to);
+        if (!(d.rooms[to] && d.rooms[to].length)) {
+          d.rooms[to] = ar.entries || [];
+          if (ar.meta && Object.keys(ar.meta).length) d.meta[to] = ar.meta;
+          delete d.archives[op.id];
+        }
+      }
+    }
+    else if (op.op === 'delArchive') { delete d.archives[op.id]; }
     else if (op.op === 'meta') { d.meta[k] = { ...(d.meta[k] || {}), ...op.patch }; }
     else if (op.op === 'edit') { d.rooms[k] = (d.rooms[k] || []).map(e => (e.id === op.entry.id ? op.entry : e)); }
     else if (op.op === 'move') {
@@ -555,7 +886,7 @@ class Component extends DCLogic {
       if (d.rooms[k]) { d.rooms[to] = d.rooms[k]; delete d.rooms[k]; }
       if (d.meta[k]) { d.meta[to] = d.meta[k]; delete d.meta[k]; }
     }
-    else if (op.op === 'import') { d.rooms = op.data.rooms || {}; d.meta = op.data.meta || {}; }
+    else if (op.op === 'import') { d.rooms = op.data.rooms || {}; d.meta = op.data.meta || {}; d.archives = op.data.archives || {}; }
   }
   sendOp(op) {
     this.setState(s => {
@@ -577,12 +908,15 @@ class Component extends DCLogic {
   mos() { return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; }
   fmtTime(iso) { const d = new Date(iso); return `${this.pad(d.getHours())}:${this.pad(d.getMinutes())}`; }
   fmtDate(iso) { const d = new Date(iso); return `${this.mos()[d.getMonth()]} ${d.getDate()}`; }
+  fmtDateFull(iso) { const d = new Date(iso); return `${this.mos()[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; }
   fmtWhen(iso) { const d = new Date(iso), now = new Date(); const sameDay = d.toDateString() === now.toDateString(); return sameDay ? this.fmtTime(iso) : `${this.fmtDate(iso)} ${this.fmtTime(iso)}`; }
+  fmtStamp(iso) { return `${this.fmtDate(iso)} ${this.fmtTime(iso)}`; }
   ago(iso) { const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); if (m < 60) return m + 'm ago'; const h = Math.floor(m / 60); if (h < 48) return h + 'h ago'; return Math.floor(h / 24) + 'd ago'; }
   concise(e) {
     const s = e.s || {}, v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : '–');
     let parts = [];
-    if (e.mode === 'HFOV') parts = [`MAP ${v('map')}`, `Δ${v('amp')}`, `${v('hz')} Hz`];
+    if (e.mode === 'SPRINT' && e.sp) parts = [`${this.setStr(e.sp.hi, e.sp.hiS)} ⇄ ${this.setStr(e.sp.lo, e.sp.loS)}`, `${e.sp.hiH}h/${e.sp.loH}h @ ${e.sp.start}`];
+    else if (e.mode === 'HFOV') parts = [`MAP ${v('map')}`, `Δ${v('amp')}`, `${v('hz')} Hz`];
     else if (e.mode === 'SIMV') parts = [`R ${v('rate')}`, `PIP ${v('pip')}`, `PEEP ${v('peep')}`];
     else if (e.mode === 'NAVA') parts = [`Lvl ${v('level')}`, `PEEP ${v('peep')}`];
     else if (e.mode === 'CPAP') parts = [`${v('press')} cmH₂O`];
@@ -594,6 +928,7 @@ class Component extends DCLogic {
   }
   modeShort(e) {
     const s = e.s || {}, v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : '–');
+    if (e.mode === 'SPRINT' && e.sp) return `Sprint ${this.setStr(e.sp.hi, e.sp.hiS)} ⇄ ${this.setStr(e.sp.lo, e.sp.loS)} (${e.sp.hiH}/${e.sp.loH}h @ ${e.sp.start})`;
     if (e.mode === 'HFOV') return `HFOV ${v('map')}/Δ${v('amp')}/${v('hz')}`;
     if (e.mode === 'SIMV') return `SIMV ${v('rate')} · ${v('pip')}/${v('peep')}`;
     if (e.mode === 'NAVA') return `NAVA ${v('level')}/${v('peep')}`;
@@ -604,9 +939,9 @@ class Component extends DCLogic {
     return 'Room air';
   }
   entryRow(e, older) {
-    const MODES = this.modes(), TG = this.targets();
-    const EM = MODES[e.mode] || MODES.RA, ET = TG[e.target] || TG.std;
+    const EM = this.modeView(e), ET = this.targetOf(e);
     const hrs = e.intv != null ? e.intv : (older ? (new Date(e.ts).getTime() - new Date(older.ts).getTime()) / 3600000 : null);
+    const seg = this.segs(e);
     return {
       date: this.fmtDate(e.ts), time: this.fmtTime(e.ts),
       intv: hrs == null ? '—' : (hrs >= 9.5 ? String(Math.round(hrs)) : String(Math.round(hrs * 10) / 10)),
@@ -616,47 +951,55 @@ class Component extends DCLogic {
       md: e.md === true ? 'Yes' : (e.md === false ? 'No' : '—'),
       iv: e.iv ? e.iv : '—',
       hb: e.h ? String(e.h[0]) : '—', hi2: e.h ? String(e.h[1]) : '—', ha: e.h ? String(e.h[2]) : '—',
+      hr6: e.r6 != null ? String(e.r6) : '—',
       hrr: e.rr != null ? String(e.rr) : '—',
+      hr8: e.r8 != null ? String(e.r8) : '—',
+      hasSeg: !!seg, seg: seg || [],
       init: e.init || '—'
     };
   }
   bandsFor(latest, prev) {
     if (!latest || !latest.h) return null;
-    const T = this.targets()[latest.target] || this.targets().std;
+    const T = this.targetOf(latest);
     const hasPrev = !!(prev && prev.h);
     const clamp = v => Math.max(1.5, Math.min(100, v)) + '%';
-    const aVals = [latest.h[0], latest.h[1], latest.h[2], latest.rr != null ? latest.rr : null];
-    const pVals = hasPrev ? [prev.h[0], prev.h[1], prev.h[2], prev.rr != null ? prev.rr : null] : [null, null, null, null];
-    const lbls = [`<${T.lo}`, `${T.lo}–${T.hi}`, `>${T.hi}`, `RR>${this.rrT()}`];
+    const val = (e, k) => {
+      if (!e) return null;
+      if (k === 'h0') return e.h ? e.h[0] : null;
+      if (k === 'h1') return e.h ? e.h[1] : null;
+      if (k === 'h2') return e.h ? e.h[2] : null;
+      if (k === 'rr') return e.rr != null ? e.rr : null;
+      if (k === 'r6') return e.r6 != null ? e.r6 : null;
+      return e.r8 != null ? e.r8 : null;
+    };
+    const defs = [['h0', `<${T.lo}`], ['h1', `${T.lo}–${T.hi}`], ['h2', `>${T.hi}`]];
+    const rrDefs = [['r6', 'RR>60'], ['rr', `RR>${this.rrT()}`], ['r8', 'RR>80']]
+      .filter(([k]) => k === 'rr' || val(latest, k) != null || (hasPrev && val(prev, k) != null));
+    const all = [...defs, ...rrDefs];
     return {
-      hasPrevBand: hasPrev,
-      cols: lbls.map((lbl, ix) => ({
-        lbl, fw: ix === 1 ? 700 : 600,
-        aV: aVals[ix] != null ? String(aVals[ix]) : '–', aH: aVals[ix] != null ? clamp(aVals[ix]) : '0%',
-        pV: pVals[ix] != null ? String(pVals[ix]) : '', pH: pVals[ix] != null ? clamp(pVals[ix]) : '0%'
-      }))
+      hasPrevBand: hasPrev, n: all.length,
+      cols: all.map(([k, lbl], ix) => {
+        const a = val(latest, k), p = hasPrev ? val(prev, k) : null;
+        return { lbl, fw: ix === 1 ? 700 : 600, aV: a != null ? String(a) : '–', aH: a != null ? clamp(a) : '0%', pV: p != null ? String(p) : '', pH: p != null ? clamp(p) : '0%' };
+      })
     };
   }
-  binsFor(latest, prev) {
-    if (!latest || !latest.h) return null;
-    const T = this.targets()[latest.target] || this.targets().std;
-    const lbls = [`<${T.lo}`, `${T.lo}–${T.hi}`, `>${T.hi}`];
-    const ph = prev && prev.h ? prev.h : null;
-    return latest.h.map((val, ix) => ({
-      lbl: lbls[ix], aV: String(val), aH: Math.max(2, Math.min(100, val)),
-      pV: ph ? String(ph[ix]) : '', pH: ph ? Math.max(2, Math.min(100, ph[ix])) : 0
-    }));
-  }
   openRoom(n) { this.setState({ view: { t: 'room', r: n } }); window.scrollTo(0, 0); }
+  defaultSp() { return { hi: 'CPAP', lo: 'RA', hiH: '6', loH: '6', start: '06:00', hiS: {}, loS: {} }; }
+  spFromEntry(sp) { return { hi: sp.hi, lo: sp.lo, hiH: String(sp.hiH), loH: String(sp.loH), start: sp.start || '06:00', hiS: { ...(sp.hiS || {}) }, loS: { ...(sp.loS || {}) } }; }
   openEditor(n) {
-    const last = this.entriesOf(n)[0];
+    const es = this.entriesOf(n), last = es[0];
+    const remembered = es.find(e => e.tg);
     this.setState({
       err: '',
       form: {
         room: n, ts: this.nowLocal(), init: this.lastInit, intv: '8',
         mode: last ? last.mode : null, s: last && last.s ? { ...last.s } : {},
+        sp: last && last.mode === 'SPRINT' && last.sp ? this.spFromEntry(last.sp) : this.defaultSp(),
         fLo: last && last.f ? String(last.f[0]) : '', fHi: last && last.f ? String(last.f[1]) : '',
-        target: last ? last.target : 'std', b: '', i: '', a: '', rr: '', md: false, iv: ''
+        target: last ? last.target : 'std',
+        tLo: remembered ? String(remembered.tg[0]) : '', tHi: remembered ? String(remembered.tg[1]) : '',
+        b: '', i: '', a: '', rr: '', r6: '', r8: '', md: false, iv: ''
       }
     });
   }
@@ -667,15 +1010,20 @@ class Component extends DCLogic {
         editId: e.id, room: n, ts: this.toLocalInput(e.ts), init: e.init || '',
         intv: e.intv != null ? String(e.intv) : '8',
         mode: e.mode, s: e.s ? { ...e.s } : {},
+        sp: e.mode === 'SPRINT' && e.sp ? this.spFromEntry(e.sp) : this.defaultSp(),
         fLo: e.f ? String(e.f[0]) : '', fHi: e.f ? String(e.f[1]) : '',
         target: e.target || 'std',
+        tLo: e.tg ? String(e.tg[0]) : '', tHi: e.tg ? String(e.tg[1]) : '',
         b: e.h ? String(e.h[0]) : '', i: e.h ? String(e.h[1]) : '', a: e.h ? String(e.h[2]) : '',
-        rr: e.rr != null ? String(e.rr) : '', md: !!e.md, iv: e.iv || ''
+        rr: e.rr != null ? String(e.rr) : '', r6: e.r6 != null ? String(e.r6) : '', r8: e.r8 != null ? String(e.r8) : '',
+        md: !!e.md, iv: e.iv || ''
       }
     });
   }
   uf(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, [k]: val } })); }; }
   us(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, s: { ...s.form.s, [k]: val } } })); }; }
+  usp(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, sp: { ...s.form.sp, [k]: val } } })); }; }
+  uspS(side, k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, sp: { ...s.form.sp, [side]: { ...s.form.sp[side], [k]: val } } } })); }; }
   resolveHisto(f) {
     const num = x => (x === '' || x === null || x === undefined ? null : Number(x));
     let b = num(f.b), i = num(f.i), a = num(f.a);
@@ -691,14 +1039,33 @@ class Component extends DCLogic {
     const f = this.state.form; if (!f) return;
     const err = m => this.setState({ err: m });
     if (!f.mode) return err('Pick a respiratory support mode.');
-    let h = null, rr = null;
+    let spSave = null;
+    if (f.mode === 'SPRINT') {
+      const sp = f.sp || {};
+      if (!sp.hi || !sp.lo) return err('Pick both sprint modes (higher and lower support).');
+      if (sp.hi === sp.lo) return err('The two sprint modes must be different.');
+      const hh = Number(sp.hiH), lh = Number(sp.loH);
+      if (!(hh > 0) || !(lh > 0)) return err('Enter positive hours for both sprint modes.');
+      if (hh + lh > 24) return err('Sprint hours must total 24 or less.');
+      if (!/^\d{1,2}:\d{2}$/.test(sp.start || '')) return err('Enter the start time of the higher support.');
+      spSave = { hi: sp.hi, lo: sp.lo, hiH: hh, loH: lh, start: sp.start, hiS: { ...sp.hiS }, loS: { ...sp.loS } };
+    }
+    let tg;
+    if (f.mode !== 'RANF' && f.target === 'custom') {
+      const lo = Number(f.tLo), hi = Number(f.tHi);
+      if (f.tLo === '' || f.tHi === '' || isNaN(lo) || isNaN(hi) || lo < 50 || hi > 100 || lo >= hi) return err('Custom target range must be 50–100% with low below high.');
+      tg = [lo, hi];
+    }
+    let h = null, rr = null, r6 = null, r8 = null;
     if (f.mode !== 'RANF') {
       const r = this.resolveHisto(f);
       if (r.blanks > 1) return err('Enter at least two of the three histogram values — the third auto-fills.');
       const bad = [r.b, r.i, r.a].some(x => x === null || isNaN(x) || x < 0 || x > 100);
       if (bad || r.b + r.i + r.a !== 100) return err('Histogram values must be 0–100 and total exactly 100%.');
       rr = f.rr === '' ? null : Number(f.rr);
-      if (rr === null || isNaN(rr) || rr < 0 || rr > 100) return err(`Enter tachypnea % (time with RR>${this.rrT()}), 0–100.`);
+      if (rr === null || isNaN(rr) || rr < 0 || rr > 100) return err(`Enter tachypnea % (time with RR>${this.rrT()}), 0–100. RR>60 and RR>80 are optional.`);
+      if (f.r6 !== '') { r6 = Number(f.r6); if (isNaN(r6) || r6 < 0 || r6 > 100) return err('RR>60 must be 0–100 (or leave it blank).'); }
+      if (f.r8 !== '') { r8 = Number(f.r8); if (isNaN(r8) || r8 < 0 || r8 > 100) return err('RR>80 must be 0–100 (or leave it blank).'); }
       h = [r.b, r.i, r.a];
     }
     let fio = null;
@@ -713,15 +1080,16 @@ class Component extends DCLogic {
     let intv = f.intv === '' ? 8 : Number(f.intv);
     if (isNaN(intv) || intv <= 0 || intv > 48) return err('Histogram interval must be 0.5–48 hours.');
     const init = (f.init || '').trim().toUpperCase().slice(0, 4);
-    const entry = { id: f.editId || (Date.now() + '' + Math.floor(Math.random() * 1000)), ts: this.isoFromLocal(f.ts), init, intv, mode: f.mode, s: { ...f.s }, f: fio, target: f.target, h, rr, md: !!f.md, iv: (f.iv || '').trim() };
+    const entry = { id: f.editId || (Date.now() + '' + Math.floor(Math.random() * 1000)), ts: this.isoFromLocal(f.ts), init, intv, mode: f.mode, s: f.mode === 'SPRINT' ? {} : { ...f.s }, sp: spSave || undefined, f: fio, target: f.target, tg, h, rr, r6, r8, md: !!f.md, iv: (f.iv || '').trim() };
     this.sendOp(f.editId ? { op: 'edit', room: f.room, entry } : { op: 'add', room: f.room, entry });
     if (init) { this.lastInit = init; try { localStorage.setItem('nicu_resp_initials', init); } catch (e) {} }
     this.setState({ form: null, err: '' });
   }
   doConfirm() {
     const c = this.state.confirm; if (!c) return;
-    if (c.type === 'reset') { this.sendOp({ op: 'reset', room: c.room }); this.setState({ confirm: null, view: { t: 'grid' } }); return; }
+    if (c.type === 'reset') { this.sendOp({ op: 'archive', room: c.room, aid: Date.now() + '' + Math.floor(Math.random() * 1000) }); this.setState({ confirm: null, view: { t: 'grid' } }); return; }
     if (c.type === 'del') { this.sendOp({ op: 'del', room: c.room, id: c.id }); }
+    if (c.type === 'delArchive') { this.sendOp({ op: 'delArchive', id: c.aid }); }
     this.setState({ confirm: null });
   }
 
@@ -737,53 +1105,107 @@ class Component extends DCLogic {
       if (!latest) { empty.push({ label, start: () => this.openEditor(n) }); continue; }
       counts[latest.mode] = (counts[latest.mode] || 0) + 1;
       if (latest.mode === 'RANF') { ranf.push({ label, ago: this.ago(latest.ts), open: () => this.openRoom(n) }); continue; }
-      const prev = es[1] || null, M = MODES[latest.mode] || MODES.RA, T = TG[latest.target] || TG.std;
+      const prev = es[1] || null, M = this.modeView(latest), T = this.targetOf(latest);
       const band = this.bandsFor(latest, prev);
+      const pT = prev && prev.h && prev.mode !== 'RANF' ? this.targetOf(prev) : null;
+      const pTgtDiff = !!(pT && (pT.lo !== T.lo || pT.hi !== T.hi));
       live.push({
+        hasPrevTgtNote: pTgtDiff, prevTgtNote: pTgtDiff ? `Prev histogram used a different target: ${pT.lo}–${pT.hi}%` : '',
         label, bg: M.bg, bd: M.bd, tx: M.tx, solid: M.solid, modeLabel: M.label,
         targetRange: `${T.lo}–${T.hi}%`, ago: this.ago(latest.ts),
         curSet: this.concise(latest), curMeta: `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}`,
         hasPrev: !!prev, prevSet: prev ? this.concise(prev) : '', prevMeta: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '',
+        isSprint: latest.mode === 'SPRINT', sprintLine: latest.mode === 'SPRINT' ? this.sprintLine(latest) : '',
         hasHisto: !!band,
+        gridCols: band ? `34px repeat(${band.n},1fr)` : '34px repeat(4,1fr)',
         cols: band ? band.cols : [], hasPrevBand: !!band && band.hasPrevBand,
-        rrCur: latest.rr != null ? latest.rr + '%' : '–', rrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
         open: () => this.openRoom(n), add: ev => { ev.stopPropagation(); this.openEditor(n); }
       });
     }
-    const order = ['HFOV','SIMV','NAVA','CPAP','HFNC','NC','RA','RANF'];
-    const legend = order.filter(k => counts[k]).map(k => ({ label: k === 'RANF' ? 'RA·NF' : (k === 'NAVA' ? 'NAVA' : MODES[k].label), color: MODES[k].solid, count: counts[k] }));
+    const order = ['HFOV','SIMV','NAVA','SPRINT','CPAP','HFNC','NC','RA','RANF'];
+    const legend = order.filter(k => counts[k]).map(k => ({
+      label: k === 'RANF' ? 'RA·NF' : (k === 'SPRINT' ? 'Sprint' : MODES[k].label),
+      color: k === 'SPRINT' ? 'linear-gradient(90deg,#E07C26,#33A35C)' : MODES[k].solid,
+      count: counts[k]
+    }));
     if (empty.length) legend.push({ label: 'Empty', color: '#C9D2D9', count: empty.length });
 
     // room detail
-    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvCols: [], rvHasPrevBand: false, rvRrCur: '', rvRrPrev: '', rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9', rvMove: () => {}, rvCurLeg: '', rvPrevLeg: '' };
+    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvCols: [], rvGridCols: '76px repeat(4,1fr)', rvHasPrevBand: false, rvHasCmpTgtNote: false, rvCmpTgtNote: '', rvALbl: 'NOW', rvPLbl: '—', rvAWhen: '', scrubPosA: 0, scrubPosP: 0, onScrubA: () => {}, onScrubP: () => {}, rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9', rvMove: () => {}, rvCurLeg: '', rvPrevLeg: '', rvIsSprint: false, rvSprintLine: '', rvHasScrub: false, scrubMax: 0, scrubPos: 0, onScrub: () => {}, rvCmpWhen: '', rvHNow: [], rvHasHCmp: false, rvHCmp: [], rvHNowTxt: '', rvHCmpTxt: '' };
     if (view.t === 'room') {
-      const n = view.r, es = this.entriesOf(n), latest = es[0] || null, prev = es[1] || null;
-      const M = latest ? (MODES[latest.mode] || MODES.RA) : null;
-      const T = latest ? (TG[latest.target] || TG.std) : TG.std;
-      const band = this.bandsFor(latest, prev);
+      const n = view.r, es = this.entriesOf(n), latest = es[0] || null;
+      const len = es.length;
+      const sel = (this.state.cmp || {})[String(n)];
+      let aIdx = 0, pIdx = Math.min(1, Math.max(0, len - 1));
+      if (sel) {
+        const selA = typeof sel === 'string' ? null : sel.a;
+        const selP = typeof sel === 'string' ? sel : sel.p;
+        if (selA) { const ix = es.findIndex(e => e.id === selA); if (ix >= 0) aIdx = ix; }
+        if (selP) { const ix = es.findIndex(e => e.id === selP); if (ix >= 0) pIdx = ix; }
+        if (pIdx <= aIdx) pIdx = Math.min(len - 1, aIdx + 1);
+      }
+      const aE = es[aIdx] || null, pE = pIdx > aIdx ? (es[pIdx] || null) : null;
+      const setSel = (ai, pi) => {
+        ai = Math.max(0, Math.min(len - 1, ai)); pi = Math.max(0, Math.min(len - 1, pi));
+        if (pi <= ai) { pi = Math.min(len - 1, ai + 1); if (pi === ai) ai = Math.max(0, pi - 1); }
+        this.setState(s => ({ cmp: { ...s.cmp, [String(n)]: { a: es[ai] ? es[ai].id : null, p: es[pi] ? es[pi].id : null } } }));
+      };
+      const M = latest ? this.modeView(latest) : null;
+      const T = latest ? this.targetOf(latest) : TG.std;
+      const Ta = aE ? this.targetOf(aE) : T;
+      const band = this.bandsFor(aE, pE);
       const meta = (this.state.data.meta || {})[String(n)] || {};
       const c24 = es.filter(e => Date.now() - new Date(e.ts).getTime() <= 24 * 3600000).length;
+      const segNow = this.segs(aE), segCmp = this.segs(pE);
+      const cT = pE && pE.h && pE.mode !== 'RANF' ? this.targetOf(pE) : null;
+      const cmpTgtDiff = !!(aE && cT && (cT.lo !== Ta.lo || cT.hi !== Ta.hi));
       rv = {
         rvLabel: `${pfx}-${n}`,
         rvBg: M ? M.bg : '#FFFFFF', rvBd: M ? M.bd : '#E2E8EE', rvTx: M ? M.tx : '#3D4C59', rvSolid: M ? M.solid : '#8895A0',
         rvModeLabel: M ? M.label : '', rvTarget: latest && latest.mode !== 'RANF' ? `${T.lo}–${T.hi}%` : '—',
         rvAgo: latest ? this.ago(latest.ts) : '', rvHasLatest: !!latest,
+        rvIsSprint: !!latest && latest.mode === 'SPRINT',
+        rvSprintLine: latest && latest.mode === 'SPRINT' ? this.sprintLine(latest) : '',
         rvHasHisto: !!band,
+        rvGridCols: band ? `76px repeat(${band.n},1fr)` : '76px repeat(4,1fr)',
         rvCols: band ? band.cols : [], rvHasPrevBand: !!band && band.hasPrevBand,
-        rvRrCur: latest && latest.rr != null ? latest.rr + '%' : '–', rvRrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
+        rvHasCmpTgtNote: cmpTgtDiff,
+        rvCmpTgtNote: cmpTgtDiff ? `Older compared entry used a different SpO₂ target (${cT.lo}–${cT.hi}%) — bins are labeled for the newer entry's ${Ta.lo}–${Ta.hi}%` : '',
+        rvHasScrub: len > 2,
+        scrubMax: Math.max(0, len - 1),
+        scrubPosA: Math.max(0, (len - 1) - aIdx),
+        scrubPosP: Math.max(0, (len - 1) - pIdx),
+        onScrubA: ev => { const pos = Number(ev.target.value); setSel((len - 1) - pos, pIdx); },
+        onScrubP: ev => { const pos = Number(ev.target.value); const pi = (len - 1) - pos; setSel(pi <= aIdx ? Math.max(0, pi - 1) : aIdx, pi); },
+        rvAWhen: aE ? this.fmtStamp(aE.ts) : '—',
+        rvCmpWhen: pE ? this.fmtStamp(pE.ts) : '—',
+        rvALbl: aE ? this.fmtStamp(aE.ts) : 'NOW',
+        rvPLbl: pE ? this.fmtStamp(pE.ts) : '—',
+        rvHNow: segNow || [], rvHasHCmp: !!segCmp, rvHCmp: segCmp || [],
+        rvHNowTxt: aE && aE.h ? `${aE.h[0]} / ${aE.h[1]} / ${aE.h[2]}` : '',
+        rvHCmpTxt: pE && pE.h ? `${pE.h[0]} / ${pE.h[1]} / ${pE.h[2]}` : '',
         rvCount: es.length, rvIsEmpty: !es.length, rvHasEntries: !!es.length,
         rvEntries: es.map((e, ix) => ({
           ...this.entryRow(e, es[ix + 1]),
-          rowBg: ix === 0 ? '#F0FAFC' : (ix === 1 ? '#F6F3FD' : '#FFFFFF'),
-          rowEdge: ix === 0 ? '#06B6D4' : (ix === 1 ? '#A78BFA' : '#E2E8EE'),
-          edit: () => this.openEdit(n, e),
-          del: () => this.setState({ confirm: { type: 'del', room: n, id: e.id, when: this.fmtWhen(e.ts) } })
+          rowBg: ix === aIdx ? '#F0FAFC' : (ix === pIdx ? '#F6F3FD' : '#FFFFFF'),
+          rowEdge: ix === aIdx ? '#06B6D4' : (ix === pIdx ? '#A78BFA' : '#E2E8EE'),
+          rowCur: len > 1 ? 'pointer' : 'default',
+          click: () => {
+            if (len < 2) return;
+            let ai = aIdx, pi = pIdx;
+            if (ix <= ai) ai = ix;
+            else if (ix >= pi) pi = ix;
+            else { if (ix - ai <= pi - ix) ai = ix; else pi = ix; }
+            setSel(ai, pi);
+          },
+          edit: ev => { ev.stopPropagation(); this.openEdit(n, e); },
+          del: ev => { ev.stopPropagation(); this.setState({ confirm: { type: 'del', room: n, id: e.id, when: this.fmtWhen(e.ts) } }); }
         })),
         rvAdd: () => this.openEditor(n),
         rvReset: () => this.setState({ confirm: { type: 'reset', room: n } }),
         rvMove: () => this.setState({ move: { from: n } }),
-        rvCurLeg: latest ? `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}` : '',
-        rvPrevLeg: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '—',
+        rvCurLeg: aE ? `${this.fmtStamp(aE.ts)}${aE.init ? ' · ' + aE.init : ''}` : '',
+        rvPrevLeg: pE ? `${this.fmtStamp(pE.ts)}${pE.init ? ' · ' + pE.init : ''}` : '—',
         rvName: meta.name || '', rvMrn: meta.mrn || '',
         onName: ev => this.sendOp({ op: 'meta', room: n, patch: { name: ev.target.value } }),
         onMrn: ev => this.sendOp({ op: 'meta', room: n, patch: { mrn: ev.target.value } }),
@@ -794,34 +1216,71 @@ class Component extends DCLogic {
 
     // editor
     const eo = !!f;
-    let ed = { eTitle: '', eTs: '', eInit: '', modeChips: [], hasFields: false, eFields: [], showFio2: false, eFLo: '', eFHi: '', showHisto: false, targetChips: [], hBval: '', hBph: '', hIval: '', hIph: '', hAval: '', hAph: '', hBsub: '', hIsub: '', hAsub: '', sumMsg: '', sumColor: '#7A8A98', eRr: '', showRanfNote: false, eIv: '', eIntv: '', onIntv: () => {}, saveLabel: 'Save entry', mdNo: () => {}, mdYes: () => {}, mdNoBg: '#FFFFFF', mdNoTx: '#3D4C59', mdNoBd: '#C9D2D9', mdYesBg: '#FFFFFF', mdYesTx: '#3D4C59', mdYesBd: '#C9D2D9' };
+    let ed = { eTitle: '', eTs: '', eInit: '', modeChips: [], isSprintForm: false, spHiChips: [], spLoChips: [], eSpHiH: '', eSpLoH: '', eSpStart: '', onSpHiH: () => {}, onSpLoH: () => {}, onSpStart: () => {}, hasSpFields: false, spFields: [], hasSpPreview: false, spPreview: '', hasFields: false, eFields: [], showFio2: false, eFLo: '', eFHi: '', showHisto: false, targetChips: [], showCustomTgt: false, eTLo: '', eTHi: '', hBval: '', hBph: '', hIval: '', hIph: '', hAval: '', hAph: '', hBsub: '', hIsub: '', hAsub: '', sumMsg: '', sumColor: '#7A8A98', eRr: '', eR6: '', eR8: '', showRanfNote: false, eIv: '', eIntv: '', onIntv: () => {}, saveLabel: 'Save entry', mdNo: () => {}, mdYes: () => {}, mdNoBg: '#FFFFFF', mdNoTx: '#3D4C59', mdNoBd: '#C9D2D9', mdYesBg: '#FFFFFF', mdYesTx: '#3D4C59', mdYesBd: '#C9D2D9' };
     if (eo) {
-      const T = TG[f.target] || TG.std;
+      const isCustom = f.target === 'custom';
+      const Tf = isCustom ? { lo: f.tLo !== '' ? f.tLo : '–', hi: f.tHi !== '' ? f.tHi : '–' } : (TG[f.target] || TG.std);
       const r = this.resolveHisto(f);
       let sumMsg = 'Enter any two — the third fills in automatically.', sumColor = '#7A8A98';
       if (r.blanks === 0) { const s = r.b + r.i + r.a; if (s === 100) { sumMsg = 'Σ = 100 ✓'; sumColor = '#1B7A3D'; } else { sumMsg = `Σ = ${s} — must equal 100`; sumColor = '#B42318'; } }
       else if (r.blanks === 1) { const okAuto = r.b >= 0 && r.i >= 0 && r.a >= 0; sumMsg = okAuto ? `Σ = 100 ✓ (auto-filled ${r.auto === 'b' ? 'Below' : r.auto === 'i' ? 'In' : 'Above'})` : 'Values exceed 100%'; sumColor = okAuto ? '#1B7A3D' : '#B42318'; }
+      const isSprint = f.mode === 'SPRINT';
+      const sp = f.sp || this.defaultSp();
+      const mk = k => {
+        const m = MODES[k], on = f.mode === k;
+        return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: k } })) };
+      };
+      const sprintOn = isSprint;
+      const modeChips = [mk('HFOV'), mk('SIMV'), mk('NAVA'), mk('CPAP'), mk('HFNC'), mk('NC'),
+        { label: 'Sprint ⇄', bg: sprintOn ? 'linear-gradient(90deg,#E07C26,#33A35C)' : '#FFFFFF', tx: sprintOn ? '#FFFFFF' : '#98510F', bd: sprintOn ? '#E07C26' : '#E0A268', pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: 'SPRINT', sp: s.form.sp || this.defaultSp() } })) },
+        mk('RA'), mk('RANF')];
+      const spChip = (k, side) => {
+        const m = MODES[k], on = sp[side] === k;
+        return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, sp: { ...s.form.sp, [side]: k } } })) };
+      };
+      const spFields = [];
+      if (isSprint) {
+        if (sp.hi && MODES[sp.hi]) MODES[sp.hi].fields.forEach(([k, label, ph]) => spFields.push({ label: `${sp.hi} — ${label}`, ph, val: sp.hiS[k] ?? '', on: this.uspS('hiS', k) }));
+        if (sp.lo && sp.lo !== 'RA' && MODES[sp.lo]) MODES[sp.lo].fields.forEach(([k, label, ph]) => spFields.push({ label: `${sp.lo} — ${label}`, ph, val: sp.loS[k] ?? '', on: this.uspS('loS', k) }));
+      }
+      let spPreview = '';
+      const hh = Number(sp.hiH), lh = Number(sp.loH);
+      if (isSprint && sp.hi && sp.lo && hh > 0 && lh > 0 && /^\d{1,2}:\d{2}$/.test(sp.start || '')) {
+        const add = (t, h) => { const p2 = t.split(':').map(Number); const tot = ((p2[0] * 60 + p2[1] + Math.round(h * 60)) % 1440 + 1440) % 1440; return `${this.pad(Math.floor(tot / 60))}:${this.pad(tot % 60)}`; };
+        const t1 = add(sp.start, hh), t2 = add(t1, lh);
+        spPreview = `${sp.hi} ${sp.start}–${t1} → ${sp.lo} ${t1}–${t2} → repeats`;
+      }
+      const tgKeys = Object.keys(TG);
+      const targetChips = [
+        ...tgKeys.map(k => {
+          const t = TG[k], on = f.target === k;
+          return { name: t.name, range: `${t.lo}–${t.hi}%`, bg: on ? '#0E7490' : '#FFFFFF', tx: on ? '#FFFFFF' : '#3D4C59', bd: on ? '#0E7490' : '#C9D2D9', pick: () => this.setState(s => ({ form: { ...s.form, target: k } })) };
+        }),
+        { name: 'Custom', range: f.tLo !== '' && f.tHi !== '' ? `${f.tLo}–${f.tHi}%` : 'set…', bg: isCustom ? '#0E7490' : '#FFFFFF', tx: isCustom ? '#FFFFFF' : '#3D4C59', bd: isCustom ? '#0E7490' : '#C9D2D9', pick: () => this.setState(s => ({ form: { ...s.form, target: 'custom' } })) }
+      ];
       ed = {
         eTitle: f.editId ? `Edit entry — ${pfx}-${f.room}` : `New entry — ${pfx}-${f.room}`,
         saveLabel: f.editId ? 'Save changes' : 'Save entry',
         eTs: f.ts, eInit: f.init, eIntv: f.intv, onIntv: this.uf('intv'),
-        modeChips: Object.keys(MODES).map(k => {
-          const m = MODES[k], on = f.mode === k;
-          return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: k } })) };
-        }),
-        hasFields: !!f.mode && MODES[f.mode].fields.length > 0,
-        eFields: f.mode ? MODES[f.mode].fields.map(([k, label, ph]) => ({ label, ph, val: f.s[k] ?? '', on: this.us(k) })) : [],
+        modeChips,
+        isSprintForm: isSprint,
+        spHiChips: ['CPAP', 'HFNC', 'NC'].map(k => spChip(k, 'hi')),
+        spLoChips: ['CPAP', 'HFNC', 'NC', 'RA'].filter(k => k !== sp.hi).map(k => spChip(k, 'lo')),
+        eSpHiH: sp.hiH, eSpLoH: sp.loH, eSpStart: sp.start,
+        onSpHiH: this.usp('hiH'), onSpLoH: this.usp('loH'), onSpStart: this.usp('start'),
+        hasSpFields: spFields.length > 0, spFields,
+        hasSpPreview: !!spPreview, spPreview,
+        hasFields: !isSprint && !!f.mode && !!MODES[f.mode] && MODES[f.mode].fields.length > 0,
+        eFields: !isSprint && f.mode && MODES[f.mode] ? MODES[f.mode].fields.map(([k, label, ph]) => ({ label, ph, val: f.s[k] ?? '', on: this.us(k) })) : [],
         showFio2: !!f.mode && f.mode !== 'RA' && f.mode !== 'RANF',
         eFLo: f.fLo, eFHi: f.fHi,
         showHisto: !!f.mode && f.mode !== 'RANF',
-        targetChips: Object.keys(TG).map(k => {
-          const t = TG[k], on = f.target === k;
-          return { name: t.name, range: `${t.lo}–${t.hi}%`, bg: on ? '#0E7490' : '#FFFFFF', tx: on ? '#FFFFFF' : '#3D4C59', bd: on ? '#0E7490' : '#C9D2D9', pick: () => this.setState(s => ({ form: { ...s.form, target: k } })) };
-        }),
+        targetChips,
+        showCustomTgt: isCustom, eTLo: f.tLo, eTHi: f.tHi,
         hBval: f.b, hIval: f.i, hAval: f.a,
         hBph: r.auto === 'b' && r.b >= 0 ? String(r.b) : '', hIph: r.auto === 'i' && r.i >= 0 ? String(r.i) : '', hAph: r.auto === 'a' && r.a >= 0 ? String(r.a) : '',
-        hBsub: `<${T.lo}%`, hIsub: `${T.lo}–${T.hi}%`, hAsub: `>${T.hi}%`,
-        sumMsg, sumColor, eRr: f.rr,
+        hBsub: `<${Tf.lo}%`, hIsub: `${Tf.lo}–${Tf.hi}%`, hAsub: `>${Tf.hi}%`,
+        sumMsg, sumColor, eRr: f.rr, eR6: f.r6, eR8: f.r8,
         showRanfNote: f.mode === 'RANF',
         eIv: f.iv || '',
         mdNo: () => this.setState(s2 => ({ form: { ...s2.form, md: false } })),
@@ -836,7 +1295,7 @@ class Component extends DCLogic {
     if (view.t === 'report') {
       for (let n = N; n >= 1; n--) {
         const es = this.entriesOf(n); if (!es.length) continue;
-        const latest = es[0], prev = es[1] || null, M = MODES[latest.mode] || MODES.RA, T = TG[latest.target] || TG.std;
+        const latest = es[0], prev = es[1] || null, M = this.modeView(latest), T = this.targetOf(latest);
         rptRooms.push({
           label: `${pfx}-${n}`, solid: M.solid, support: this.modeShort(latest),
           fio2: latest.f ? (latest.f[0] === latest.f[1] ? latest.f[0] + '%' : `${latest.f[0]}–${latest.f[1]}%`) : '21%',
@@ -855,6 +1314,34 @@ class Component extends DCLogic {
       }
     }
 
+    // archive
+    const archives = this.state.data.archives || {};
+    const arKeys = Object.keys(archives).sort((a, b) => ((archives[a].archivedAt || '') < (archives[b].archivedAt || '') ? 1 : -1));
+    const arList = arKeys.map(id => {
+      const ar = archives[id];
+      const es = (ar.entries || []).slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
+      const open = this.state.arOpen === id;
+      return {
+        label: `${pfx}-${ar.room}`,
+        when: ar.archivedAt ? this.fmtDateFull(ar.archivedAt) : '—',
+        name: (ar.meta && ar.meta.name) || '—', mrn: (ar.meta && ar.meta.mrn) || '—',
+        count: es.length,
+        lastWhen: ar.lastTs ? this.fmtDateFull(ar.lastTs) : (es[0] ? this.fmtDateFull(es[0].ts) : '—'),
+        open, toggleLbl: open ? 'Hide entries' : 'View entries',
+        toggle: () => this.setState({ arOpen: open ? null : id }),
+        rows: open ? es.map((e, ix) => this.entryRow(e, es[ix + 1])) : [],
+        restore: () => this.setState({ restore: { id } }),
+        exportA: () => {
+          const blob = new Blob([JSON.stringify(ar, null, 2)], { type: 'application/json' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `nicu-archive-${pfx}-${ar.room}-${(ar.archivedAt || '').slice(0, 10)}.json`;
+          a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        },
+        delA: () => this.setState({ confirm: { type: 'delArchive', aid: id, label: `${pfx}-${ar.room} (archived ${ar.archivedAt ? this.fmtDateFull(ar.archivedAt) : ''})` } })
+      };
+    });
+
     const mv = this.state.move;
     let moveTargets = [];
     if (mv) {
@@ -868,11 +1355,31 @@ class Component extends DCLogic {
         });
       }
     }
+    const rs = this.state.restore;
+    let restoreTargets = [];
+    if (rs) {
+      for (let n = N; n >= 1; n--) {
+        const occ = this.entriesOf(n).length > 0;
+        restoreTargets.push({
+          label: `${pfx}-${n}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
+          bg: occ ? '#EDF0F2' : '#FFFFFF', tx: occ ? '#B4BEC7' : '#0E7490', bd: occ ? '#E2E8EE' : '#9CC3CF',
+          pick: () => { this.sendOp({ op: 'restoreArchive', id: rs.id, to: n }); this.setState({ restore: null, view: { t: 'room', r: n } }); }
+        });
+      }
+    }
+    const rsAr = rs ? archives[rs.id] : null;
 
     const c = this.state.confirm;
     return {
       moveOpen: !!mv, moveFrom: mv ? `${pfx}-${mv.from}` : '', moveTargets,
       cancelMove: () => this.setState({ move: null }),
+      restoreOpen: !!rs, restoreFrom: rsAr ? `${pfx}-${rsAr.room} archive` : 'archive', restoreTargets,
+      cancelRestore: () => this.setState({ restore: null }),
+      isArchive: view.t === 'archive',
+      arLabel: arKeys.length ? `Archive (${arKeys.length})` : 'Archive',
+      arCountLbl: `${arKeys.length} archived ${arKeys.length === 1 ? 'bundle' : 'bundles'}`,
+      arEmpty: !arKeys.length, arList,
+      openArchive: () => { this.setState({ view: { t: 'archive' } }); window.scrollTo(0, 0); },
       exportJson: () => {
         const d = new Date(), p = this.pad.bind(this);
         const blob = new Blob([JSON.stringify(this.state.data, null, 2)], { type: 'application/json' });
@@ -892,7 +1399,7 @@ class Component extends DCLogic {
               const j = JSON.parse(rd.result);
               if (!j || typeof j.rooms !== 'object') { alert('Not a valid backup file.'); return; }
               if (confirm('Replace ALL current data with this backup? This overwrites every room for everyone.')) {
-                this.sendOp({ op: 'import', data: { rooms: j.rooms || {}, meta: j.meta || {} } });
+                this.sendOp({ op: 'import', data: { rooms: j.rooms || {}, meta: j.meta || {}, archives: j.archives || {} } });
               }
             } catch (e) { alert('Could not read that file as JSON.'); }
           };
@@ -905,7 +1412,7 @@ class Component extends DCLogic {
       openReport: () => { this.setState({ view: { t: 'report', full: true } }); window.scrollTo(0, 0); },
       openSnapshot: () => { this.setState({ view: { t: 'report', full: false } }); window.scrollTo(0, 0); },
       doPrint: () => window.print(),
-      todayStr, legend, rrLbl,
+      todayStr, legend, rrLbl, rrMid: this.rrT(),
       showSync: !!this.state.sync,
       syncLabel: this.state.sync === 'live' ? 'Shared · live' : 'This device only',
       syncDot: this.state.sync === 'live' ? '#33A35C' : '#BFA10E',
@@ -917,16 +1424,17 @@ class Component extends DCLogic {
       ...rv,
       editorOpen: eo, ...ed,
       onTs: this.uf('ts'), onInit: this.uf('init'), onFLo: this.uf('fLo'), onFHi: this.uf('fHi'),
-      hBon: this.uf('b'), hIon: this.uf('i'), hAon: this.uf('a'), onRr: this.uf('rr'), onIv: this.uf('iv'),
-      rrFieldLabel: `Tachypnea — % time RR>${this.rrT()}`,
+      onTLo: this.uf('tLo'), onTHi: this.uf('tHi'),
+      hBon: this.uf('b'), hIon: this.uf('i'), hAon: this.uf('a'), onRr: this.uf('rr'), onR6: this.uf('r6'), onR8: this.uf('r8'), onIv: this.uf('iv'),
       hasErr: !!this.state.err, errMsg: this.state.err,
       saveEntry: () => this.saveEntry(),
       closeEditor: () => this.setState({ form: null, err: '' }),
       swallow: ev => ev.stopPropagation(),
       confirmOpen: !!c,
-      cTitle: c ? (c.type === 'reset' ? `Reset ${pfx}-${c.room}?` : 'Delete this entry?') : '',
-      cMsg: c ? (c.type === 'reset' ? 'This permanently clears every entry for this room. This cannot be undone.' : `The entry from ${c.when || ''} will be permanently deleted.`) : '',
-      cBtn: c ? (c.type === 'reset' ? 'Yes, clear room' : 'Delete') : '',
+      cTitle: c ? (c.type === 'reset' ? `Archive & clear ${pfx}-${c.room}?` : (c.type === 'delArchive' ? 'Delete archived bundle?' : 'Delete this entry?')) : '',
+      cMsg: c ? (c.type === 'reset' ? 'Every entry and the patient info move to the Archive (button in the header), identified by room and archive date. The room clears for a new patient.' : (c.type === 'delArchive' ? `The archived data for ${c.label || ''} will be permanently deleted. Export it first if you need a copy.` : `The entry from ${c.when || ''} will be permanently deleted.`)) : '',
+      cBtn: c ? (c.type === 'reset' ? 'Archive & clear' : 'Delete') : '',
+      cBtnBg: c && c.type === 'reset' ? '#0E7490' : '#B42318',
       doConfirm: () => this.doConfirm(),
       cancelConfirm: () => this.setState({ confirm: null })
     };
