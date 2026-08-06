@@ -1,7 +1,7 @@
 # NICU Respiratory Tracker — Netlify deploy
 
 Static app (index.html + support.js) + one serverless function (/api/data) that stores
-all entries in Netlify Blobs, so everyone with the URL sees the same live data
+all entries in Netlify Blobs, so everyone with the URL sees the same live data 
 (the board polls every 5 seconds).
 
 ## Deploy — Option A: GitHub (recommended)
