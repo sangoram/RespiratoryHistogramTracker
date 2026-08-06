@@ -3,7 +3,11 @@ import { getStore } from '@netlify/blobs';
 const KEY = 'store';
 
 export default async (req) => {
-  const store = getStore({ name: 'nicu-resp', consistency: 'strong' });
+  // Branch/preview deploys get their own sandbox store; only the production
+  // deploy touches the live 'nicu-resp' data.
+  const ctx = process.env.CONTEXT || 'production';
+  const storeName = ctx === 'production' ? 'nicu-resp' : `nicu-resp-${ctx === 'branch-deploy' ? (process.env.BRANCH || 'branch') : ctx}`;
+  const store = getStore({ name: storeName, consistency: 'strong' });
   const load = async () => (await store.get(KEY, { type: 'json' })) || { rooms: {}, meta: {}, archives: {} };
 
   if (req.method === 'GET') return Response.json(await load());
