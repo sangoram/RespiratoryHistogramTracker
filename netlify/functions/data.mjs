@@ -3,17 +3,19 @@ import { getStore } from '@netlify/blobs';
 const KEY = 'store';
 
 export default async (req) => {
-  // Branch/preview deploys get their own sandbox store; only the production
-  // deploy touches the live 'nicu-resp' data.
-  const ctx = process.env.CONTEXT || 'production';
-  const storeName = ctx === 'production' ? 'nicu-resp' : `nicu-resp-${ctx === 'branch-deploy' ? (process.env.BRANCH || 'branch') : ctx}`;
+  // Branch/preview deploys (host looks like "branch--site.netlify.app") get their
+  // own sandbox store; the production host touches the live 'nicu-resp' data.
+  const host = new URL(req.url).hostname;
+  const m = host.match(/^([^.]+?)--/);
+  const label = m ? m[1].toLowerCase() : null;
+  const storeName = label ? `nicu-resp-${label}` : 'nicu-resp';
   const store = getStore({ name: storeName, consistency: 'strong' });
   const load = async () => (await store.get(KEY, { type: 'json' })) || { rooms: {}, meta: {}, archives: {} };
 
   if (req.method === 'GET') {
     const url = new URL(req.url);
     if (url.searchParams.has('whoami')) {
-      return Response.json({ context: ctx, branch: process.env.BRANCH || null, store: storeName });
+      return Response.json({ host, deployLabel: label, store: storeName });
     }
     return Response.json(await load());
   }
