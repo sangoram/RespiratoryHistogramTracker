@@ -10,7 +10,13 @@ export default async (req) => {
   const store = getStore({ name: storeName, consistency: 'strong' });
   const load = async () => (await store.get(KEY, { type: 'json' })) || { rooms: {}, meta: {}, archives: {} };
 
-  if (req.method === 'GET') return Response.json(await load());
+  if (req.method === 'GET') {
+    const url = new URL(req.url);
+    if (url.searchParams.has('whoami')) {
+      return Response.json({ context: ctx, branch: process.env.BRANCH || null, store: storeName });
+    }
+    return Response.json(await load());
+  }
 
   if (req.method === 'POST') {
     let op;
