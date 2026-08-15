@@ -1357,6 +1357,23 @@ class Component extends DCLogic {
     return Array.from({ length: N }, (_, i) => ({ k: String(i + 1), label: p ? `${p}-${i + 1}` : String(i + 1), cx: (i % 10) * 2 + 1, cy: i < 10 ? 2 : 6, bay: null }));
   }
   bedLabel(k) { const b = this.beds().find(x => String(x.k) === String(k)); return b ? b.label : `${this.prefix()}-${k}`; }
+  bayNameOf(k) {
+    const b = this.beds().find(x => String(x.k) === String(k));
+    const L = this.layoutOf();
+    if (!b || !b.bay || !L || !L.bays) return '\uffff';
+    const y = L.bays.find(v => v.id === b.bay);
+    return y && y.name ? y.name : '\uffff';
+  }
+  // Board order: bay first (alphabetical/natural by bay name, unbayed beds last),
+  // then the bed label read the way a person reads it — A1, A2, A10, B1.
+  sortedBedKeys() {
+    const nat = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+    return this.beds().map(b => b.k).slice().sort((x, y) => {
+      const bx = this.bayNameOf(x), by = this.bayNameOf(y);
+      if (bx !== by) return nat(bx, by);
+      return nat(this.bedLabel(x), this.bedLabel(y));
+    });
+  }
   needsSetup() { return !this.layoutOf() && !Object.keys(this.state.data.rooms || {}).length; }
   viewNow() {
     const v = this.state.view;
@@ -2254,7 +2271,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const MODES = this.modes(), TG = this.targets(), pfx = this.prefix(), N = this.count(), rrLbl = 'RR>' + this.rrT();
-    const bedKeys = this.beds().map(b => b.k).slice().reverse();
+    const bedKeys = this.sortedBedKeys();
     const view = this.viewNow(), f = this.state.form;
     const now = new Date();
     const todayStr = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][now.getDay()]} · ${this.mos()[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
