@@ -3,49 +3,20 @@ import { getStore } from '@netlify/blobs';
 const KEY = 'store';
 
 export default async (req) => {
-  // Branch/preview deploys (host looks like "branch--site.netlify.app") get their
-  // own sandbox store; the production host touches the live 'nicu-resp' data.
-  const host = new URL(req.url).hostname;
-  const m = host.match(/^([^.]+?)--/);
-  const label = m ? m[1].toLowerCase() : null;
-  const storeName = label ? `nicu-resp-${label}` : 'nicu-resp';
-  const store = getStore({ name: storeName, consistency: 'strong' });
-  const load = async () => (await store.get(KEY, { type: 'json' })) || { rooms: {}, meta: {}, archives: {} };
+  const store = getStore({ name: 'nicu-resp', consistency: 'strong' });
+  const load = async () => (await store.get(KEY, { type: 'json' })) || { rooms: {}, meta: {} };
 
-  if (req.method === 'GET') {
-    const url = new URL(req.url);
-    if (url.searchParams.has('whoami')) {
-      return Response.json({ host, deployLabel: label, store: storeName });
-    }
-    return Response.json(await load());
-  }
+  if (req.method === 'GET') return Response.json(await load());
 
   if (req.method === 'POST') {
     let op;
     try { op = await req.json(); } catch (e) { return new Response('Bad JSON', { status: 400 }); }
     const d = await load();
-    d.rooms = d.rooms || {}; d.meta = d.meta || {}; d.archives = d.archives || {};
+    d.rooms = d.rooms || {}; d.meta = d.meta || {};
     if (op.op === 'import' && op.data && typeof op.data === 'object') {
-      const nd = { rooms: op.data.rooms || {}, meta: op.data.meta || {}, archives: op.data.archives || {} };
+      const nd = { rooms: op.data.rooms || {}, meta: op.data.meta || {} };
       await store.setJSON(KEY, nd);
       return Response.json(nd);
-    }
-    if (op.op === 'restoreArchive' && op.id) {
-      const ar = d.archives[op.id];
-      if (!ar) return new Response('No such archive', { status: 404 });
-      const to = String(op.to || '');
-      if (!to) return new Response('Missing target room', { status: 400 });
-      if (d.rooms[to] && d.rooms[to].length) return new Response('Target room occupied', { status: 409 });
-      d.rooms[to] = ar.entries || [];
-      if (ar.meta && Object.keys(ar.meta).length) d.meta[to] = ar.meta;
-      delete d.archives[op.id];
-      await store.setJSON(KEY, d);
-      return Response.json(d);
-    }
-    if (op.op === 'delArchive' && op.id) {
-      delete d.archives[op.id];
-      await store.setJSON(KEY, d);
-      return Response.json(d);
     }
     const k = String(op.room || '');
     if (!k) return new Response('Missing room', { status: 400 });
@@ -57,13 +28,6 @@ export default async (req) => {
       d.rooms[k] = (d.rooms[k] || []).filter(e => e.id !== op.id);
       if (!d.rooms[k].length) delete d.rooms[k];
     } else if (op.op === 'reset') {
-      delete d.rooms[k]; delete d.meta[k];
-    } else if (op.op === 'archive') {
-      if (d.rooms[k] && d.rooms[k].length) {
-        const id = String(op.aid || (Date.now() + '' + Math.floor(Math.random() * 1000)));
-        const es = d.rooms[k].slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
-        d.archives[id] = { id, room: k, archivedAt: new Date().toISOString(), lastTs: es[0] ? es[0].ts : null, entries: d.rooms[k], meta: d.meta[k] || {} };
-      }
       delete d.rooms[k]; delete d.meta[k];
     } else if (op.op === 'edit' && op.entry && typeof op.entry === 'object' && op.entry.id) {
       d.rooms[k] = (d.rooms[k] || []).map(e => (e.id === op.entry.id ? op.entry : e));
