@@ -1,6 +1,6 @@
 {
-  "name": "nicu-respiratory-tracker",
-  "version": "1.0.0",
+  "name": "owl-oxygen-with-love",
+  "version": "2.0.0",
   "private": true,
   "dependencies": {
     "@netlify/blobs": "^8.1.0"

@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O.W.L. - Oxygen With Love Histogram Tracking Tool</title>
+<meta name="description" content="A free tool for NICUs to aid precision delivery and decision support around that precious molecule of life.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E7490'/%3E%3Ccircle cx='11.5' cy='14' r='4.5' fill='%23fff'/%3E%3Ccircle cx='20.5' cy='14' r='4.5' fill='%23fff'/%3E%3Ccircle cx='11.5' cy='14' r='1.9' fill='%230E7490'/%3E%3Ccircle cx='20.5' cy='14' r='1.9' fill='%230E7490'/%3E%3Cpath d='M16 19.5l2.4 4.2h-4.8z' fill='%23fff'/%3E%3C/svg%3E">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -26,28 +29,360 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   <div data-noprint="1" style="position:sticky;top:0;z-index:40;background:rgba(255,255,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #E2E8EE">
     <div style="max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
-        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">San Leandro NICU Histogram Tracking Digital Binder</div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-0.01em">O.W.L. <span style="font-weight:500;color:#5A6B7A">- Oxygen With Love Histogram Tracking Tool</span></div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ todayStr }}</div>
         <sc-if value="{{ showSync }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:2.5px 8px 2.5px 6px;letter-spacing:0.03em">
             <span style="width:7px;height:7px;border-radius:50%;background:{{ syncDot }};display:inline-block"></span>{{ syncLabel }}
           </div>
         </sc-if>
+        <sc-if value="{{ hasUnitName }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:11.5px;font-weight:700;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:2.5px 9px">{{ unitName }}</div>
+        </sc-if>
+        <sc-if value="{{ hasCodeChip }}" hint-placeholder-val="{{ false }}">
+          <div title="The unit you are charting into" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.07em;color:#0E7490;background:#EAF4F7;border:1px solid #9CC3CF;border-radius:999px;padding:2.5px 9px">{{ unitCode }}</div>
+        </sc-if>
+        <div style="flex-basis:100%;height:0"></div>
+        <div style="font-size:11px;color:#7A8A98;line-height:1.45;max-width:660px;text-wrap:pretty">A free tool for NICUs to aid precision delivery and decision support around that precious molecule of life.</div>
       </div>
       <div style="flex:1"></div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
-        <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="0">
-          <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:3px 8px 3px 6px">
-            <span style="width:9px;height:9px;border-radius:3px;background:{{ lg.color }};display:inline-block"></span>{{ lg.label }} {{ lg.count }}
-          </div>
-        </sc-for>
+        <sc-if value="{{ hasMap }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ openMap }}" title="Expand the unit map" style="display:flex;align-items:center;gap:2px;min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;cursor:pointer;padding:0 9px" style-hover="border-color:#0E7490">
+            <sc-for list="{{ mapStrip }}" as="m" hint-placeholder-count="0">
+              <span style="width:7px;height:15px;border-radius:2px;background:{{ m.color }};display:inline-block"></span>
+            </sc-for>
+            <span style="font-size:10.5px;font-weight:700;color:#3D4C59;margin-left:5px">Unit map</span>
+          </button>
+        </sc-if>
+        <sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:3px 8px 3px 6px">
+              <span style="width:9px;height:9px;border-radius:3px;background:{{ lg.color }};display:inline-block"></span>{{ lg.label }} {{ lg.count }}
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ openUnit }}" title="Unit layout, code and settings" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Unit</button>
         <button onClick="{{ exportJson }}" title="Download a JSON backup of all data" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Backup</button>
         <button onClick="{{ importJson }}" title="Restore from a JSON backup" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Import</button>
+        <button onClick="{{ openArchive }}" title="Archived room bundles" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ arLabel }}</button>
         <button onClick="{{ openSnapshot }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#EAF4F7">Current NICU Snapshot Report</button>
         <button onClick="{{ openReport }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#0B5C73">Complete Histogram Log Report</button>
+        </sc-if>
       </div>
     </div>
   </div>
+
+  <sc-if value="{{ isAdminView }}" hint-placeholder-val="{{ false }}">
+    <div data-noprint="1" style="max-width:1180px;margin:0 auto;padding:10px 16px 0">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#F1E7FB;border:1px solid #B583E3;border-radius:11px;padding:8px 12px">
+        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#8A46CF;border-radius:5px;padding:3px 7px">ADMIN VIEW</span>
+        <span style="font-size:12px;color:#6B21A8;font-weight:600">You are in another unit's board. Anything you save is stamped ADMIN in their log.</span>
+        <span style="flex:1"></span>
+        <button onClick="{{ exitAdminView }}" style="min-height:30px;background:#FFFFFF;border:1px solid #B583E3;border-radius:8px;color:#6B21A8;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Leave this unit</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showTrial }}" hint-placeholder-val="{{ false }}">
+    <div data-noprint="1" style="max-width:1180px;margin:0 auto;padding:10px 16px 0">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#FCF0E2;border:1px solid #E0A268;border-radius:11px;padding:8px 12px">
+        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#E07C26;border-radius:5px;padding:3px 7px">TRIAL</span>
+        <span style="font-size:12px;color:#98510F;font-weight:600">{{ trialText }}</span>
+        <span style="flex:1"></span>
+        <button onClick="{{ openUnit }}" style="min-height:30px;background:#FFFFFF;border:1px solid #E0A268;border-radius:8px;color:#98510F;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Unit settings</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Welcome" style="max-width:780px;margin:0 auto;padding:30px 16px 0">
+      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:16px;padding:26px 24px;display:flex;flex-direction:column;gap:15px">
+        <div style="font-size:23px;font-weight:700;letter-spacing:-0.015em">Set up your unit</div>
+        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:580px;text-wrap:pretty">OWL works off your unit's own shape. Draw your beds on a grid — optionally over a photo or scan of your floorplan — label them exactly as your unit numbers them, group open bays, then lock the layout. Every board, report and histogram after that follows it.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <button onClick="{{ startSetup }}" style="min-height:44px;background:#0E7490;border:1px solid #0E7490;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 18px" style-hover="background:#0B5C73">Build my NICU layout</button>
+          <button onClick="{{ seedExample }}" style="min-height:44px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="border-color:#0E7490;color:#0E7490">Start from a 20-room example</button>
+        </div>
+        <div style="height:1px;background:#EDF1F4"></div>
+        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+          <div style="font-size:11.5px;color:#5A6B7A;line-height:1.45">Your unit code is <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0E7490;letter-spacing:0.06em">{{ unitCode }}</span> — everyone on your unit uses it to reach this same board.</div>
+          <button onClick="{{ leaveUnit }}" style="min-height:32px;background:none;border:none;color:#5A6B7A;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 4px;text-decoration:underline">Not your unit? Go back</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isDirectory }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Unit directory" style="max-width:900px;margin:0 auto;padding:26px 16px 0;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:24px;font-weight:700;letter-spacing:-0.015em">Choose your unit</div>
+        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:620px;text-wrap:pretty">Units are private by default and reached with a code — the same one everyone on your unit uses, so no unit ever sees another's board. Any unit that chooses to be listed appears below.</div>
+      </div>
+
+      <sc-if value="{{ dirLoading }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:20px;font-size:13px;color:#7A8A98">Loading units…</div>
+      </sc-if>
+      <sc-if value="{{ dirEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px dashed #C9D2D9;border-radius:14px;padding:18px;font-size:13px;color:#5A6B7A;line-height:1.55">No units are listed publicly. If your unit already runs OWL, enter its code below.</div>
+      </sc-if>
+
+      <sc-if value="{{ dirHasUnits }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px">
+          <sc-for list="{{ dirUnits }}" as="u" hint-placeholder-count="0">
+            <button onClick="{{ u.click }}" style="text-align:left;background:{{ u.bg }};border:1.5px solid {{ u.bd }};border-radius:13px;padding:13px;cursor:pointer;display:flex;flex-direction:column;gap:7px;min-height:112px" style-hover="border-color:#0E7490">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span style="font-size:14.5px;font-weight:700;color:#16232E;line-height:1.25">{{ u.name }}</span>
+                <sc-if value="{{ u.isTrial }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:8.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#E07C26;border-radius:4px;padding:2px 5px">TRIAL</span>
+                </sc-if>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <sc-for list="{{ u.strip }}" as="m" hint-placeholder-count="0">
+                  <span style="width:6px;height:13px;border-radius:2px;background:{{ m.color }};display:inline-block"></span>
+                </sc-for>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ gateOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1.5px solid #0E7490;border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:14.5px;font-weight:700">Enter the code for {{ gateName }}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input value="{{ gateCode }}" onChange="{{ onGateCode }}" placeholder="OWL-XXXXX" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:16px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;min-height:46px;width:170px;box-sizing:border-box">
+            <button onClick="{{ gateSubmit }}" style="min-height:46px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">Enter unit</button>
+            <button onClick="{{ gateCancel }}" style="min-height:46px;background:none;border:none;color:#5A6B7A;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 8px">Cancel</button>
+          </div>
+          <sc-if value="{{ gateHasErr }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12.5px;color:#A32222;font-weight:600">{{ gateErr }}</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">What OWL does</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:stretch">
+          <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:13px;color:#5A6B7A;line-height:1.6;text-wrap:pretty">OWL turns bedside saturation histograms into a unit-wide picture. Every bed carries its respiratory support, FiO₂, target range and a cumulative oxygenation tally, so a glance across the board shows where time is being spent below, inside and above target.</div>
+            <div style="font-size:12.5px;color:#7A8A98;line-height:1.55;font-style:italic">More on the approach, and the evidence behind it, is coming from the OWL site — this space is reserved for it.</div>
+          </div>
+          <div style="flex:1;min-width:250px;background:#F6F9FB;border:1px dashed #C9D2D9;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">A bed on the board</div>
+            <div style="background:#E6F5EA;border:1.5px solid #6BC488;border-radius:9px;padding:9px;display:flex;flex-direction:column;gap:7px">
+              <div style="display:flex;align-items:center;gap:7px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#16232E">ICN-4</span>
+                <span style="font-size:8.5px;font-weight:700;letter-spacing:0.06em;color:#136B31;background:#FFFFFF;border-radius:4px;padding:2px 6px">ROOM AIR</span>
+              </div>
+              <div style="display:flex;align-items:baseline;gap:9px;background:rgba(255,255,255,0.7);border-radius:7px;padding:5px 8px">
+                <span style="font-size:8.5px;font-weight:700;letter-spacing:0.07em;color:#7A8A98">CUMULATIVE</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#3E97CE">4%</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#33A35C">91%</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#D14848">5%</span>
+              </div>
+              <div style="display:flex;height:9px;border-radius:5px;overflow:hidden">
+                <span style="width:4%;background:#3E97CE"></span>
+                <span style="width:91%;background:#33A35C"></span>
+                <span style="width:5%;background:#D14848"></span>
+              </div>
+            </div>
+            <div style="font-size:11px;color:#7A8A98;line-height:1.45">Blue below target, green in target, red above — weighted across every histogram entered.</div>
+          </div>
+        </div>
+        <div style="height:1px;background:#EDF1F4"></div>
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">New to OWL?</div>
+        <div style="font-size:13px;color:#5A6B7A;line-height:1.55;max-width:600px;text-wrap:pretty">Set up your own unit in a few minutes: draw your beds on a grid — over a photo of your floorplan if you have one — label them with your unit's own numbering, then lock it. You get a private unit code to share with your team.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <button onClick="{{ startSetup }}" style="min-height:44px;background:#0E7490;border:1px solid #0E7490;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 18px" style-hover="background:#0B5C73">Set up a new NICU</button>
+          <button onClick="{{ seedExample }}" style="min-height:44px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="border-color:#0E7490;color:#0E7490">Start from a 20-room example</button>
+        </div>
+        <div style="height:1px;background:#EDF1F4"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:11.5px;font-weight:700;color:#5A6B7A">Have a code for a unit that isn't listed?</span>
+          <input value="{{ joinCode }}" onChange="{{ onJoinCode }}" placeholder="OWL-XXXXX" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 11px;font-size:14px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;min-height:40px;width:150px;box-sizing:border-box">
+          <button onClick="{{ doJoin }}" style="min-height:40px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 13px" style-hover="background:#EAF4F7">Join</button>
+          <sc-if value="{{ joinHasErr }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:12px;color:#A32222;font-weight:600">{{ joinErr }}</span>
+          </sc-if>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:0 2px 8px">
+        <span style="font-size:11.5px;color:#7A8A98">Questions, or something that would make this work better on your unit?</span>
+        <a href="{{ feedbackHref }}" style="min-height:34px;display:inline-flex;align-items:center;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;text-decoration:none;padding:0 12px">Give feedback</a>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Admin" style="max-width:1080px;margin:0 auto;padding:22px 16px 0;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+        <div style="font-size:21px;font-weight:700;letter-spacing:-0.015em">Units on this deployment</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ admStore }}</div>
+        <div style="flex:1"></div>
+        <button onClick="{{ admRefresh }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Refresh</button>
+      </div>
+      <sc-if value="{{ admGateOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1.5px solid #0E7490;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;max-width:400px">
+          <div style="font-size:14.5px;font-weight:700">Admin PIN</div>
+          <div style="font-size:12.5px;color:#5A6B7A;line-height:1.5">Enter the six-digit PIN set on this site. Three wrong attempts locks this device out for five minutes.</div>
+          <input value="{{ admPin }}" onChange="{{ onAdmPin }}" placeholder="000000" inputmode="numeric" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:19px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.3em;min-height:46px;box-sizing:border-box;width:100%">
+          <sc-if value="{{ admGateErr }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;color:#A32222;font-weight:600">{{ admGateMsg }}</div>
+          </sc-if>
+          <button onClick="{{ admGateSubmit }}" style="min-height:42px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">Unlock admin</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ admDenied }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FBE8E8;border:1px solid #E08585;border-radius:11px;padding:12px;font-size:13px;color:#A32222;font-weight:600">{{ admMsg }}</div>
+      </sc-if>
+      <sc-if value="{{ admHasUnits }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:128px 1fr 62px 78px 74px 140px 196px;gap:0;background:#F6F9FB;border-bottom:1px solid #E2E8EE;padding:8px 12px;font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#7A8A98">
+            <div>Code</div><div>Unit</div><div>Beds</div><div>Occupied</div><div>Entries</div><div>Last entry</div><div></div>
+          </div>
+          <sc-for list="{{ admUnits }}" as="u" hint-placeholder-count="0">
+            <div style="display:grid;grid-template-columns:128px 1fr 62px 78px 74px 140px 196px;gap:0;align-items:center;border-bottom:1px solid #EDF1F4;padding:9px 12px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#0E7490">{{ u.code }}</div>
+              <div style="font-size:13px;font-weight:600;color:#16232E;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.name }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#3D4C59">{{ u.beds }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#3D4C59">{{ u.occupied }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#3D4C59">{{ u.entries }}</div>
+              <div style="font-size:11.5px;color:#5A6B7A">{{ u.when }}</div>
+              <div style="display:flex;gap:6px;justify-content:flex-end">
+                <button onClick="{{ u.open }}" style="min-height:30px;background:#FFFFFF;border:1px solid #0E7490;border-radius:8px;color:#0E7490;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Open</button>
+                <button onClick="{{ u.exp }}" style="min-height:30px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 9px">JSON</button>
+                <button onClick="{{ u.del }}" style="min-height:30px;background:#FFFFFF;border:1px solid #E0A0A0;border-radius:8px;color:#B42318;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 9px">Delete</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="font-size:11.5px;color:#7A8A98;line-height:1.5;max-width:620px">Opening a unit joins it on this device with its code. Use <strong>Unit → Leave unit</strong> to come back out.</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Layout builder" style="max-width:1280px;margin:0 auto;padding:12px 14px 0">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="font-size:18px;font-weight:700">{{ edTitle }}</div>
+        <div style="font-size:12px;color:#5A6B7A">{{ edSummary }}</div>
+        <div style="flex:1"></div>
+        <button onClick="{{ edCancel }}" style="min-height:36px;background:none;border:none;color:#5A6B7A;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 8px">Cancel</button>
+        <button onClick="{{ edSaveDraft }}" style="min-height:36px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Save draft</button>
+        <button onClick="{{ edLock }}" style="min-height:36px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 14px" style-hover="background:#0B5C73">Save &amp; lock layout</button>
+      </div>
+      <sc-if value="{{ edHasErr }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FBE8E8;border:1px solid #E08585;border-radius:9px;padding:8px 11px;font-size:12.5px;color:#A32222;font-weight:600;margin-bottom:10px">{{ edErr }}</div>
+      </sc-if>
+      <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:min(640px,100%);background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:10px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:9px">
+            <sc-for list="{{ edTools }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.pick }}" title="{{ t.hint }}" style="display:flex;align-items:center;gap:6px;min-height:36px;background:{{ t.bg }};border:1px solid {{ t.bd }};border-radius:9px;color:{{ t.tx }};font-size:12.5px;font-weight:700;cursor:pointer;padding:0 12px">
+                <span style="font-size:13px;line-height:1">{{ t.icon }}</span>{{ t.label }}
+              </button>
+            </sc-for>
+            <div style="width:1px;height:24px;background:#E2E8EE;margin:0 2px"></div>
+            <button onClick="{{ edUndo }}" title="Undo (⌘Z)" style="min-height:36px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:{{ edUndoTx }};font-size:12.5px;font-weight:700;cursor:{{ edUndoCur }};padding:0 11px">↶ Undo</button>
+            <button onClick="{{ edRedo }}" title="Redo (⇧⌘Z)" style="min-height:36px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:{{ edRedoTx }};font-size:12.5px;font-weight:700;cursor:{{ edRedoCur }};padding:0 11px">↷ Redo</button>
+            <div style="flex:1"></div>
+            <div style="font-size:11.5px;color:#5A6B7A;max-width:340px;line-height:1.35;text-align:right">{{ edHint }}</div>
+          </div>
+          <div style="overflow:auto;border:1px solid #E2E8EE;border-radius:10px;background:#FBFCFD">
+            <div style="position:relative;width:{{ edW }};height:{{ edH }}">
+              <div style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none">{{ edSketchEl }}</div>
+              <sc-for list="{{ edBays }}" as="b" hint-placeholder-count="0">
+                <div style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;border:2px dashed #0E7490;border-radius:11px;background:rgba(14,116,144,0.05);pointer-events:none">
+                  <div style="position:absolute;top:-9px;left:9px;background:#FFFFFF;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#0E7490;padding:0 5px;white-space:nowrap">{{ b.name }}</div>
+                </div>
+              </sc-for>
+              <div onPointerDown="{{ edDown }}" onPointerMove="{{ edMove }}" onPointerLeave="{{ edLeave }}" onDoubleClick="{{ edDbl }}" ref="{{ edHitRef }}" style="position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;background-image:linear-gradient(to right,rgba(22,35,46,0.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(22,35,46,0.08) 1px,transparent 1px);background-size:{{ edCellPx }} {{ edCellPx }}"></div>
+              <sc-for list="{{ edBeds }}" as="b" hint-placeholder-count="0">
+                <div style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;background:{{ b.bg }};border:1.5px solid {{ b.bd }};border-radius:7px;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;color:{{ b.tx }};text-align:center;line-height:1.1;padding:1px;overflow:hidden">{{ b.label }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ edHasDrag }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:{{ edDL }};top:{{ edDT }};width:{{ edDW }};height:{{ edDH }};box-sizing:border-box;border:2px solid {{ edDragBd }};background:{{ edDragBg }};border-radius:8px;pointer-events:none"></div>
+              </sc-if>
+              <sc-if value="{{ edEditing }}" hint-placeholder-val="{{ false }}">
+                <input ref="{{ edEditRef }}" value="{{ edEditV }}" onChange="{{ onEdEditV }}" onKeyDown="{{ onEdEditKey }}" onBlur="{{ onEdEditDone }}" style="position:absolute;left:{{ edEditL }};top:{{ edEditT }};width:{{ edEditW }};height:{{ edEditH }};box-sizing:border-box;border:2px solid #0E7490;border-radius:7px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:700;padding:0 3px;z-index:6;background:#FFFFFF">
+              </sc-if>
+            </div>
+          </div>
+        </div>
+        <div style="width:300px;display:flex;flex-direction:column;gap:10px">
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Unit &amp; numbering</div>
+            <input value="{{ edName }}" onChange="{{ onEdName }}" placeholder="Unit name (e.g. San Leandro ICN)" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box;width:100%">
+            <div style="display:flex;gap:6px">
+              <input value="{{ edPrefix }}" onChange="{{ onEdPrefix }}" placeholder="Prefix" style="flex:1;min-width:0;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box">
+              <input value="{{ edNext }}" onChange="{{ onEdNext }}" placeholder="Next #" style="width:78px;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:40px;box-sizing:border-box">
+            </div>
+            <div style="font-size:11.5px;color:#5A6B7A;line-height:1.45">New beds label as <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0E7490">{{ edSample }}</span>. Leave the prefix blank for bare numbers. Double-click any bed on the canvas to rename it.</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input value="{{ edRun }}" onChange="{{ onEdRun }}" placeholder="Qty" style="width:64px;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:40px;box-sizing:border-box">
+              <button onClick="{{ edSeedRun }}" style="flex:1;min-height:40px;background:#EAF4F7;border:1px solid #9CC3CF;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:#DBEDF3">Add a run of beds</button>
+            </div>
+            <button onClick="{{ edUShape }}" title="Lays that many beds around three sides of a central core — undo if it is not what you wanted" style="min-height:40px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:#0E7490;color:#0E7490">U-shape starter (replaces beds)</button>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Selection · {{ edSelCount }}</div>
+            <sc-if value="{{ edHasOne }}" hint-placeholder-val="{{ false }}">
+              <input value="{{ edRename }}" onChange="{{ onEdRename }}" placeholder="Bed label" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:40px;box-sizing:border-box;width:100%">
+            </sc-if>
+            <sc-if value="{{ edHasSel }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:6px">
+                <input value="{{ edBayName }}" onChange="{{ onEdBayName }}" placeholder="Bay name" style="flex:1;min-width:0;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box">
+                <button onClick="{{ edGroupBay }}" style="min-height:40px;background:#EAF4F7;border:1px solid #9CC3CF;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 12px">Group as bay</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ edNoSel }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">With <strong>Arrange</strong>, click a bed to select it, drag a box over several, then group them as an open bay.</div>
+            </sc-if>
+            <sc-if value="{{ edHasBays }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <sc-for list="{{ edBayList }}" as="y" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:7px;background:#F6F9FB;border-radius:8px;padding:6px 8px">
+                    <span style="font-size:12px;font-weight:600;color:#3D4C59;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ y.name }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ y.n }}</span>
+                    <button onClick="{{ y.del }}" style="background:none;border:none;color:#B42318;font-size:11px;font-weight:700;cursor:pointer;padding:2px 4px">Remove</button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Floorplan underlay</div>
+            <div style="font-size:11.5px;color:#5A6B7A;line-height:1.45">Drop in a PNG or JPG of your unit sketch and trace beds over it. The image is a guide only — it is not saved with reports.</div>
+            <button onClick="{{ edPickSketch }}" style="min-height:40px;background:#FFFFFF;border:1.5px dashed #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:#0E7490;color:#0E7490">{{ edSketchLabel }}</button>
+            <sc-if value="{{ edHasSketch }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="range" min="0.05" max="1" step="0.05" value="{{ edOpacity }}" onChange="{{ onEdOpacity }}" style="flex:1;accent-color:#0E7490">
+                <button onClick="{{ edClearSketch }}" style="background:none;border:none;color:#B42318;font-size:11.5px;font-weight:700;cursor:pointer;padding:2px 4px">Remove</button>
+              </div>
+            </sc-if>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Canvas</div>
+            <div style="display:flex;gap:8px">
+              <label style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <span style="font-size:10.5px;font-weight:600;color:#5A6B7A">Columns</span>
+                <input value="{{ edCols }}" onChange="{{ onEdCols }}" style="border:1px solid #C9D2D9;border-radius:8px;padding:8px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:38px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <span style="font-size:10.5px;font-weight:600;color:#5A6B7A">Rows</span>
+                <input value="{{ edRows }}" onChange="{{ onEdRows }}" style="border:1px solid #C9D2D9;border-radius:8px;padding:8px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:38px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
+            <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">Locking hides the builder. It stays editable from <strong>Unit</strong> in the header with your PIN.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 
   <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Unit board" style="max-width:1180px;margin:0 auto;padding:14px 14px 0">
@@ -67,6 +402,16 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               <div style="flex:1"></div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6B7A;white-space:nowrap">{{ r.ago }}</div>
             </div>
+            <sc-if value="{{ r.hasTally }}" hint-placeholder-val="{{ true }}">
+              <div title="Time-weighted across every histogram logged for this bed" style="display:flex;align-items:baseline;gap:8px;background:rgba(255,255,255,0.72);border-radius:9px;padding:5px 9px">
+                <span style="font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Cumulative</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#2A7FB8">{{ r.tB }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#137F3B">{{ r.tI }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#C43A3A">{{ r.tA }}</span>
+                <span style="flex:1"></span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A8A98;white-space:nowrap">{{ r.tHrs }}</span>
+              </div>
+            </sc-if>
             <div style="display:flex;flex-direction:column;gap:3px">
               <div style="display:flex;align-items:center;gap:6px;font-size:12px;min-width:0">
                 <span style="width:8px;height:8px;border-radius:50%;background:#06B6D4;flex:none"></span>
@@ -83,9 +428,12 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                 </div>
               </sc-if>
             </div>
+            <sc-if value="{{ r.isSprint }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11px;font-weight:600;color:{{ r.tx }};background:rgba(255,255,255,0.6);border-radius:7px;padding:4px 8px">{{ r.sprintLine }}</div>
+            </sc-if>
             <sc-if value="{{ r.hasHisto }}" hint-placeholder-val="{{ true }}">
               <div style="background:#FFFFFF;border-radius:10px;padding:8px 10px 6px">
-                <div style="display:grid;grid-template-columns:34px repeat(4,1fr);column-gap:4px;align-items:end">
+                <div style="display:grid;grid-template-columns:{{ r.gridCols }};column-gap:4px;align-items:end">
                   <div></div>
                   <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
                     <div style="display:flex;gap:3px;align-items:flex-end;height:44px;justify-content:center">
@@ -94,7 +442,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                     </div>
                   </sc-for>
                 </div>
-                <div style="display:grid;grid-template-columns:34px repeat(4,1fr);column-gap:4px;border-top:1.5px solid #D5DEE6;padding-top:3px;align-items:center">
+                <div style="display:grid;grid-template-columns:{{ r.gridCols }};column-gap:4px;border-top:1.5px solid #D5DEE6;padding-top:3px;align-items:center">
                   <div></div>
                   <sc-for list="{{ r.cols }}" as="c" hint-placeholder-count="4">
                     <div style="text-align:center;font-size:9px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.lbl }}</div>
@@ -111,6 +459,9 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                   </sc-if>
                 </div>
               </div>
+            </sc-if>
+            <sc-if value="{{ r.hasPrevTgtNote }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:10px;font-weight:600;color:#98510F;background:#FCF0E2;border-radius:6px;padding:3px 7px">{{ r.prevTgtNote }}</div>
             </sc-if>
             <button onClick="{{ r.add }}" style="width:100%;min-height:36px;background:rgba(255,255,255,0.75);border:1px solid {{ r.bd }};border-radius:9px;color:{{ r.tx }};font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#FFFFFF">+ New entry</button>
           </div>
@@ -144,7 +495,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   </sc-if>
 
   <sc-if value="{{ isRoom }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="Room detail" style="max-width:780px;margin:0 auto;padding:12px 14px 0">
+    <div data-screen-label="Room detail" style="max-width:820px;margin:0 auto;padding:12px 14px 0">
       <button onClick="{{ back }}" style="background:none;border:none;color:#0E7490;font-size:13px;font-weight:600;cursor:pointer;padding:8px 2px;margin-bottom:2px" style-hover="color:#155E75">← All rooms</button>
       <div style="background:{{ rvBg }};border:1.5px solid {{ rvBd }};border-radius:16px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -158,7 +509,37 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           <button onClick="{{ rvMove }}" title="Move this patient's data to another room" style="min-height:40px;background:rgba(255,255,255,0.75);border:1.5px solid {{ rvBd }};border-radius:10px;color:{{ rvTx }};font-size:13px;font-weight:600;cursor:pointer;padding:0 14px" style-hover="background:#FFFFFF">Move room…</button>
           <button onClick="{{ rvAdd }}" style="min-height:40px;background:#0E7490;border:none;border-radius:10px;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">+ New entry</button>
         </div>
+        <sc-if value="{{ rvTalHas }}" hint-placeholder-val="{{ true }}">
+          <div style="background:rgba(255,255,255,0.78);border-radius:12px;padding:10px 12px 9px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
+              <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#5A6B7A">Cumulative oxygenation</span>
+              <span style="flex:1"></span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ rvTalHrs }}</span>
+            </div>
+            <div style="display:flex;gap:18px;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;gap:1px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:700;color:#2A7FB8;line-height:1">{{ rvTalB }}</span>
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98">Under target</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:1px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:700;color:#137F3B;line-height:1">{{ rvTalI }}</span>
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98">In target</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:1px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:700;color:#C43A3A;line-height:1">{{ rvTalA }}</span>
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98">Over target</span>
+              </div>
+            </div>
+            <div style="display:flex;height:9px;border-radius:5px;overflow:hidden;background:#EDF1F4">
+              <sc-for list="{{ rvTalBar }}" as="sg" hint-placeholder-count="3">
+                <div style="width:{{ sg.w }};background:{{ sg.bg }}"></div>
+              </sc-for>
+            </div>
+            <div style="font-size:10.5px;color:#7A8A98;line-height:1.4">Time-weighted across every histogram logged in this room, using each entry's own target band.</div>
+          </div>
+        </sc-if>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <sc-if value="{{ showIds }}" hint-placeholder-val="{{ true }}">
           <label style="flex:2;min-width:170px;display:flex;flex-direction:column;gap:2px">
             <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">Patient name</span>
             <input value="{{ rvName }}" onChange="{{ onName }}" placeholder="—" style="background:rgba(255,255,255,0.65);border:none;border-bottom:1.5px solid {{ rvBd }};padding:5px 8px;font-size:13px;font-weight:600;border-radius:7px 7px 0 0;min-height:34px;box-sizing:border-box;width:100%">
@@ -167,20 +548,45 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">MRN #</span>
             <input value="{{ rvMrn }}" onChange="{{ onMrn }}" placeholder="—" style="background:rgba(255,255,255,0.65);border:none;border-bottom:1.5px solid {{ rvBd }};padding:5px 8px;font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace;border-radius:7px 7px 0 0;min-height:34px;box-sizing:border-box;width:100%">
           </label>
+          </sc-if>
+          <sc-if value="{{ hideIds }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:2;min-width:200px;font-size:11.5px;font-weight:600;color:{{ rvTx }};background:rgba(255,255,255,0.6);border-radius:8px;padding:7px 10px;line-height:1.4">Trial unit — bed labels only. No patient identifiers are stored.</div>
+          </sc-if>
           <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-start">
             <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">Compliance</span>
             <div style="font-size:11.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:{{ rvCompTx }};background:{{ rvCompBg }};border:1px solid {{ rvCompBd }};border-radius:7px;padding:7px 10px">{{ rvComp }}</div>
           </div>
         </div>
+        <sc-if value="{{ rvIsSprint }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;font-weight:600;color:{{ rvTx }};background:rgba(255,255,255,0.6);border-radius:8px;padding:6px 10px">{{ rvSprintLine }}</div>
+        </sc-if>
         <sc-if value="{{ rvHasHisto }}" hint-placeholder-val="{{ true }}">
-          <div style="background:#FFFFFF;border-radius:12px;padding:10px 14px 8px">
+          <div style="background:#FFFFFF;border-radius:12px;padding:10px 14px 10px">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
               <div style="font-size:10.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#7A8A98">Saturation histogram</div>
               <div style="flex:1"></div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Current — {{ rvCurLeg }}</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Previous — {{ rvPrevLeg }}</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#0891B2"><span style="width:8px;height:8px;border-radius:50%;background:#06B6D4"></span>Newer — {{ rvCurLeg }}</div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#7C3AED"><span style="width:8px;height:8px;border-radius:50%;background:#A78BFA"></span>Older — {{ rvPrevLeg }}</div>
             </div>
-            <div style="display:grid;grid-template-columns:42px repeat(4,1fr);column-gap:6px;align-items:end">
+            <sc-if value="{{ rvHasCmpTgtNote }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11px;font-weight:600;color:#98510F;background:#FCF0E2;border:1px solid #EBDDC3;border-radius:8px;padding:5px 9px;margin:2px 0 8px">{{ rvCmpTgtNote }}</div>
+            </sc-if>
+            <sc-if value="{{ rvHasScrub }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:4px;margin:2px 0 8px;background:#F6F9FE;border:1px solid #DCE6F2;border-radius:9px;padding:7px 10px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:56px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;color:#0891B2;white-space:nowrap">NEWER</span>
+                  <input type="range" min="0" max="{{ scrubMax }}" step="1" value="{{ scrubPosA }}" onChange="{{ onScrubA }}" style="flex:1;accent-color:#06B6D4;min-height:22px;margin:0">
+                  <span style="width:88px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0891B2;white-space:nowrap">{{ rvAWhen }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:56px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;color:#7C3AED;white-space:nowrap">OLDER</span>
+                  <input type="range" min="0" max="{{ scrubMax }}" step="1" value="{{ scrubPosP }}" onChange="{{ onScrubP }}" style="flex:1;accent-color:#7C3AED;min-height:22px;margin:0">
+                  <span style="width:88px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#7C3AED;white-space:nowrap">{{ rvCmpWhen }}</span>
+                </div>
+                <div style="font-size:9.5px;color:#7A8A98">Drag either slider (left = older) or click log rows below to pick the two compared entries.</div>
+              </div>
+            </sc-if>
+            <div style="display:grid;grid-template-columns:{{ rvGridCols }};column-gap:6px;align-items:end">
               <div></div>
               <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                 <div style="display:flex;gap:4px;align-items:flex-end;height:72px;justify-content:center">
@@ -189,21 +595,40 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                 </div>
               </sc-for>
             </div>
-            <div style="display:grid;grid-template-columns:42px repeat(4,1fr);column-gap:6px;border-top:1.5px solid #D5DEE6;padding-top:4px;align-items:center;row-gap:2px">
+            <div style="display:grid;grid-template-columns:{{ rvGridCols }};column-gap:6px;border-top:1.5px solid #D5DEE6;padding-top:4px;align-items:center;row-gap:2px">
               <div></div>
               <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                 <div style="text-align:center;font-size:10px;font-weight:700;color:#7A8A98;font-family:'IBM Plex Mono',monospace;white-space:nowrap">{{ c.lbl }}</div>
               </sc-for>
-              <div style="font-size:10px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace">NOW</div>
+              <div style="font-size:8.5px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvALbl }}</div>
               <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                 <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:{{ c.fw }};color:#0891B2">{{ c.aV }}</div>
               </sc-for>
               <sc-if value="{{ rvHasPrevBand }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:10px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace">PREV</div>
+                <div style="font-size:8.5px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvPLbl }}</div>
                 <sc-for list="{{ rvCols }}" as="c" hint-placeholder-count="4">
                   <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#7C3AED">{{ c.pV }}</div>
                 </sc-for>
               </sc-if>
+            </div>
+            <div style="margin-top:10px;border-top:1px solid #EDF1F4;padding-top:8px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="width:76px;flex:none;font-size:8.5px;font-weight:700;color:#0891B2;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvALbl }}</span>
+                <div style="flex:1;display:flex;height:16px;border-radius:4px;overflow:hidden;border:1px solid #E2E8EE">
+                  <sc-for list="{{ rvHNow }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0891B2;white-space:nowrap">{{ rvHNowTxt }}</span>
+              </div>
+              <sc-if value="{{ rvHasHCmp }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="width:76px;flex:none;font-size:8.5px;font-weight:700;color:#7C3AED;font-family:'IBM Plex Mono',monospace;line-height:1.25">{{ rvPLbl }}</span>
+                  <div style="flex:1;display:flex;height:16px;border-radius:4px;overflow:hidden;border:1px solid #E2E8EE;opacity:0.8">
+                    <sc-for list="{{ rvHCmp }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C3AED;white-space:nowrap">{{ rvHCmpTxt }}</span>
+                </div>
+              </sc-if>
+              <div style="font-size:9.5px;color:#7A8A98;font-family:'IBM Plex Mono',monospace;padding-left:84px">blue = below (hypoxia) · green = in target · red = above (hyperoxia)</div>
             </div>
           </div>
         </sc-if>
@@ -214,12 +639,13 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
       <div style="display:flex;align-items:baseline;gap:8px;margin:18px 2px 10px;flex-wrap:wrap">
         <div style="font-size:13px;font-weight:700">Histogram log</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A98">{{ rvCount }} entries · newest first</div>
+        <div style="font-size:10.5px;color:#7C3AED">Click rows to pick the two compared entries (aqua = newer, purple = older)</div>
         <div style="flex:1"></div>
         <div style="font-size:10.5px;color:#7A8A98">Compliance = 3 log entries / 24 h</div>
       </div>
       <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;overflow-x:auto">
-        <div style="min-width:990px">
-          <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 64px;border-bottom:1.5px solid #D5DEE6">
+        <div style="min-width:1240px">
+          <div style="display:grid;grid-template-columns:64px 52px 46px minmax(140px,1.1fr) 56px 62px 60px minmax(140px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px 64px;border-bottom:1.5px solid #D5DEE6">
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Hist hr</div>
@@ -227,16 +653,19 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm limits</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">MD notified</div>
-            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes/Interventions</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Histogram</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% Left</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% Right</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% RR>60</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% {{ rrLbl }}</div>
+            <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% RR>80</div>
             <div style="padding:9px 8px;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
             <div></div>
           </div>
           <sc-for list="{{ rvEntries }}" as="e" hint-placeholder-count="3">
-            <div style="display:grid;grid-template-columns:64px 52px 46px minmax(150px,1.1fr) 58px 64px 62px minmax(150px,1.3fr) 50px 50px 54px 62px 50px 64px;border-bottom:1px solid #EDF1F4;background:{{ e.rowBg }};box-shadow:inset 3px 0 0 {{ e.rowEdge }};align-items:center">
+            <div onClick="{{ e.click }}" title="Click to compare this entry" style="display:grid;grid-template-columns:64px 52px 46px minmax(140px,1.1fr) 56px 62px 60px minmax(140px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px 64px;border-bottom:1px solid #EDF1F4;background:{{ e.rowBg }};box-shadow:inset 3px 0 0 {{ e.rowEdge }};align-items:center;cursor:{{ e.rowCur }}">
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4A5865">{{ e.date }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.time }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#4A5865">{{ e.intv }}</div>
@@ -245,10 +674,19 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ e.alarm }}</div>
               <div style="padding:8px;font-size:11.5px;font-weight:600;color:#4A5865">{{ e.md }}</div>
               <div style="padding:8px;font-size:11.5px;color:#1D2B36;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.iv }}</div>
+              <div style="padding:8px 6px">
+                <sc-if value="{{ e.hasSeg }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;height:12px;border-radius:3px;overflow:hidden;width:84px;border:1px solid #E2E8EE">
+                    <sc-for list="{{ e.seg }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                  </div>
+                </sc-if>
+              </div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hb }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.hi2 }}</div>
               <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.ha }}</div>
-              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hrr }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hr6 }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">{{ e.hrr }}</div>
+              <div style="padding:8px;font-family:'IBM Plex Mono',monospace;font-size:12px">{{ e.hr8 }}</div>
               <div style="padding:8px;font-size:11px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
               <div style="display:flex;gap:3px;align-items:center;padding:4px">
                 <button onClick="{{ e.edit }}" title="Edit entry" style="width:26px;height:26px;border-radius:7px;border:1px solid #E2E8EE;background:#FFFFFF;color:#0E7490;font-size:11px;cursor:pointer;line-height:1" style-hover="border-color:#0E7490">✎</button>
@@ -259,8 +697,89 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         </div>
       </div>
       <sc-if value="{{ rvHasEntries }}" hint-placeholder-val="{{ true }}">
-        <button onClick="{{ rvReset }}" style="margin-top:20px;min-height:42px;width:100%;background:#FFFFFF;border:1.5px solid #E5B7B0;border-radius:10px;color:#B42318;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#FBEEEC">Reset room — clear all data…</button>
+        <button onClick="{{ rvReset }}" style="margin-top:20px;min-height:42px;width:100%;background:#FFFFFF;border:1.5px solid #E5B7B0;border-radius:10px;color:#B42318;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#FBEEEC">Archive &amp; clear room — data moves to the Archive tab…</button>
       </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Archive" style="max-width:1000px;margin:0 auto;padding:12px 14px 0">
+      <button onClick="{{ back }}" style="background:none;border:none;color:#0E7490;font-size:13px;font-weight:600;cursor:pointer;padding:8px 2px" style-hover="color:#155E75">← All rooms</button>
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 2px 12px">
+        <div style="font-size:18px;font-weight:700">Archive</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7A8A98">{{ arCountLbl }}</div>
+        <div style="flex:1"></div>
+        <div style="font-size:11px;color:#7A8A98">Bundles are created by "Archive &amp; clear room" and kept here until deleted.</div>
+      </div>
+      <sc-if value="{{ arEmpty }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:18px;max-width:560px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">No archived bundles yet</div>
+          <div style="font-size:12.5px;color:#5A6B7A;line-height:1.5">When a room is archived &amp; cleared, its full histogram log lands here — identified by room and archive date.</div>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ arList }}" as="a" hint-placeholder-count="1">
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:13px 14px">
+            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+              <div style="font-size:15px;font-weight:700">{{ a.label }}</div>
+              <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#5B4A82;background:#F1EBFB;border:1px solid #D8C8F2;border-radius:6px;padding:2.5px 7px;text-transform:uppercase">Archived {{ a.when }}</div>
+              <div style="font-size:11.5px;color:#4A5865">Patient: <span style="font-weight:600">{{ a.name }}</span> · MRN <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ a.mrn }}</span></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ a.count }} entries · last entry {{ a.lastWhen }}</div>
+              <div style="flex:1"></div>
+              <button onClick="{{ a.toggle }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ a.toggleLbl }}</button>
+              <button onClick="{{ a.restore }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#EAF4F7">Restore to room…</button>
+              <button onClick="{{ a.exportA }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Export JSON</button>
+              <button onClick="{{ a.delA }}" style="min-height:34px;background:#FFFFFF;border:1px solid #E5B7B0;border-radius:9px;color:#B42318;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#FBEEEC">Delete…</button>
+            </div>
+            <sc-if value="{{ a.open }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;border:1px solid #E2E8EE;border-radius:10px;overflow-x:auto">
+                <div style="min-width:1080px">
+                  <div style="display:grid;grid-template-columns:62px 50px minmax(150px,1.2fr) 56px 64px minmax(150px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px;border-bottom:1.5px solid #D5DEE6">
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes/Interventions</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Histogram</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% L</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% R</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>60</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>70</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>80</div>
+                    <div style="padding:7px 8px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
+                  </div>
+                  <sc-for list="{{ a.rows }}" as="e" hint-placeholder-count="3">
+                    <div style="display:grid;grid-template-columns:62px 50px minmax(150px,1.2fr) 56px 64px minmax(150px,1.2fr) 96px 44px 44px 46px 48px 48px 48px 46px;border-bottom:1px solid #EDF1F4;align-items:center">
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.date }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.time }}</div>
+                      <div style="padding:6px 8px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;min-width:0"><span style="width:7px;height:7px;border-radius:2px;background:{{ e.solid }};flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.support }}</span></div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px">{{ e.fio2 }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px">{{ e.alarm }}</div>
+                      <div style="padding:6px 8px;font-size:10.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.iv }}</div>
+                      <div style="padding:6px">
+                        <sc-if value="{{ e.hasSeg }}" hint-placeholder-val="{{ true }}">
+                          <div style="display:flex;height:11px;border-radius:3px;overflow:hidden;width:84px;border:1px solid #E2E8EE">
+                            <sc-for list="{{ e.seg }}" as="s" hint-placeholder-count="3"><div style="width:{{ s.w }};background:{{ s.bg }}"></div></sc-for>
+                          </div>
+                        </sc-if>
+                      </div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hb }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hi2 }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.ha }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr6 }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hrr }}</div>
+                      <div style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr8 }}</div>
+                      <div style="padding:6px 8px;font-size:10.5px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
     </div>
   </sc-if>
 
@@ -310,7 +829,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="flex:1"></div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ p.count }} entries · newest first</div>
           </div>
-          <div style="display:grid;grid-template-columns:58px 48px 44px minmax(130px,1.2fr) 52px 60px 56px minmax(130px,1.4fr) 42px 42px 46px 56px 44px;border-bottom:1.5px solid #D5DEE6">
+          <div style="display:grid;grid-template-columns:58px 48px 42px minmax(120px,1.1fr) 50px 56px 52px minmax(120px,1.1fr) 40px 40px 42px 44px 44px 44px 42px;border-bottom:1.5px solid #D5DEE6">
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Date</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Time</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Hist hr</div>
@@ -318,15 +837,17 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">FiO₂ %</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Alarm</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">MD notif</div>
-            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes/Interventions</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% L</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% In</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% R</div>
-            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">% {{ rrLbl }}</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>60</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>70</div>
+            <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">%>80</div>
             <div style="padding:6px 6px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Init</div>
           </div>
           <sc-for list="{{ p.rows }}" as="e" hint-placeholder-count="3">
-            <div style="display:grid;grid-template-columns:58px 48px 44px minmax(130px,1.2fr) 52px 60px 56px minmax(130px,1.4fr) 42px 42px 46px 56px 44px;border-bottom:1px solid #EDF1F4;align-items:center;break-inside:avoid">
+            <div style="display:grid;grid-template-columns:58px 48px 42px minmax(120px,1.1fr) 50px 56px 52px minmax(120px,1.1fr) 40px 40px 42px 44px 44px 44px 42px;border-bottom:1px solid #EDF1F4;align-items:center;break-inside:avoid">
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.date }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.time }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#4A5865">{{ e.intv }}</div>
@@ -338,7 +859,9 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hb }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hi2 }}</div>
               <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.ha }}</div>
-              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hrr }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr6 }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">{{ e.hrr }}</div>
+              <div style="padding:5px 6px;font-family:'IBM Plex Mono',monospace;font-size:11px">{{ e.hr8 }}</div>
               <div style="padding:5px 6px;font-size:10.5px;font-weight:700;color:#3D4C59">{{ e.init }}</div>
             </div>
           </sc-for>
@@ -349,7 +872,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
 
   <sc-if value="{{ editorOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeEditor }}" style="position:fixed;inset:0;z-index:100;background:rgba(22,35,46,0.45);display:flex;align-items:center;justify-content:center;padding:12px">
-      <div data-screen-label="Entry editor" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(560px,100%);max-height:92vh;overflow-y:auto;border-radius:16px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
+      <div data-screen-label="Entry editor" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(580px,100%);max-height:92vh;overflow-y:auto;border-radius:16px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-size:16px;font-weight:700">{{ eTitle }}</div>
           <div style="flex:1"></div>
@@ -372,11 +895,60 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="display:flex;flex-direction:column;gap:6px">
           <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Respiratory support</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px">
-            <sc-for list="{{ modeChips }}" as="m" hint-placeholder-count="8">
+            <sc-for list="{{ modeChips }}" as="m" hint-placeholder-count="9">
               <button onClick="{{ m.pick }}" style="padding:8px 12px;min-height:38px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.tx }};border:1.5px solid {{ m.bd }}">{{ m.label }}</button>
             </sc-for>
           </div>
         </div>
+        <sc-if value="{{ isSprintForm }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px;background:#FCF9F2;border:1px solid #EBDDC3;border-radius:12px;padding:12px">
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <div style="flex:1;min-width:190px;display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Higher support</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ spHiChips }}" as="m" hint-placeholder-count="3">
+                    <button onClick="{{ m.pick }}" style="padding:7px 11px;min-height:36px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.tx }};border:1.5px solid {{ m.bd }}">{{ m.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="flex:1;min-width:190px;display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Lower support</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ spLoChips }}" as="m" hint-placeholder-count="4">
+                    <button onClick="{{ m.pick }}" style="padding:7px 11px;min-height:36px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;background:{{ m.bg }};color:{{ m.tx }};border:1.5px solid {{ m.bd }}">{{ m.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <label style="flex:1;min-width:100px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Hours on higher</span>
+                <input type="number" inputMode="decimal" min="0.5" max="23.5" step="0.5" value="{{ eSpHiH }}" onChange="{{ onSpHiH }}" placeholder="6" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;min-width:100px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Hours on lower</span>
+                <input type="number" inputMode="decimal" min="0.5" max="23.5" step="0.5" value="{{ eSpLoH }}" onChange="{{ onSpLoH }}" placeholder="6" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">Higher starts at</span>
+                <input type="time" value="{{ eSpStart }}" onChange="{{ onSpStart }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
+            <sc-if value="{{ hasSpFields }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ spFields }}" as="f" hint-placeholder-count="0">
+                  <label style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:4px">
+                    <span style="font-size:11px;font-weight:600;color:#5A6B7A">{{ f.label }}</span>
+                    <input type="number" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.on }}" placeholder="{{ f.ph }}" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+                  </label>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasSpPreview }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px;font-weight:600;color:#98510F;background:#FCF0E2;border-radius:8px;padding:7px 10px;font-family:'IBM Plex Mono',monospace">{{ spPreview }}</div>
+            </sc-if>
+          </div>
+        </sc-if>
         <sc-if value="{{ hasFields }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:6px">
             <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Settings</div>
@@ -408,14 +980,26 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <sc-if value="{{ showHisto }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;flex-direction:column;gap:6px">
             <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Target SpO₂</div>
-            <div style="display:flex;gap:6px">
-              <sc-for list="{{ targetChips }}" as="t" hint-placeholder-count="3">
-                <button onClick="{{ t.pick }}" style="flex:1;padding:7px 4px;min-height:46px;border-radius:10px;cursor:pointer;background:{{ t.bg }};border:1.5px solid {{ t.bd }};color:{{ t.tx }}">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ targetChips }}" as="t" hint-placeholder-count="5">
+                <button onClick="{{ t.pick }}" style="flex:1;min-width:86px;padding:7px 4px;min-height:46px;border-radius:10px;cursor:pointer;background:{{ t.bg }};border:1.5px solid {{ t.bd }};color:{{ t.tx }}">
                   <div style="font-size:11.5px;font-weight:700">{{ t.name }}</div>
                   <div style="font-size:11px;font-family:'IBM Plex Mono',monospace">{{ t.range }}</div>
                 </button>
               </sc-for>
             </div>
+            <sc-if value="{{ showCustomTgt }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;max-width:280px">
+                <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:11px;font-weight:600;color:#5A6B7A">Custom low %</span>
+                  <input type="number" inputMode="numeric" min="50" max="100" value="{{ eTLo }}" onChange="{{ onTLo }}" placeholder="92" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+                </label>
+                <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:11px;font-weight:600;color:#5A6B7A">Custom high %</span>
+                  <input type="number" inputMode="numeric" min="50" max="100" value="{{ eTHi }}" onChange="{{ onTHi }}" placeholder="97" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:15px;font-family:'IBM Plex Mono',monospace;min-height:42px;box-sizing:border-box;width:100%">
+                </label>
+              </div>
+            </sc-if>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px">
             <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Saturation histogram (% of time)</div>
@@ -434,10 +1018,21 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               </label>
             </div>
             <div style="font-size:11.5px;font-weight:600;color:{{ sumColor }}">{{ sumMsg }}</div>
-            <label style="display:flex;flex-direction:column;gap:4px;max-width:220px">
-              <span style="font-size:11px;font-weight:600;color:#5A6B7A">{{ rrFieldLabel }}</span>
-              <input type="number" inputMode="numeric" min="0" max="100" value="{{ eRr }}" onChange="{{ onRr }}" placeholder="0" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
-            </label>
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A;margin-top:4px">Tachypnea (% of time)</div>
+            <div style="display:flex;gap:8px">
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#7A8A98">RR&gt;60 <span style="font-weight:500">optional</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ eR6 }}" onChange="{{ onR6 }}" placeholder="—" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#5A6B7A">RR&gt;{{ rrMid }} <span style="font-weight:700;color:#B42318">required</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ eRr }}" onChange="{{ onRr }}" placeholder="0" style="border:1.5px solid #9CB4C0;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:11px;font-weight:600;color:#7A8A98">RR&gt;80 <span style="font-weight:500">optional</span></span>
+                <input type="number" inputMode="numeric" min="0" max="100" value="{{ eR8 }}" onChange="{{ onR8 }}" placeholder="—" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:16px;font-family:'IBM Plex Mono',monospace;min-height:44px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
           </div>
         </sc-if>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
@@ -449,7 +1044,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             </div>
           </div>
           <label style="flex:2;min-width:200px;display:flex;flex-direction:column;gap:4px">
-            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Intervention / note</span>
+            <span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#5A6B7A">Notes / interventions</span>
             <input value="{{ eIv }}" onChange="{{ onIv }}" placeholder="e.g. Wean to CPAP 4" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 10px;font-size:14px;min-height:42px;box-sizing:border-box;width:100%">
           </label>
         </div>
@@ -482,6 +1077,132 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
     </div>
   </sc-if>
 
+  <sc-if value="{{ restoreOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelRestore }}" style="position:fixed;inset:0;z-index:110;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Restore archive dialog" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(420px,100%);max-height:88vh;overflow-y:auto;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
+        <div style="font-size:15.5px;font-weight:700">Restore {{ restoreFrom }} to…</div>
+        <div style="font-size:12.5px;color:#4A5865;line-height:1.5">The archived entries and patient info move back into the room you pick. Occupied rooms are disabled.</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px">
+          <sc-for list="{{ restoreTargets }}" as="t" hint-placeholder-count="8">
+            <button onClick="{{ t.pick }}" disabled="{{ t.dis }}" style="min-height:44px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:{{ t.cur }};background:{{ t.bg }};color:{{ t.tx }};border:1.5px solid {{ t.bd }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+        <button onClick="{{ cancelRestore }}" style="min-height:44px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ mapOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMap }}" style="position:fixed;inset:0;z-index:115;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Unit map" onClick="{{ swallow }}" style="background:#FFFFFF;border-radius:16px;padding:16px;max-width:min(1140px,100%);max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:11px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <div style="font-size:16.5px;font-weight:700">{{ mapTitle }}</div>
+          <div style="font-size:11.5px;color:#7A8A98;max-width:520px;line-height:1.4">Colour follows the support in use. Grey beds are empty — click one to start its first histogram.</div>
+          <div style="flex:1"></div>
+          <button onClick="{{ closeMap }}" style="min-height:32px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Close</button>
+        </div>
+        <div style="position:relative;width:{{ mapW }};height:{{ mapH }}">
+          <sc-for list="{{ mapBays }}" as="b" hint-placeholder-count="0">
+            <div style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;border:1.5px dashed #B4BEC7;border-radius:11px;pointer-events:none">
+              <div style="position:absolute;top:-8px;left:9px;background:#FFFFFF;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98;padding:0 5px;white-space:nowrap">{{ b.name }}</div>
+            </div>
+          </sc-for>
+          <sc-for list="{{ mapBeds }}" as="b" hint-placeholder-count="0">
+            <div onClick="{{ b.click }}" title="{{ b.title }}" style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;background:{{ b.bg }};border:1.5px solid {{ b.bd }};border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px" style-hover="box-shadow:0 4px 12px rgba(22,35,46,0.2)">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:{{ b.tx }};line-height:1.05;text-align:center">{{ b.label }}</span>
+              <span style="font-size:8px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:{{ b.tx }};opacity:0.85;line-height:1.05;text-align:center">{{ b.mode }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ unitOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeUnit }}" style="position:fixed;inset:0;z-index:118;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Unit settings" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(460px,100%);max-height:88vh;overflow-y:auto;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:13px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
+        <div style="font-size:16px;font-weight:700">Unit settings</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Layout</div>
+          <div style="font-size:13px;font-weight:600;color:#16232E">{{ layoutStatus }}</div>
+          <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">{{ layoutDetail }}</div>
+          <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <button onClick="{{ editLayout }}" style="min-height:38px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 13px" style-hover="background:#EAF4F7">Edit layout</button>
+            <button onClick="{{ openMapFromUnit }}" style="min-height:38px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 13px">View unit map</button>
+          </div>
+        </div>
+        <div style="height:1px;background:#EDF1F4"></div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Home page listing</div>
+          <button onClick="{{ toggleListed }}" style="display:flex;align-items:center;gap:9px;background:none;border:none;padding:0;cursor:pointer;text-align:left">
+            <span style="width:38px;height:22px;border-radius:999px;background:{{ listedBg }};border:1px solid {{ listedBd }};position:relative;flex:none;display:inline-block">
+              <span style="position:absolute;top:2px;left:{{ listedX }};width:16px;height:16px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(22,35,46,0.3)"></span>
+            </span>
+            <span style="font-size:12.5px;font-weight:600;color:#3D4C59">{{ listedLabel }}</span>
+          </button>
+          <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">{{ listedHelp }}</div>
+        </div>
+        <div style="height:1px;background:#EDF1F4"></div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Unit code</div>
+          <sc-if value="{{ hasCode }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:700;letter-spacing:0.08em;color:#0E7490">{{ unitCode }}</div>
+              <button onClick="{{ copyCode }}" style="min-height:32px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">{{ copyLabel }}</button>
+              <button onClick="{{ leaveUnit }}" title="Sign out of this unit on this device" style="min-height:32px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#5A6B7A;font-size:11.5px;font-weight:600;cursor:pointer;padding:0 10px">Leave unit</button>
+            </div>
+            <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">Share this with your unit — anyone who joins with it sees this board.</div>
+          </sc-if>
+          <sc-if value="{{ noCode }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:12px;color:#5A6B7A;line-height:1.45">This board is the site's main unit and has no shareable code.</div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ isAdminView }}" hint-placeholder-val="{{ false }}">
+    <div data-noprint="1" style="max-width:1180px;margin:0 auto;padding:10px 16px 0">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#F1E7FB;border:1px solid #B583E3;border-radius:11px;padding:8px 12px">
+        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#8A46CF;border-radius:5px;padding:3px 7px">ADMIN VIEW</span>
+        <span style="font-size:12px;color:#6B21A8;font-weight:600">You are in another unit's board. Anything you save is stamped ADMIN in their log.</span>
+        <span style="flex:1"></span>
+        <button onClick="{{ exitAdminView }}" style="min-height:30px;background:#FFFFFF;border:1px solid #B583E3;border-radius:8px;color:#6B21A8;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Leave this unit</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showTrial }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FCF0E2;border:1px solid #E0A268;border-radius:10px;padding:10px 11px;display:flex;flex-direction:column;gap:7px">
+            <div style="font-size:12px;font-weight:700;color:#98510F">{{ trialText }}</div>
+            <div style="font-size:11.5px;color:#98510F;line-height:1.45">Trial units hold bed labels only — no patient identifiers. For a permanent, unit-only instance, ask for your own deployment.</div>
+            <button onClick="{{ loadSample }}" style="min-height:36px;background:#FFFFFF;border:1px solid #E0A268;border-radius:9px;color:#98510F;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Fill with sample entries</button>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+          <a href="{{ feedbackHref }}" style="min-height:40px;display:inline-flex;align-items:center;color:#0E7490;font-size:12px;font-weight:700;text-decoration:underline">Give feedback</a>
+          <button onClick="{{ closeUnit }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">Done</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ pinOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelPin }}" style="position:fixed;inset:0;z-index:122;background:rgba(22,35,46,0.55);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Layout PIN" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(400px,100%);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:11px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
+        <div style="font-size:15.5px;font-weight:700">{{ pinTitle }}</div>
+        <div style="font-size:12.5px;color:#5A6B7A;line-height:1.5">{{ pinMsg }}</div>
+        <input value="{{ pin1 }}" onChange="{{ onPin1 }}" placeholder="4-digit PIN" inputmode="numeric" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:19px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.35em;min-height:46px;box-sizing:border-box;width:100%">
+        <sc-if value="{{ pinNeeds2 }}" hint-placeholder-val="{{ false }}">
+          <input value="{{ pin2 }}" onChange="{{ onPin2 }}" placeholder="Confirm PIN" inputmode="numeric" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:19px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.35em;min-height:46px;box-sizing:border-box;width:100%">
+        </sc-if>
+        <sc-if value="{{ pinHasErr }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:#A32222;font-weight:600">{{ pinErr }}</div>
+        </sc-if>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button onClick="{{ cancelPin }}" style="min-height:40px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:13px;font-weight:600;cursor:pointer;padding:0 14px">Cancel</button>
+          <button onClick="{{ submitPin }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">{{ pinBtn }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ cancelConfirm }}" style="position:fixed;inset:0;z-index:120;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
       <div data-screen-label="Confirm dialog" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(380px,100%);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
@@ -489,7 +1210,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="font-size:13px;color:#4A5865;line-height:1.5">{{ cMsg }}</div>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button onClick="{{ cancelConfirm }}" style="flex:1;min-height:44px;background:#FFFFFF;border:1.5px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#F3F5F7">Cancel</button>
-          <button onClick="{{ doConfirm }}" style="flex:1;min-height:44px;background:#B42318;border:none;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#9A1E14">{{ cBtn }}</button>
+          <button onClick="{{ doConfirm }}" style="flex:1;min-height:44px;background:{{ cBtnBg }};border:none;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer">{{ cBtn }}</button>
         </div>
       </div>
     </div>
@@ -500,19 +1221,37 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.KEY = 'nicu_resp_v1';
+    this.code = '';
+    let q = null; try { q = new URLSearchParams(window.location.search); } catch (e) {}
+    this.adminTok = (q && q.get('admin')) || '';
+    const urlUnit = ((q && q.get('unit')) || '').toUpperCase().replace(/[^A-Z0-9-]/g, '');
+    try { this.code = urlUnit || (localStorage.getItem('owl_unit') || '').toUpperCase(); } catch (e) { this.code = urlUnit; }
+    if (urlUnit) { try { localStorage.setItem('owl_unit', urlUnit); } catch (e) {} }
+    this.stripUnitParam = !!urlUnit;
+    this.isHome = this.code === 'OWL-KSLN';
+    this.KEY = 'nicu_resp_v1' + (this.code ? ':' + this.code : '');
     let data = { rooms: {} };
     try { const raw = localStorage.getItem(this.KEY); if (raw) { const p = JSON.parse(raw); if (p && p.rooms) data = p; } } catch (e) {}
     let li = ''; try { li = localStorage.getItem('nicu_resp_initials') || ''; } catch (e) {}
-    this.lastInit = li;
-    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null };
-    this.API = '/api/data'; this.remote = false; this.lastWrite = 0;
+    try { this.adminView = localStorage.getItem('owl_admin_view') === '1'; } catch (e) { this.adminView = false; }
+    this.lastInit = this.adminView ? 'ADMIN' : li;
+    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null, restore: null, cmp: {}, arOpen: null, ed: null, map: false, unit: false, pin: null, join: '', copied: false, dir: null, dirLoading: false, gate: null, joinErr: '', adm: null, admLoading: false, admMsg: '', admStore: '', admGate: null };
+    this.API = '/api/data' + (this.code ? '?unit=' + encodeURIComponent(this.code) : ''); this.remote = false; this.lastWrite = 0;
     this.onStorage = (ev) => {
       if (ev.key === this.KEY && ev.newValue) { try { const p = JSON.parse(ev.newValue); if (p && p.rooms) this.setState({ data: p }); } catch (e) {} }
     };
   }
   componentDidMount() {
     window.addEventListener('storage', this.onStorage);
+    this.onUp = () => this.edUp();
+    window.addEventListener('pointerup', this.onUp);
+    this.onKey = ev => this.edKey(ev);
+    window.addEventListener('keydown', this.onKey);
+    if (this.stripUnitParam) {
+      try { const u = new URL(window.location.href); u.searchParams.delete('unit'); window.history.replaceState({}, '', u.toString()); } catch (e) {}
+    }
+    if (this.adminTok) this.loadAdmin();
+    if (!this.code) { this.loadDirectory(); this.setState({ sync: '' }); return; }
     fetch(this.API).then(r => (r.ok ? r.json() : Promise.reject())).then(j => {
       this.remote = true;
       this.setState(j && j.rooms ? { data: j, sync: 'live' } : { sync: 'live' });
@@ -524,7 +1263,8 @@ class Component extends DCLogic {
       }, 5000);
     }).catch(() => this.setState({ sync: 'local' }));
   }
-  componentWillUnmount() { window.removeEventListener('storage', this.onStorage); if (this.pollId) clearInterval(this.pollId); }
+  componentDidUpdate() { if (this.hitEl && this.cursorNow) this.hitEl.style.cursor = this.cursorNow; }
+  componentWillUnmount() { window.removeEventListener('storage', this.onStorage); window.removeEventListener('pointerup', this.onUp); window.removeEventListener('keydown', this.onKey); if (this.pollId) clearInterval(this.pollId); }
 
   modes() {
     return {
@@ -538,16 +1278,746 @@ class Component extends DCLogic {
       RANF: { label: 'RA · not following', bg: '#EDF0F2', bd: '#BFC9D0', tx: '#4A5560', solid: '#8895A0', fields: [] }
     };
   }
-  targets() { return { std: { name: 'Standard', lo: 90, hi: 95 }, bpd: { name: 'BPD', lo: 94, hi: 98 }, pphn: { name: 'PPHN', lo: 92, hi: 97 } }; }
+  targets() { return { std: { name: 'Standard', lo: 90, hi: 95 }, bpd: { name: 'BPD', lo: 94, hi: 98 }, pphn: { name: 'PPHN', lo: 92, hi: 97 }, rop: { name: 'ROP', lo: 97, hi: 99 } }; }
+  targetOf(e) {
+    const TG = this.targets();
+    if (e && e.target === 'custom') { const tg = e.tg || []; return { name: 'Custom', lo: tg[0] != null ? tg[0] : '–', hi: tg[1] != null ? tg[1] : '–' }; }
+    return TG[e && e.target] || TG.std;
+  }
   rrT() { return this.props.rrThreshold ?? 70; }
   prefix() { return this.props.unitPrefix ?? 'ICN'; }
   count() { return Math.max(1, Math.min(60, this.props.roomCount ?? 20)); }
 
+  /* ---------- unit directory, code gate, admin ---------- */
+  hashCode(str) {
+    let h = 0x811c9dc5;
+    const v = String(str).toUpperCase();
+    for (let i = 0; i < v.length; i++) { h ^= v.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return h.toString(36);
+  }
+  loadDirectory() {
+    this.setState({ dirLoading: true });
+    fetch('/api/data?directory')
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(j => this.setState({ dir: (j && j.units) || [], dirLoading: false }))
+      .catch(() => this.setState({ dir: [], dirLoading: false }));
+  }
+  adminQS() { return 'admin=' + encodeURIComponent(this.adminTok) + (this.admPin ? '&pin=' + encodeURIComponent(this.admPin) : ''); }
+  loadAdmin() {
+    this.setState({ admLoading: true });
+    fetch('/api/data?directory&' + this.adminQS())
+      .then(r => r.json().then(j => ({ ok: r.ok, j })))
+      .then(({ ok, j }) => {
+        if (ok && j && j.admin) {
+          this.setState({ adm: j.units || [], admLoading: false, admMsg: '', admGate: null });
+          fetch('/api/data?whoami').then(r2 => (r2.ok ? r2.json() : null)).then(w => {
+            if (w) this.setState({ admStore: w.host + ' · store ' + w.store });
+          }).catch(() => {});
+          return;
+        }
+        if (j && j.pinRequired) { this.setState({ admLoading: false, admGate: { pin: '', err: '' } }); return; }
+        this.setState({ adm: [], admLoading: false, admMsg: 'That admin token was not accepted.' });
+      })
+      .catch(() => this.setState({ adm: [], admLoading: false, admMsg: 'Admin listing unavailable — check OWL_ADMIN_TOKEN on the site.' }));
+  }
+  adminOpen(code) {
+    try { localStorage.setItem('owl_admin_view', '1'); localStorage.setItem('nicu_resp_initials', 'ADMIN'); } catch (e) {}
+    this.joinUnit(code);
+  }
+  adminExport(code) {
+    fetch('/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS())
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(j => {
+        const blob = new Blob([JSON.stringify({ unit: code, exportedAt: new Date().toISOString(), ...j }, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'owl-' + code.toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.json';
+        a.click();
+      })
+      .catch(() => this.setState({ admMsg: 'Could not export ' + code + '.' }));
+  }
+  verifyAndJoin(code, onErr) {
+    const c = String(code || '').trim().toUpperCase();
+    if (!/^[A-Z0-9-]{3,16}$/.test(c)) { onErr('Enter a unit code like OWL-LJFC4.'); return; }
+    fetch('/api/data?unit=' + encodeURIComponent(c))
+      .then(r => {
+        if (r.ok) { this.joinUnit(c); return; }
+        if (r.status === 404) onErr('No unit on this site uses that code.');
+        else onErr('Could not reach the server. Try again.');
+      })
+      .catch(() => onErr('Could not reach the server. Try again.'));
+  }
+
+  /* ---------- unit layout ---------- */
+  layoutOf() { const L = this.state.data.layout; return L && L.beds && L.beds.length ? L : null; }
+  beds() {
+    const L = this.layoutOf();
+    if (L) return L.beds;
+    const N = this.count(), p = this.prefix();
+    return Array.from({ length: N }, (_, i) => ({ k: String(i + 1), label: p ? `${p}-${i + 1}` : String(i + 1), cx: (i % 10) * 2 + 1, cy: i < 10 ? 2 : 6, bay: null }));
+  }
+  bedLabel(k) { const b = this.beds().find(x => String(x.k) === String(k)); return b ? b.label : `${this.prefix()}-${k}`; }
+  needsSetup() { return !this.layoutOf() && !Object.keys(this.state.data.rooms || {}).length; }
+  viewNow() {
+    const v = this.state.view;
+    if (v.t === 'setup') return v;
+    if (this.adminTok) return { t: 'admin' };
+    if (!this.code) return { t: 'directory' };
+    if (this.needsSetup()) return { t: 'welcome' };
+    return v;
+  }
+  cell() { return 40; }
+  geom() { const L = this.layoutOf(); return { cols: (L && L.cols) || 16, rows: (L && L.rows) || 9 }; }
+  nextNum(beds, prefix) {
+    let mx = 0;
+    beds.forEach(b => { const m = String(b.label).match(/(\d+)\s*$/); if (m) mx = Math.max(mx, Number(m[1])); });
+    return mx + 1;
+  }
+  newCode() { const c = 'ACDEFGHJKLMNPQRTUVWXY34679'; let s = ''; for (let i = 0; i < 5; i++) s += c[Math.floor(Math.random() * c.length)]; return 'OWL-' + s; }
+  setCode(code) {
+    this.code = code;
+    try { localStorage.setItem('owl_unit', code); } catch (e) {}
+    this.KEY = 'nicu_resp_v1:' + code;
+    this.API = '/api/data?unit=' + encodeURIComponent(code);
+  }
+  joinUnit(raw) {
+    const code = String(raw || '').trim().toUpperCase();
+    if (!code) return;
+    this.setCode(code);
+    window.location.reload();
+  }
+  startSetup() {
+    const L = this.layoutOf(), g = this.geom();
+    if (!L && !this.code) this.setCode(this.newCode());
+    const beds = L ? L.beds.map(b => ({ ...b })) : (this.needsSetup() ? [] : this.beds().map(b => ({ ...b })));
+    const prefix = L && L.prefix != null ? L.prefix : this.prefix();
+    const ed = {
+      cols: g.cols, rows: g.rows, beds, bays: L && L.bays ? L.bays.map(b => ({ ...b })) : [],
+      sketch: (L && L.sketch) || '', opacity: L && L.opacity != null ? L.opacity : 0.4,
+      tool: 'arrange', prefix, next: String(this.nextNum(beds, prefix)), run: '6',
+      sel: [], bayName: '', name: (L && L.name) || '', err: '', drag: null, hover: null,
+      editK: null, editV: '', hist: [], hp: 0
+    };
+    ed.hist = [this.snap(ed)];
+    this.setState({ view: { t: 'setup' }, unit: false, map: false, pin: null, ed });
+    window.scrollTo(0, 0);
+  }
+  snap(e) { return JSON.stringify({ beds: e.beds, bays: e.bays, cols: e.cols, rows: e.rows }); }
+  edSet(patch) { this.setState(s => (s.ed ? { ed: { ...s.ed, ...patch } } : {})); }
+  // Structural edits go through edCommit so undo/redo has a history to walk.
+  edCommit(patch) {
+    this.setState(s => {
+      if (!s.ed) return {};
+      const ed = { ...s.ed, ...patch };
+      ed.cols = Math.min(40, Math.max(ed.cols, ...ed.beds.map(b => b.cx + 2), ...ed.bays.map(y => y.x1 + 2), 8));
+      ed.rows = Math.min(24, Math.max(ed.rows, ...ed.beds.map(b => b.cy + 2), ...ed.bays.map(y => y.y1 + 2), 5));
+      const sn = this.snap(ed);
+      if (s.ed.hist[s.ed.hp] !== sn) {
+        ed.hist = s.ed.hist.slice(0, s.ed.hp + 1).concat([sn]).slice(-50);
+        ed.hp = ed.hist.length - 1;
+      }
+      return { ed };
+    });
+  }
+  edStep(dir) {
+    this.setState(s => {
+      if (!s.ed) return {};
+      const hp = s.ed.hp + dir;
+      if (hp < 0 || hp >= s.ed.hist.length) return {};
+      const st = JSON.parse(s.ed.hist[hp]);
+      return { ed: { ...s.ed, beds: st.beds, bays: st.bays, cols: st.cols, rows: st.rows, hp, sel: [], drag: null, editK: null, err: '' } };
+    });
+  }
+  bedAt(beds, x, y) { return beds.find(b => b.cx === x && b.cy === y) || null; }
+  uid(sfx) { return 'b' + Date.now().toString(36) + Math.floor(Math.random() * 1e5).toString(36) + (sfx || ''); }
+  edPos(ev) {
+    const e = this.state.ed, c = this.cell();
+    const t = ev.currentTarget || ev.target, r = t.getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.min((e ? e.cols : 1) - 1, Math.floor((ev.clientX - r.left) / c))),
+      y: Math.max(0, Math.min((e ? e.rows : 1) - 1, Math.floor((ev.clientY - r.top) / c)))
+    };
+  }
+  edDown(ev) {
+    const e = this.state.ed; if (!e) return;
+    const p = this.edPos(ev), bed = this.bedAt(e.beds, p.x, p.y);
+    const mode = e.tool === 'add' ? 'paint' : (e.tool === 'bay' ? 'bay' : (e.tool === 'erase' ? 'erase' : (bed ? 'move' : 'marquee')));
+    const drag = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, mode };
+    this.dragNow = drag;
+    const sel = mode === 'move' ? (e.sel.indexOf(bed.k) >= 0 ? e.sel : [bed.k]) : (mode === 'marquee' ? [] : e.sel);
+    this.edSet({ editK: null, err: '', sel, drag });
+  }
+  edMove(ev) {
+    const e = this.state.ed; if (!e) return;
+    const p = this.edPos(ev);
+    const d = this.dragNow;
+    if (!d) { if (!e.hover || e.hover.x !== p.x || e.hover.y !== p.y) this.edSet({ hover: p }); return; }
+    if (p.x !== d.x1 || p.y !== d.y1) { d.x1 = p.x; d.y1 = p.y; this.edSet({ drag: { ...d }, hover: p }); }
+  }
+  edDbl(ev) {
+    const e = this.state.ed; if (!e) return;
+    const p = this.edPos(ev), bed = this.bedAt(e.beds, p.x, p.y);
+    if (bed) this.edSet({ editK: bed.k, editV: bed.label, sel: [bed.k], drag: null });
+  }
+  edUp() {
+    const e = this.state.ed, d = this.dragNow;
+    this.dragNow = null;
+    if (!e || !d) return;
+    const x0 = Math.min(d.x0, d.x1), x1 = Math.max(d.x0, d.x1);
+    const y0 = Math.min(d.y0, d.y1), y1 = Math.max(d.y0, d.y1);
+    const inRect = b => b.cx >= x0 && b.cx <= x1 && b.cy >= y0 && b.cy <= y1;
+    if (d.mode === 'paint') {
+      const beds = e.beds.slice(); let num = Math.max(1, Number(e.next) || 1), made = [];
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        if (this.bedAt(beds, x, y)) continue;
+        const b = { k: this.uid(String(made.length)), label: e.prefix ? `${e.prefix}-${num}` : String(num), cx: x, cy: y, bay: null };
+        beds.push(b); made.push(b); num++;
+      }
+      const single = made.length === 1 && x0 === x1 && y0 === y1;
+      this.edCommit({ beds, next: String(num), drag: null, sel: made.map(b => b.k), editK: single ? made[0].k : null, editV: single ? made[0].label : '' });
+    } else if (d.mode === 'move') {
+      const dx = d.x1 - d.x0, dy = d.y1 - d.y0;
+      if (!dx && !dy) { this.edSet({ drag: null }); return; }
+      const group = e.sel.length ? e.sel : [];
+      const moving = e.beds.filter(b => group.indexOf(b.k) >= 0);
+      const ok = moving.length && moving.every(b => {
+        const nx = b.cx + dx, ny = b.cy + dy;
+        if (nx < 0 || ny < 0 || nx > 39 || ny > 23) return false;
+        const t = this.bedAt(e.beds, nx, ny);
+        return !t || group.indexOf(t.k) >= 0;
+      });
+      if (!ok) { this.edSet({ drag: null, err: 'That spot is taken — drop the bed on empty cells.' }); return; }
+      this.edCommit({ beds: e.beds.map(b => (group.indexOf(b.k) >= 0 ? { ...b, cx: b.cx + dx, cy: b.cy + dy } : b)), drag: null, err: '' });
+    } else if (d.mode === 'marquee') {
+      this.edSet({ sel: e.beds.filter(inRect).map(b => b.k), drag: null });
+    } else if (d.mode === 'bay') {
+      this.edCommit({ bays: e.bays.concat([{ id: 'y' + Date.now().toString(36), name: e.bayName || `Bay ${e.bays.length + 1}`, x0, y0, x1, y1 }]), drag: null, bayName: '' });
+    } else if (d.mode === 'erase') {
+      this.edCommit({
+        beds: e.beds.filter(b => !inRect(b)),
+        bays: e.bays.filter(y => !(y.x0 >= x0 && y.x1 <= x1 && y.y0 >= y0 && y.y1 <= y1)),
+        sel: [], drag: null
+      });
+    } else this.edSet({ drag: null });
+  }
+  edKey(ev) {
+    const e = this.state.ed; if (!e) return;
+    const tag = (ev.target && ev.target.tagName) || '';
+    const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    if ((ev.metaKey || ev.ctrlKey) && (ev.key === 'z' || ev.key === 'Z')) { ev.preventDefault(); this.edStep(ev.shiftKey ? 1 : -1); return; }
+    if ((ev.metaKey || ev.ctrlKey) && (ev.key === 'y' || ev.key === 'Y')) { ev.preventDefault(); this.edStep(1); return; }
+    if (typing) return;
+    if (ev.key === 'Escape') { this.dragNow = null; this.edSet({ sel: [], editK: null, drag: null }); return; }
+    if ((ev.key === 'Delete' || ev.key === 'Backspace') && e.sel.length) {
+      ev.preventDefault();
+      this.edCommit({ beds: e.beds.filter(b => e.sel.indexOf(b.k) < 0), sel: [] });
+    }
+  }
+  seedRun() {
+    const e = this.state.ed; if (!e) return;
+    const qty = Math.max(1, Math.min(60, Number(e.run) || 6));
+    const beds = e.beds.slice(); let num = Math.max(1, Number(e.next) || 1), placed = 0;
+    const cols = Math.max(e.cols, Math.min(40, qty + 1));
+    for (let y = 0; y < 24 && placed < qty; y++) for (let x = 0; x < cols && placed < qty; x++) {
+      if (this.bedAt(beds, x, y)) continue;
+      beds.push({ k: this.uid(String(placed)), label: e.prefix ? `${e.prefix}-${num}` : String(num), cx: x, cy: y, bay: null });
+      num++; placed++;
+    }
+    this.edCommit({ beds, cols, next: String(num), sel: [], err: '' });
+  }
+  uShape() {
+    const e = this.state.ed; if (!e) return;
+    const qty = Math.max(3, Math.min(60, Number(e.run) || 12));
+    const side = Math.max(2, Math.ceil((qty + 2) / 3));
+    const W = Math.min(38, side + 1), H = Math.min(22, side);
+    const path = [];
+    for (let y = 1; y <= H; y++) path.push([1, y]);
+    for (let x = 2; x <= W; x++) path.push([x, H]);
+    for (let y = H - 1; y >= 1; y--) path.push([W, y]);
+    let num = Math.max(1, Number(e.next) || 1);
+    const beds = path.slice(0, qty).map((p, i) => ({ k: this.uid('u' + i), label: e.prefix ? `${e.prefix}-${num + i}` : String(num + i), cx: p[0], cy: p[1], bay: null }));
+    this.edCommit({ beds, bays: [], next: String(num + beds.length), sel: [], err: '', cols: Math.min(40, W + 2), rows: Math.min(24, H + 2) });
+  }
+    pickSketch() {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/png,image/jpeg';
+    inp.onchange = () => {
+      const file = inp.files && inp.files[0]; if (!file) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const max = 1400, sc = Math.min(1, max / Math.max(img.width, img.height));
+          const cv = document.createElement('canvas');
+          cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          this.edSet({ sketch: cv.toDataURL('image/jpeg', 0.7) });
+        };
+        img.src = String(rd.result);
+      };
+      rd.readAsDataURL(file);
+    };
+    inp.click();
+  }
+  saveLayout(lock, pin) {
+    const e = this.state.ed; if (!e) return;
+    if (!e.beds.length) { this.edSet({ err: 'Place at least one bed before saving.' }); return; }
+    // Crop the empty margins: shift everything up and left, then size the grid to what is used.
+    const bays = e.bays.map(y => ({ ...y }));
+    const xs = e.beds.map(b => b.cx).concat(bays.map(y => y.x0));
+    const ys = e.beds.map(b => b.cy).concat(bays.map(y => y.y0));
+    const sx = Math.min(...xs), sy = Math.min(...ys);
+    bays.forEach(y => { y.x0 -= sx; y.x1 -= sx; y.y0 -= sy; y.y1 -= sy; });
+    const beds = e.beds.slice()
+      .map(b => ({ ...b, cx: b.cx - sx, cy: b.cy - sy }))
+      .sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx))
+      .map(b => {
+        const y = bays.find(v => b.cx >= v.x0 && b.cx <= v.x1 && b.cy >= v.y0 && b.cy <= v.y1);
+        return { k: b.k, label: b.label, cx: b.cx, cy: b.cy, bay: y ? y.id : null };
+      });
+    const cols = Math.max(8, Math.max(...beds.map(b => b.cx), ...bays.map(y => y.x1)) + 2);
+    const rows = Math.max(5, Math.max(...beds.map(b => b.cy), ...bays.map(y => y.y1)) + 2);
+    const old = this.layoutOf();
+    const layout = { name: e.name || '', cols, rows, prefix: e.prefix, beds, bays, sketch: e.sketch, opacity: e.opacity, locked: !!lock, pin: pin || (old && old.pin) || '', updatedAt: new Date().toISOString() };
+    this.sendOp({ op: 'layout', layout });
+    this.setState({ view: { t: 'grid' }, ed: null, pin: null });
+    window.scrollTo(0, 0);
+  }
+  exampleLayout() {
+    const beds = [];
+    for (let i = 0; i < 20; i++) beds.push({ k: String(i + 1), label: `ICN-${i + 1}`, cx: (i % 10) * 2 + 1, cy: i < 10 ? 2 : 6, bay: null });
+    return { name: '', cols: 26, rows: 13, prefix: 'ICN', beds, bays: [], sketch: '', opacity: 0.4, locked: true, pin: '', updatedAt: new Date().toISOString() };
+  }
+  lastActivity() {
+    let t = 0; const rooms = this.state.data.rooms || {};
+    Object.keys(rooms).forEach(k => (rooms[k] || []).forEach(e => { const v = new Date(e.ts).getTime(); if (v > t) t = v; }));
+    const L = this.layoutOf(); if (L && L.updatedAt) t = Math.max(t, new Date(L.updatedAt).getTime());
+    return t || Date.now();
+  }
+  loadSample() {
+    const beds = this.beds().slice(0, 6), now = Date.now();
+    const plan = [
+      { mode: 'HFOV', s: { map: '14', amp: '30', hz: '9' }, f: [38, 52], h: [8, 79, 13], rr: 22, r6: 41, r8: 9 },
+      { mode: 'SIMV', s: { rate: '35', pip: '20', peep: '6' }, f: [30, 44], h: [11, 82, 7], rr: 18, r6: 33, r8: 5 },
+      { mode: 'CPAP', s: { press: '6' }, f: [21, 30], h: [6, 88, 6], rr: 12, r6: 26, r8: 3 },
+      { mode: 'HFNC', s: { flow: '4' }, f: [21, 28], h: [4, 91, 5], rr: 9, r6: 19, r8: 2 },
+      { mode: 'NC', s: { flow: '0.5' }, f: [21, 25], h: [3, 93, 4], rr: 7, r6: 14, r8: 1 },
+      { mode: 'RA', s: {}, f: null, h: [2, 96, 2], rr: 4, r6: 8, r8: 0 }
+    ];
+    beds.forEach((b, i) => {
+      const p = plan[i % plan.length];
+      [16, 8].forEach((back, j) => {
+        const entry = { id: `${now}${i}${j}`, ts: new Date(now - back * 3600000).toISOString(), init: 'RT', intv: 8, mode: p.mode, s: { ...p.s }, f: p.f, target: 'std', h: j === 0 ? p.h : [p.h[0] + 3, p.h[1] - 4, p.h[2] + 1], rr: p.rr + (j ? 5 : 0), r6: p.r6, r8: p.r8, md: false, iv: '' };
+        this.sendOp({ op: 'add', room: b.k, entry });
+      });
+    });
+    this.setState({ unit: false });
+  }
+  layoutVals(view) {
+    const px = v => v + 'px', cell = this.cell();
+    const e = this.state.ed, L = this.layoutOf(), beds = this.beds();
+    const bedStyle = k => {
+      const latest = this.entriesOf(k)[0];
+      if (!latest) return { bg: '#EDF0F2', bd: '#C9D2D9', tx: '#5A6B7A', mode: 'Empty' };
+      const M = this.modeView(latest);
+      return { bg: M.bg, bd: M.bd, tx: M.tx, mode: M.label };
+    };
+    const mapCell = 46;
+    const bays = (L && L.bays) || [];
+    const geom = this.geom();
+    const xs = beds.map(b => b.cx).concat(bays.map(y => y.x0), bays.map(y => y.x1));
+    const ys = beds.map(b => b.cy).concat(bays.map(y => y.y0), bays.map(y => y.y1));
+    const mnX = xs.length ? Math.min(...xs) : 0, mxX = xs.length ? Math.max(...xs) : 0;
+    const mnY = ys.length ? Math.min(...ys) : 0, mxY = ys.length ? Math.max(...ys) : 0;
+    const mapBeds = beds.map(b => {
+      const st = bedStyle(b.k), occ = this.entriesOf(b.k).length > 0;
+      return {
+        l: px((b.cx - mnX) * mapCell + 2), t: px((b.cy - mnY) * mapCell + 2), w: px(mapCell - 5), h: px(mapCell - 5),
+        bg: st.bg, bd: st.bd, tx: st.tx, label: b.label, mode: st.mode, title: `${b.label} · ${st.mode}`,
+        click: () => { this.setState({ map: false }); if (occ) this.openRoom(b.k); else this.openEditor(b.k); }
+      };
+    });
+    const tool = e ? e.tool : 'arrange';
+    const sel = e ? e.sel : [];
+    const one = e && sel.length === 1 ? e.beds.find(b => b.k === sel[0]) : null;
+    const d = e && e.drag ? e.drag : null;
+    const moving = !!(d && d.mode === 'move');
+    const mdx = moving ? d.x1 - d.x0 : 0, mdy = moving ? d.y1 - d.y0 : 0;
+    const dx0 = d ? Math.min(d.x0, d.x1) : 0, dx1 = d ? Math.max(d.x0, d.x1) : 0;
+    const dy0 = d ? Math.min(d.y0, d.y1) : 0, dy1 = d ? Math.max(d.y0, d.y1) : 0;
+    const hov = e && e.hover ? this.bedAt(e.beds, e.hover.x, e.hover.y) : null;
+    const toolDefs = [
+      ['arrange', 'Arrange', '\u2196', 'Click a bed to select it \u00b7 drag it to move \u00b7 double-click to rename \u00b7 Delete removes.'],
+      ['add', 'Add beds', '+', 'Drag across empty cells to drop a run. A single click adds one bed and opens its name.'],
+      ['bay', 'Bay', '\u25ad', 'Drag a dashed outline around the beds that share an open bay.'],
+      ['erase', 'Erase', '\u00d7', 'Click a bed to remove it, or drag across several.']
+    ];
+    const eraserCur = 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\'><g transform=\'rotate(-40 12 14)\'><rect x=\'3\' y=\'9\' width=\'16\' height=\'9\' rx=\'2\' fill=\'%23ffffff\' stroke=\'%23C43A3A\' stroke-width=\'2\'/><rect x=\'3\' y=\'14\' width=\'16\' height=\'4\' fill=\'%23F6CFCF\' stroke=\'%23C43A3A\' stroke-width=\'2\'/></g></svg>") 4 16, crosshair';
+    let cursor = 'crosshair';
+    if (tool === 'arrange') cursor = moving ? 'grabbing' : (hov ? 'grab' : 'default');
+    else if (tool === 'erase') cursor = eraserCur;
+    this.cursorNow = cursor;
+    if (this.hitEl) this.hitEl.style.cursor = cursor;
+    const canUndo = !!(e && e.hp > 0), canRedo = !!(e && e.hp < e.hist.length - 1);
+    const commitEdit = () => {
+      const st = this.state.ed; if (!st || !st.editK) return;
+      const v = (st.editV || '').trim();
+      this.edCommit({ beds: st.beds.map(b => (b.k === st.editK ? { ...b, label: v || b.label } : b)), editK: null, editV: '' });
+    };
+    const eBed = e && e.editK ? e.beds.find(b => b.k === e.editK) : null;
+    const editL = eBed ? Math.max(0, Math.min((e.cols - 2) * cell, eBed.cx * cell - cell / 2)) : 0;
+    
+    const p = this.state.pin;
+    const act = this.lastActivity();
+    const daysIdle = Math.floor((Date.now() - act) / 86400000);
+    const left = Math.max(0, 30 - daysIdle);
+    return {
+      inApp: view.t !== 'welcome' && view.t !== 'setup' && view.t !== 'directory' && view.t !== 'admin',
+      hasCodeChip: !!this.code && view.t !== 'directory' && view.t !== 'admin',
+      hasUnitName: !!(L && L.name), unitName: (L && L.name) || '',
+      showIds: !this.code || this.isHome, hideIds: !!this.code && !this.isHome,
+      showTrial: !!this.code && !this.isHome && view.t !== 'setup' && view.t !== 'welcome' && view.t !== 'directory',
+      trialText: `Trial unit ${this.code} · bed labels only, no patient identifiers · clears after 30 days idle (${left} left)`,
+      isWelcome: view.t === 'welcome', isSetup: view.t === 'setup',
+      isDirectory: view.t === 'directory', isAdmin: view.t === 'admin',
+      dirLoading: !!this.state.dirLoading,
+      dirHasUnits: !!(this.state.dir && this.state.dir.length),
+      dirEmpty: !this.state.dirLoading && !!this.state.dir && !this.state.dir.length,
+      dirUnits: (this.state.dir || []).map(u => {
+        const sel = this.state.gate && this.state.gate.id === u.id;
+        const filled = Math.max(0, Math.min(14, u.occupied || 0));
+        const total = Math.max(filled, Math.min(14, u.beds || 0));
+        const strip = [];
+        for (let i = 0; i < total; i++) strip.push({ color: i < filled ? '#0E7490' : '#D5DEE6' });
+        return {
+          name: u.name || 'Unnamed unit',
+          isTrial: u.code !== 'OWL-KSLN' && u.id !== this.hashCode('OWL-KSLN'),
+          strip,
+          bg: sel ? '#EAF4F7' : '#FFFFFF', bd: sel ? '#0E7490' : '#E2E8EE',
+          click: () => this.setState({ gate: { id: u.id, name: u.name || 'this unit', code: '', err: '' } })
+        };
+      }),
+      gateOpen: !!this.state.gate,
+      gateName: (this.state.gate && this.state.gate.name) || '',
+      gateCode: (this.state.gate && this.state.gate.code) || '',
+      onGateCode: ev => { const v = ev.target.value.toUpperCase(); this.setState(st => ({ gate: { ...st.gate, code: v, err: '' } })); },
+      gateHasErr: !!(this.state.gate && this.state.gate.err),
+      gateErr: (this.state.gate && this.state.gate.err) || '',
+      gateCancel: () => this.setState({ gate: null }),
+      gateSubmit: () => {
+        const g = this.state.gate; if (!g) return;
+        const tries = (this.gateTries || 0);
+        if (this.coolUntil && Date.now() < this.coolUntil) {
+          const secs = Math.ceil((this.coolUntil - Date.now()) / 1000);
+          this.setState({ gate: { ...g, err: `Too many attempts — wait ${secs}s.` } });
+          return;
+        }
+        const typed = String(g.code || '').trim().toUpperCase();
+        if (this.hashCode(typed) !== g.id) {
+          this.gateTries = tries + 1;
+          if (this.gateTries >= 5) { this.coolUntil = Date.now() + 60000; this.gateTries = 0; }
+          this.setState({ gate: { ...g, err: `That code does not match ${g.name}.` } });
+          return;
+        }
+        this.gateTries = 0;
+        this.verifyAndJoin(typed, msg => this.setState({ gate: { ...this.state.gate, err: msg } }));
+      },
+      joinHasErr: !!this.state.joinErr, joinErr: this.state.joinErr || '',
+      admStore: this.state.admStore || '',
+      admDenied: !!this.state.admMsg, admMsg: this.state.admMsg || '',
+      admHasUnits: !!(this.state.adm && this.state.adm.length),
+      admUnits: (this.state.adm || []).map(u => ({
+        code: u.code, name: u.name || '—', beds: String(u.beds || 0), occupied: String(u.occupied || 0), entries: String(u.entries || 0),
+        when: u.lastTs ? this.fmtDateFull(u.lastTs) : '—',
+        open: () => this.adminOpen(u.code),
+        exp: () => this.adminExport(u.code),
+        del: () => {
+          if (!window.confirm('Delete unit ' + u.code + ' and all of its data? This cannot be undone.')) return;
+          fetch('/api/data?unit=' + encodeURIComponent(u.code) + '&admin=' + encodeURIComponent(this.adminTok), { method: 'DELETE' })
+            .then(() => this.loadAdmin());
+        }
+      })),
+      admRefresh: () => this.loadAdmin(),
+      admGateOpen: !!this.state.admGate,
+      admPin: (this.state.admGate && this.state.admGate.pin) || '',
+      onAdmPin: ev => { const v = ev.target.value.replace(/[^0-9]/g, '').slice(0, 6); this.setState(st => ({ admGate: { ...st.admGate, pin: v, err: '' } })); },
+      admGateErr: !!(this.state.admGate && this.state.admGate.err),
+      admGateMsg: (this.state.admGate && this.state.admGate.err) || '',
+      admGateSubmit: () => {
+        const g = this.state.admGate; if (!g) return;
+        if (this.admCool && Date.now() < this.admCool) {
+          const mins = Math.ceil((this.admCool - Date.now()) / 60000);
+          this.setState({ admGate: { ...g, err: `Locked out — try again in ${mins} min.` } });
+          return;
+        }
+        if (!/^\d{6}$/.test(g.pin)) { this.setState({ admGate: { ...g, err: 'The PIN is six digits.' } }); return; }
+        this.admPin = g.pin;
+        fetch('/api/data?directory&' + this.adminQS())
+          .then(r => r.json().then(j => ({ ok: r.ok, j })))
+          .then(({ ok, j }) => {
+            if (ok && j && j.admin) {
+              this.admTries = 0;
+              this.setState({ adm: j.units || [], admGate: null, admMsg: '' });
+              fetch('/api/data?whoami').then(r2 => (r2.ok ? r2.json() : null)).then(w => {
+                if (w) this.setState({ admStore: w.host + ' · store ' + w.store });
+              }).catch(() => {});
+              return;
+            }
+            this.admTries = (this.admTries || 0) + 1;
+            this.admPin = '';
+            if (this.admTries >= 3) { this.admCool = Date.now() + 300000; this.admTries = 0; this.setState({ admGate: { pin: '', err: 'Three wrong attempts — locked out for five minutes.' } }); return; }
+            this.setState({ admGate: { pin: '', err: 'That PIN was not accepted.' } });
+          })
+          .catch(() => this.setState({ admGate: { ...g, err: 'Could not reach the server.' } }));
+      },
+      exitAdminView: () => { try { localStorage.removeItem('owl_admin_view'); localStorage.removeItem('owl_unit'); } catch (e) {} window.location.reload(); },
+      joinCode: this.state.join,
+      onJoinCode: ev => this.setState({ join: ev.target.value }),
+      doJoin: () => this.verifyAndJoin(this.state.join, msg => this.setState({ joinErr: msg })),
+      startSetup: () => this.startSetup(),
+      seedExample: () => { if (!this.code) this.setCode(this.newCode()); this.sendOp({ op: 'layout', layout: this.exampleLayout() }); this.setState({ view: { t: 'grid' } }); },
+      edTitle: L ? 'Edit unit layout' : 'New NICU layout',
+      edSummary: e ? `${e.beds.length} bed${e.beds.length === 1 ? '' : 's'}${e.bays.length ? ' \u00b7 ' + e.bays.length + ' bay' + (e.bays.length === 1 ? '' : 's') : ''} \u00b7 ${e.cols}\u00d7${e.rows} grid` : '',
+      edTools: toolDefs.map(([k, label, icon, hint]) => ({
+        label, icon, hint,
+        pick: () => { this.dragNow = null; this.edSet({ tool: k, drag: null, editK: null, err: '' }); },
+        bg: tool === k ? '#0E7490' : '#FFFFFF', bd: tool === k ? '#0E7490' : '#C9D2D9', tx: tool === k ? '#FFFFFF' : '#3D4C59'
+      })),
+      edHint: (toolDefs.find(t => t[0] === tool) || toolDefs[0])[3],
+      edHitRef: el => { this.hitEl = el; if (el) el.style.cursor = this.cursorNow || 'default'; },
+      edUndo: () => this.edStep(-1), edRedo: () => this.edStep(1),
+      edUndoTx: canUndo ? '#3D4C59' : '#C2CBD3', edUndoCur: canUndo ? 'pointer' : 'default',
+      edRedoTx: canRedo ? '#3D4C59' : '#C2CBD3', edRedoCur: canRedo ? 'pointer' : 'default',
+      edW: e ? px(e.cols * cell) : '0px', edH: e ? px(e.rows * cell) : '0px',
+      edCellPx: px(cell),
+      edDown: ev => this.edDown(ev),
+      edMove: ev => this.edMove(ev),
+      edDbl: ev => this.edDbl(ev),
+      edLeave: () => this.edSet({ hover: null }),
+      edBeds: e ? e.beds.map(b => {
+        const on = sel.indexOf(b.k) >= 0;
+        const mv = moving && on;
+        const cx = b.cx + (mv ? mdx : 0), cy = b.cy + (mv ? mdy : 0);
+        const del = tool === 'erase' && ((hov && hov.k === b.k && !d) || (d && d.mode === 'erase' && b.cx >= dx0 && b.cx <= dx1 && b.cy >= dy0 && b.cy <= dy1));
+        return {
+          l: px(cx * cell + 2), t: px(cy * cell + 2), w: px(cell - 5), h: px(cell - 5), label: b.label,
+          bg: del ? '#FBE8E8' : (on ? '#0E7490' : '#FFFFFF'),
+          bd: del ? '#C43A3A' : (on ? '#0E7490' : '#7FA8B8'),
+          tx: del ? '#A32222' : (on ? '#FFFFFF' : '#16232E')
+        };
+      }) : [],
+      edBays: e ? e.bays.map(y => ({ l: px(y.x0 * cell), t: px(y.y0 * cell), w: px((y.x1 - y.x0 + 1) * cell), h: px((y.y1 - y.y0 + 1) * cell), name: y.name })) : [],
+      edHasDrag: !!d && d.mode !== 'move',
+      edDL: px(dx0 * cell), edDT: px(dy0 * cell), edDW: px((dx1 - dx0 + 1) * cell), edDH: px((dy1 - dy0 + 1) * cell),
+      edDragBd: d && d.mode === 'erase' ? '#C43A3A' : '#0E7490',
+      edDragBg: d && d.mode === 'erase' ? 'rgba(196,58,58,0.14)' : 'rgba(14,116,144,0.14)',
+      edEditing: !!eBed,
+      edEditL: px(editL), edEditT: eBed ? px(eBed.cy * cell + 2) : '0px', edEditW: px(cell * 2), edEditH: px(cell - 5),
+      edEditV: (e && e.editV) || '',
+      edEditRef: el => { if (el && !el.__owlFocus) { el.__owlFocus = true; setTimeout(() => { el.focus(); el.select(); }, 0); } },
+      onEdEditV: ev => this.edSet({ editV: ev.target.value }),
+      onEdEditKey: ev => {
+        if (ev.key === 'Enter') { ev.preventDefault(); commitEdit(); }
+        else if (ev.key === 'Escape') { ev.preventDefault(); this.edSet({ editK: null, editV: '' }); }
+      },
+      onEdEditDone: () => commitEdit(),
+      edHasSketch: !!(e && e.sketch), edOpacity: e ? e.opacity : 0.4,
+      edSketchEl: e && e.sketch ? React.createElement('img', { src: e.sketch, alt: '', style: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', objectFit: 'contain', opacity: e.opacity, pointerEvents: 'none' } }) : null,
+      edSketchLabel: e && e.sketch ? 'Replace floorplan image' : 'Upload a PNG or JPG floorplan',
+      edPickSketch: () => this.pickSketch(),
+      edClearSketch: () => this.edSet({ sketch: '' }),
+      onEdOpacity: ev => this.edSet({ opacity: Number(ev.target.value) }),
+      edName: (e && e.name) || '', onEdName: ev => this.edSet({ name: ev.target.value }),
+      edPrefix: (e && e.prefix) || '', onEdPrefix: ev => this.edSet({ prefix: ev.target.value }),
+      edNext: (e && e.next) || '1', onEdNext: ev => this.edSet({ next: ev.target.value.replace(/[^0-9]/g, '') }),
+      edSample: e ? (e.prefix ? `${e.prefix}-${Math.max(1, Number(e.next) || 1)}` : String(Math.max(1, Number(e.next) || 1))) : '',
+      edRun: (e && e.run) || '6', onEdRun: ev => this.edSet({ run: ev.target.value.replace(/[^0-9]/g, '') }),
+      edSeedRun: () => this.seedRun(),
+      edUShape: () => this.uShape(),
+      edSelCount: sel.length ? `${sel.length} bed${sel.length === 1 ? '' : 's'}` : 'nothing selected',
+      edHasSel: sel.length > 0, edHasOne: !!one, edNoSel: !sel.length,
+      edRename: one ? one.label : '',
+      onEdRename: ev => { const v = ev.target.value; this.edSet({ beds: e.beds.map(b => (b.k === one.k ? { ...b, label: v } : b)) }); },
+      edBayName: (e && e.bayName) || '', onEdBayName: ev => this.edSet({ bayName: ev.target.value }),
+      edGroupBay: () => {
+        if (!e || !sel.length) return;
+        const g = e.beds.filter(b => sel.indexOf(b.k) >= 0);
+        const bay = { id: 'y' + Date.now().toString(36), name: e.bayName || `Bay ${e.bays.length + 1}`, x0: Math.min(...g.map(b => b.cx)), y0: Math.min(...g.map(b => b.cy)), x1: Math.max(...g.map(b => b.cx)), y1: Math.max(...g.map(b => b.cy)) };
+        this.edCommit({ bays: e.bays.concat([bay]), bayName: '', sel: [] });
+      },
+      edHasBays: !!(e && e.bays.length),
+      edBayList: e ? e.bays.map(y => ({
+        name: y.name, n: `${e.beds.filter(b => b.cx >= y.x0 && b.cx <= y.x1 && b.cy >= y.y0 && b.cy <= y.y1).length} beds`,
+        del: () => this.edCommit({ bays: e.bays.filter(v => v.id !== y.id) })
+      })) : [],
+      edCols: e ? String(e.cols) : '', onEdCols: ev => this.edSet({ cols: Math.max(4, Math.min(40, Number(ev.target.value) || 16)) }),
+      edRows: e ? String(e.rows) : '', onEdRows: ev => this.edSet({ rows: Math.max(3, Math.min(24, Number(ev.target.value) || 9)) }),
+      edHasErr: !!(e && e.err), edErr: (e && e.err) || '',
+      edCancel: () => this.setState({ ed: null, view: { t: 'grid' } }),
+      edSaveDraft: () => this.saveLayout(false, null),
+      edLock: () => {
+        if (!e || !e.beds.length) { this.edSet({ err: 'Place at least one bed before locking.' }); return; }
+        this.setState({ pin: { mode: 'lock', v1: '', v2: '', err: '' } });
+      },
+      pinOpen: !!p,      pinOpen: !!p, pinNeeds2: !!(p && p.mode === 'lock'),
+      pinTitle: p && p.mode === 'lock' ? 'Lock this layout' : 'Unlock the layout',
+      pinMsg: p && p.mode === 'lock'
+        ? 'Set a 4-digit PIN. The layout then sits in the background and informs the whole app; editing it later asks for this PIN.'
+        : 'Enter the 4-digit PIN set when this layout was locked.',
+      pin1: (p && p.v1) || '', pin2: (p && p.v2) || '',
+      onPin1: ev => { const v = ev.target.value.replace(/[^0-9]/g, '').slice(0, 4); this.setState(s => ({ pin: { ...s.pin, v1: v, err: '' } })); },
+      onPin2: ev => { const v = ev.target.value.replace(/[^0-9]/g, '').slice(0, 4); this.setState(s => ({ pin: { ...s.pin, v2: v, err: '' } })); },
+      pinHasErr: !!(p && p.err), pinErr: (p && p.err) || '',
+      pinBtn: p && p.mode === 'lock' ? 'Lock layout' : 'Unlock',
+      cancelPin: () => this.setState({ pin: null }),
+      submitPin: () => {
+        const s = this.state.pin; if (!s) return;
+        if (s.mode === 'lock') {
+          if (!/^\d{4}$/.test(s.v1)) { this.setState({ pin: { ...s, err: 'Use exactly four digits.' } }); return; }
+          if (s.v1 !== s.v2) { this.setState({ pin: { ...s, err: 'The two PINs do not match.' } }); return; }
+          this.saveLayout(true, s.v1);
+        } else {
+          if (!L || s.v1 !== (L.pin || '')) { this.setState({ pin: { ...s, err: 'That PIN does not match.' } }); return; }
+          this.startSetup();
+        }
+      },
+      hasMap: beds.length > 0 && (view.t === 'grid' || view.t === 'room' || view.t === 'archive'),
+      mapStrip: beds.slice(0, 44).map(b => { const latest = this.entriesOf(b.k)[0]; return { color: latest ? this.modeView(latest).solid : '#D5DEE6' }; }),
+      openMap: () => this.setState({ map: true }),
+      closeMap: () => this.setState({ map: false }),
+      mapOpen: !!this.state.map,
+      mapTitle: (L && L.name) || 'Unit map',
+      mapW: px((mxX - mnX + 1) * mapCell), mapH: px((mxY - mnY + 1) * mapCell),
+      mapBeds,
+      mapBays: bays.map(y => ({ l: px((y.x0 - mnX) * mapCell), t: px((y.y0 - mnY) * mapCell), w: px((y.x1 - y.x0 + 1) * mapCell), h: px((y.y1 - y.y0 + 1) * mapCell), name: y.name })),
+      unitOpen: !!this.state.unit,
+      openUnit: () => this.setState({ unit: true, copied: false }),
+      closeUnit: () => this.setState({ unit: false }),
+      openMapFromUnit: () => this.setState({ unit: false, map: true }),
+      layoutStatus: L ? (L.locked ? 'Setup complete · locked' : 'Draft layout · not locked') : 'No layout yet',
+      layoutDetail: L ? `${L.beds.length} beds${L.bays && L.bays.length ? ', ' + L.bays.length + ' bay' + (L.bays.length === 1 ? '' : 's') : ''} · last saved ${this.fmtDateFull(L.updatedAt || new Date().toISOString())}` : 'Draw your unit once and everything else follows it.',
+      editLayout: () => { if (L && L.locked && L.pin) this.setState({ unit: false, pin: { mode: 'unlock', v1: '', v2: '', err: '' } }); else this.startSetup(); },
+      isListed: !!(L && L.listed === true),
+      listedLabel: L && L.listed === true ? 'Listed on the OWL home page' : 'Private — not listed',
+      listedHelp: L && L.listed === true
+        ? 'Visitors see your unit name and a bed-occupancy bar. Entry still needs your code.'
+        : 'Your unit is reachable only by its code. Nobody browsing the site can see it exists.',
+      listedBg: L && L.listed === true ? '#0E7490' : '#DCE3E9',
+      listedBd: L && L.listed === true ? '#0E7490' : '#C9D2D9',
+      listedX: L && L.listed === true ? '18px' : '2px',
+      toggleListed: () => {
+        if (!L) return;
+        this.sendOp({ op: 'layout', layout: { ...L, listed: !(L.listed === true), updatedAt: new Date().toISOString() } });
+      },
+      feedbackHref: 'mailto:sangoram+histogram@gmail.com?subject=' + encodeURIComponent('OWL feedback' + (this.code ? ' — ' + this.code : '')),
+      hasCode: !!this.code, noCode: !this.code, unitCode: this.code,
+      isAdminView: !!this.adminView,
+      copyLabel: this.state.copied ? 'Copied' : 'Copy',
+      copyCode: () => { try { navigator.clipboard.writeText(this.code); } catch (er) {} this.setState({ copied: true }); },
+      leaveUnit: () => { try { localStorage.removeItem('owl_unit'); } catch (er) {} window.location.reload(); },
+      loadSample: () => this.loadSample()
+    };
+  }
+
+  sprintStyle(e) {
+    const M = this.modes(), sp = e.sp;
+    const A = M[sp.hi] || M.CPAP, B = M[sp.lo] || M.RA;
+    let schedX = Math.round(Number(sp.hiH) / (Number(sp.hiH) + Number(sp.loH)) * 100);
+    schedX = Math.max(0, Math.min(100, isNaN(schedX) ? 50 : schedX));
+    const split = this.sprintSplit(e);
+    let bg = `linear-gradient(90deg, ${A.bg} 0 ${schedX}%, ${B.bg} ${schedX}% 100%)`;
+    if (split && split.hiHrs + split.loHrs > 0) {
+      // chronological: earlier mode left, mode in effect at entry time right
+      const hiPct = Math.max(0, Math.min(100, Math.round(split.hiHrs / (split.hiHrs + split.loHrs) * 100)));
+      const endHi = this.sprintModeAtEnd(e);
+      const leftC = endHi ? B.bg : A.bg, rightC = endHi ? A.bg : B.bg;
+      const leftPct = endHi ? 100 - hiPct : hiPct;
+      bg = `linear-gradient(90deg, ${leftC} 0 ${leftPct}%, ${rightC} ${leftPct}% 100%)`;
+    }
+    return {
+      bg, bd: A.bd, tx: A.tx,
+      solid: `linear-gradient(90deg, ${A.solid} 0 ${schedX}%, ${B.solid} ${schedX}% 100%)`,
+      label: `Sprint ${sp.hi}/${sp.lo}`
+    };
+  }
+  sprintModeAtEnd(e) {
+    const sp = e.sp, cyc = (Number(sp.hiH) + Number(sp.loH)) * 60;
+    if (!cyc || isNaN(cyc)) return true;
+    const parts = String(sp.start || '06:00').split(':');
+    const startMin = (Number(parts[0]) || 0) * 60 + (Number(parts[1]) || 0);
+    const t = new Date(new Date(e.ts).getTime() - 60000); // sample 1 min before ts: entries logged exactly at a block transition belong to the block that just ended
+    const dayMin = t.getHours() * 60 + t.getMinutes();
+    const rel = ((dayMin - startMin) % cyc + cyc) % cyc;
+    return rel < Number(sp.hiH) * 60;
+  }
+  modeView(e) {
+    const M = this.modes();
+    if (e && e.mode === 'SPRINT' && e.sp) return this.sprintStyle(e);
+    const m = M[e && e.mode] || M.RA;
+    return { bg: m.bg, bd: m.bd, tx: m.tx, solid: m.solid, label: m.label };
+  }
+  setStr(mode, s) {
+    s = s || {}; const v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : null);
+    if (mode === 'CPAP') return v('press') != null ? `CPAP ${v('press')}` : 'CPAP';
+    if (mode === 'HFNC') return v('flow') != null ? `HFNC ${v('flow')}L` : 'HFNC';
+    if (mode === 'NC') return v('flow') != null ? `NC ${v('flow')}L` : 'NC';
+    if (mode === 'RA') return 'RA';
+    return mode || '';
+  }
+  sprintSplit(e) {
+    if (!e || e.mode !== 'SPRINT' || !e.sp) return null;
+    const sp = e.sp, cyc = (Number(sp.hiH) + Number(sp.loH)) * 60;
+    if (!cyc || isNaN(cyc)) return null;
+    const parts = String(sp.start || '06:00').split(':');
+    const startMin = (Number(parts[0]) || 0) * 60 + (Number(parts[1]) || 0);
+    const end = new Date(e.ts), intv = (e.intv != null ? e.intv : 8) * 60;
+    let hi = 0; const step = 5;
+    for (let m = step / 2; m < intv; m += step) {
+      const t = new Date(end.getTime() - m * 60000);
+      const dayMin = t.getHours() * 60 + t.getMinutes();
+      const rel = ((dayMin - startMin) % cyc + cyc) % cyc;
+      if (rel < Number(sp.hiH) * 60) hi += step;
+    }
+    const hiHrs = Math.round(hi / 60 * 10) / 10;
+    const loHrs = Math.round((intv / 60 - hi / 60) * 10) / 10;
+    return { hiHrs, loHrs };
+  }
+  sprintLine(e) {
+    const sp = e.sp, split = this.sprintSplit(e);
+    if (!sp || !split) return '';
+    return `Sprint ⇄ ≈ ${split.hiHrs}h ${sp.hi} · ${split.loHrs}h ${sp.lo} of this ${e.intv != null ? e.intv : 8}h histogram (${sp.hi} starts at ${sp.start})`;
+  }
+  segs(e) {
+    if (!e || !e.h) return null;
+    const t = v => Math.max(0, Math.min(100, v));
+    return [{ w: t(e.h[0]) + '%', bg: '#3E97CE' }, { w: t(e.h[1]) + '%', bg: '#33A35C' }, { w: t(e.h[2]) + '%', bg: '#D14848' }];
+  }
+
   applyOp(d, op) {
-    const k = String(op.room); d.rooms = d.rooms || {}; d.meta = d.meta || {};
+    const k = String(op.room || ''); d.rooms = d.rooms || {}; d.meta = d.meta || {}; d.archives = d.archives || {};
     if (op.op === 'add') { d.rooms[k] = d.rooms[k] || []; d.rooms[k].push(op.entry); }
     else if (op.op === 'del') { d.rooms[k] = (d.rooms[k] || []).filter(e => e.id !== op.id); if (!d.rooms[k].length) delete d.rooms[k]; }
     else if (op.op === 'reset') { delete d.rooms[k]; delete d.meta[k]; }
+    else if (op.op === 'archive') {
+      if (d.rooms[k] && d.rooms[k].length) {
+        const id = String(op.aid || (Date.now() + '' + Math.floor(Math.random() * 1000)));
+        const es = d.rooms[k].slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
+        d.archives[id] = { id, room: k, archivedAt: new Date().toISOString(), lastTs: es[0] ? es[0].ts : null, entries: d.rooms[k], meta: d.meta[k] || {} };
+      }
+      delete d.rooms[k]; delete d.meta[k];
+    }
+    else if (op.op === 'restoreArchive') {
+      const ar = d.archives[op.id];
+      if (ar) {
+        const to = String(op.to);
+        if (!(d.rooms[to] && d.rooms[to].length)) {
+          d.rooms[to] = ar.entries || [];
+          if (ar.meta && Object.keys(ar.meta).length) d.meta[to] = ar.meta;
+          delete d.archives[op.id];
+        }
+      }
+    }
+    else if (op.op === 'delArchive') { delete d.archives[op.id]; }
     else if (op.op === 'meta') { d.meta[k] = { ...(d.meta[k] || {}), ...op.patch }; }
     else if (op.op === 'edit') { d.rooms[k] = (d.rooms[k] || []).map(e => (e.id === op.entry.id ? op.entry : e)); }
     else if (op.op === 'move') {
@@ -555,7 +2025,8 @@ class Component extends DCLogic {
       if (d.rooms[k]) { d.rooms[to] = d.rooms[k]; delete d.rooms[k]; }
       if (d.meta[k]) { d.meta[to] = d.meta[k]; delete d.meta[k]; }
     }
-    else if (op.op === 'import') { d.rooms = op.data.rooms || {}; d.meta = op.data.meta || {}; }
+    else if (op.op === 'import') { d.rooms = op.data.rooms || {}; d.meta = op.data.meta || {}; d.archives = op.data.archives || {}; if (op.data.layout) d.layout = op.data.layout; }
+    else if (op.op === 'layout') { d.layout = op.layout; }
   }
   sendOp(op) {
     this.setState(s => {
@@ -577,12 +2048,15 @@ class Component extends DCLogic {
   mos() { return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; }
   fmtTime(iso) { const d = new Date(iso); return `${this.pad(d.getHours())}:${this.pad(d.getMinutes())}`; }
   fmtDate(iso) { const d = new Date(iso); return `${this.mos()[d.getMonth()]} ${d.getDate()}`; }
+  fmtDateFull(iso) { const d = new Date(iso); return `${this.mos()[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; }
   fmtWhen(iso) { const d = new Date(iso), now = new Date(); const sameDay = d.toDateString() === now.toDateString(); return sameDay ? this.fmtTime(iso) : `${this.fmtDate(iso)} ${this.fmtTime(iso)}`; }
+  fmtStamp(iso) { return `${this.fmtDate(iso)} ${this.fmtTime(iso)}`; }
   ago(iso) { const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); if (m < 60) return m + 'm ago'; const h = Math.floor(m / 60); if (h < 48) return h + 'h ago'; return Math.floor(h / 24) + 'd ago'; }
   concise(e) {
     const s = e.s || {}, v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : '–');
     let parts = [];
-    if (e.mode === 'HFOV') parts = [`MAP ${v('map')}`, `Δ${v('amp')}`, `${v('hz')} Hz`];
+    if (e.mode === 'SPRINT' && e.sp) parts = [`${this.setStr(e.sp.hi, e.sp.hiS)} ⇄ ${this.setStr(e.sp.lo, e.sp.loS)}`, `${e.sp.hiH}h/${e.sp.loH}h @ ${e.sp.start}`];
+    else if (e.mode === 'HFOV') parts = [`MAP ${v('map')}`, `Δ${v('amp')}`, `${v('hz')} Hz`];
     else if (e.mode === 'SIMV') parts = [`R ${v('rate')}`, `PIP ${v('pip')}`, `PEEP ${v('peep')}`];
     else if (e.mode === 'NAVA') parts = [`Lvl ${v('level')}`, `PEEP ${v('peep')}`];
     else if (e.mode === 'CPAP') parts = [`${v('press')} cmH₂O`];
@@ -594,6 +2068,7 @@ class Component extends DCLogic {
   }
   modeShort(e) {
     const s = e.s || {}, v = k => (s[k] !== undefined && s[k] !== '' ? s[k] : '–');
+    if (e.mode === 'SPRINT' && e.sp) return `Sprint ${this.setStr(e.sp.hi, e.sp.hiS)} ⇄ ${this.setStr(e.sp.lo, e.sp.loS)} (${e.sp.hiH}/${e.sp.loH}h @ ${e.sp.start})`;
     if (e.mode === 'HFOV') return `HFOV ${v('map')}/Δ${v('amp')}/${v('hz')}`;
     if (e.mode === 'SIMV') return `SIMV ${v('rate')} · ${v('pip')}/${v('peep')}`;
     if (e.mode === 'NAVA') return `NAVA ${v('level')}/${v('peep')}`;
@@ -604,9 +2079,9 @@ class Component extends DCLogic {
     return 'Room air';
   }
   entryRow(e, older) {
-    const MODES = this.modes(), TG = this.targets();
-    const EM = MODES[e.mode] || MODES.RA, ET = TG[e.target] || TG.std;
+    const EM = this.modeView(e), ET = this.targetOf(e);
     const hrs = e.intv != null ? e.intv : (older ? (new Date(e.ts).getTime() - new Date(older.ts).getTime()) / 3600000 : null);
+    const seg = this.segs(e);
     return {
       date: this.fmtDate(e.ts), time: this.fmtTime(e.ts),
       intv: hrs == null ? '—' : (hrs >= 9.5 ? String(Math.round(hrs)) : String(Math.round(hrs * 10) / 10)),
@@ -616,47 +2091,74 @@ class Component extends DCLogic {
       md: e.md === true ? 'Yes' : (e.md === false ? 'No' : '—'),
       iv: e.iv ? e.iv : '—',
       hb: e.h ? String(e.h[0]) : '—', hi2: e.h ? String(e.h[1]) : '—', ha: e.h ? String(e.h[2]) : '—',
+      hr6: e.r6 != null ? String(e.r6) : '—',
       hrr: e.rr != null ? String(e.rr) : '—',
+      hr8: e.r8 != null ? String(e.r8) : '—',
+      hasSeg: !!seg, seg: seg || [],
       init: e.init || '—'
     };
   }
+  tally(es) {
+    // Time-weighted roll-up of every histogram on this bed: each entry counts for the hours
+    // it represents, so an 8 h and a 4 h histogram are not treated as equal. Band positions
+    // (under / in target / over) are used as logged, whatever each entry's target range was.
+    let w = 0; const acc = [0, 0, 0]; let n = 0;
+    (es || []).forEach(e => {
+      if (!e || !e.h || e.mode === 'RANF') return;
+      const h = e.intv != null ? Number(e.intv) : 8;
+      if (!(h > 0)) return;
+      w += h; n++;
+      acc[0] += h * e.h[0]; acc[1] += h * e.h[1]; acc[2] += h * e.h[2];
+    });
+    if (!w) return { has: false, b: 0, i: 0, a: 0, hrs: 0, n: 0 };
+    const pc = v => Math.round(v / w);
+    let b = pc(acc[0]), i = pc(acc[1]), a = pc(acc[2]);
+    const drift = 100 - (b + i + a);
+    if (drift) i += drift;
+    return { has: true, b, i, a, hrs: Math.round(w * 10) / 10, n };
+  }
   bandsFor(latest, prev) {
     if (!latest || !latest.h) return null;
-    const T = this.targets()[latest.target] || this.targets().std;
+    const T = this.targetOf(latest);
     const hasPrev = !!(prev && prev.h);
     const clamp = v => Math.max(1.5, Math.min(100, v)) + '%';
-    const aVals = [latest.h[0], latest.h[1], latest.h[2], latest.rr != null ? latest.rr : null];
-    const pVals = hasPrev ? [prev.h[0], prev.h[1], prev.h[2], prev.rr != null ? prev.rr : null] : [null, null, null, null];
-    const lbls = [`<${T.lo}`, `${T.lo}–${T.hi}`, `>${T.hi}`, `RR>${this.rrT()}`];
+    const val = (e, k) => {
+      if (!e) return null;
+      if (k === 'h0') return e.h ? e.h[0] : null;
+      if (k === 'h1') return e.h ? e.h[1] : null;
+      if (k === 'h2') return e.h ? e.h[2] : null;
+      if (k === 'rr') return e.rr != null ? e.rr : null;
+      if (k === 'r6') return e.r6 != null ? e.r6 : null;
+      return e.r8 != null ? e.r8 : null;
+    };
+    const defs = [['h0', `<${T.lo}`], ['h1', `${T.lo}–${T.hi}`], ['h2', `>${T.hi}`]];
+    const rrDefs = [['r6', 'RR>60'], ['rr', `RR>${this.rrT()}`], ['r8', 'RR>80']]
+      .filter(([k]) => k === 'rr' || val(latest, k) != null || (hasPrev && val(prev, k) != null));
+    const all = [...defs, ...rrDefs];
     return {
-      hasPrevBand: hasPrev,
-      cols: lbls.map((lbl, ix) => ({
-        lbl, fw: ix === 1 ? 700 : 600,
-        aV: aVals[ix] != null ? String(aVals[ix]) : '–', aH: aVals[ix] != null ? clamp(aVals[ix]) : '0%',
-        pV: pVals[ix] != null ? String(pVals[ix]) : '', pH: pVals[ix] != null ? clamp(pVals[ix]) : '0%'
-      }))
+      hasPrevBand: hasPrev, n: all.length,
+      cols: all.map(([k, lbl], ix) => {
+        const a = val(latest, k), p = hasPrev ? val(prev, k) : null;
+        return { lbl, fw: ix === 1 ? 700 : 600, aV: a != null ? String(a) : '–', aH: a != null ? clamp(a) : '0%', pV: p != null ? String(p) : '', pH: p != null ? clamp(p) : '0%' };
+      })
     };
   }
-  binsFor(latest, prev) {
-    if (!latest || !latest.h) return null;
-    const T = this.targets()[latest.target] || this.targets().std;
-    const lbls = [`<${T.lo}`, `${T.lo}–${T.hi}`, `>${T.hi}`];
-    const ph = prev && prev.h ? prev.h : null;
-    return latest.h.map((val, ix) => ({
-      lbl: lbls[ix], aV: String(val), aH: Math.max(2, Math.min(100, val)),
-      pV: ph ? String(ph[ix]) : '', pH: ph ? Math.max(2, Math.min(100, ph[ix])) : 0
-    }));
-  }
   openRoom(n) { this.setState({ view: { t: 'room', r: n } }); window.scrollTo(0, 0); }
+  defaultSp() { return { hi: 'CPAP', lo: 'RA', hiH: '6', loH: '6', start: '06:00', hiS: {}, loS: {} }; }
+  spFromEntry(sp) { return { hi: sp.hi, lo: sp.lo, hiH: String(sp.hiH), loH: String(sp.loH), start: sp.start || '06:00', hiS: { ...(sp.hiS || {}) }, loS: { ...(sp.loS || {}) } }; }
   openEditor(n) {
-    const last = this.entriesOf(n)[0];
+    const es = this.entriesOf(n), last = es[0];
+    const remembered = es.find(e => e.tg);
     this.setState({
       err: '',
       form: {
         room: n, ts: this.nowLocal(), init: this.lastInit, intv: '8',
         mode: last ? last.mode : null, s: last && last.s ? { ...last.s } : {},
+        sp: last && last.mode === 'SPRINT' && last.sp ? this.spFromEntry(last.sp) : this.defaultSp(),
         fLo: last && last.f ? String(last.f[0]) : '', fHi: last && last.f ? String(last.f[1]) : '',
-        target: last ? last.target : 'std', b: '', i: '', a: '', rr: '', md: false, iv: ''
+        target: last ? last.target : 'std',
+        tLo: remembered ? String(remembered.tg[0]) : '', tHi: remembered ? String(remembered.tg[1]) : '',
+        b: '', i: '', a: '', rr: '', r6: '', r8: '', md: false, iv: ''
       }
     });
   }
@@ -667,15 +2169,20 @@ class Component extends DCLogic {
         editId: e.id, room: n, ts: this.toLocalInput(e.ts), init: e.init || '',
         intv: e.intv != null ? String(e.intv) : '8',
         mode: e.mode, s: e.s ? { ...e.s } : {},
+        sp: e.mode === 'SPRINT' && e.sp ? this.spFromEntry(e.sp) : this.defaultSp(),
         fLo: e.f ? String(e.f[0]) : '', fHi: e.f ? String(e.f[1]) : '',
         target: e.target || 'std',
+        tLo: e.tg ? String(e.tg[0]) : '', tHi: e.tg ? String(e.tg[1]) : '',
         b: e.h ? String(e.h[0]) : '', i: e.h ? String(e.h[1]) : '', a: e.h ? String(e.h[2]) : '',
-        rr: e.rr != null ? String(e.rr) : '', md: !!e.md, iv: e.iv || ''
+        rr: e.rr != null ? String(e.rr) : '', r6: e.r6 != null ? String(e.r6) : '', r8: e.r8 != null ? String(e.r8) : '',
+        md: !!e.md, iv: e.iv || ''
       }
     });
   }
   uf(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, [k]: val } })); }; }
   us(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, s: { ...s.form.s, [k]: val } } })); }; }
+  usp(k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, sp: { ...s.form.sp, [k]: val } } })); }; }
+  uspS(side, k) { return e => { const val = e.target.value; this.setState(s => ({ err: '', form: { ...s.form, sp: { ...s.form.sp, [side]: { ...s.form.sp[side], [k]: val } } } })); }; }
   resolveHisto(f) {
     const num = x => (x === '' || x === null || x === undefined ? null : Number(x));
     let b = num(f.b), i = num(f.i), a = num(f.a);
@@ -691,14 +2198,33 @@ class Component extends DCLogic {
     const f = this.state.form; if (!f) return;
     const err = m => this.setState({ err: m });
     if (!f.mode) return err('Pick a respiratory support mode.');
-    let h = null, rr = null;
+    let spSave = null;
+    if (f.mode === 'SPRINT') {
+      const sp = f.sp || {};
+      if (!sp.hi || !sp.lo) return err('Pick both sprint modes (higher and lower support).');
+      if (sp.hi === sp.lo) return err('The two sprint modes must be different.');
+      const hh = Number(sp.hiH), lh = Number(sp.loH);
+      if (!(hh > 0) || !(lh > 0)) return err('Enter positive hours for both sprint modes.');
+      if (hh + lh > 24) return err('Sprint hours must total 24 or less.');
+      if (!/^\d{1,2}:\d{2}$/.test(sp.start || '')) return err('Enter the start time of the higher support.');
+      spSave = { hi: sp.hi, lo: sp.lo, hiH: hh, loH: lh, start: sp.start, hiS: { ...sp.hiS }, loS: { ...sp.loS } };
+    }
+    let tg;
+    if (f.mode !== 'RANF' && f.target === 'custom') {
+      const lo = Number(f.tLo), hi = Number(f.tHi);
+      if (f.tLo === '' || f.tHi === '' || isNaN(lo) || isNaN(hi) || lo < 50 || hi > 100 || lo >= hi) return err('Custom target range must be 50–100% with low below high.');
+      tg = [lo, hi];
+    }
+    let h = null, rr = null, r6 = null, r8 = null;
     if (f.mode !== 'RANF') {
       const r = this.resolveHisto(f);
       if (r.blanks > 1) return err('Enter at least two of the three histogram values — the third auto-fills.');
       const bad = [r.b, r.i, r.a].some(x => x === null || isNaN(x) || x < 0 || x > 100);
       if (bad || r.b + r.i + r.a !== 100) return err('Histogram values must be 0–100 and total exactly 100%.');
       rr = f.rr === '' ? null : Number(f.rr);
-      if (rr === null || isNaN(rr) || rr < 0 || rr > 100) return err(`Enter tachypnea % (time with RR>${this.rrT()}), 0–100.`);
+      if (rr === null || isNaN(rr) || rr < 0 || rr > 100) return err(`Enter tachypnea % (time with RR>${this.rrT()}), 0–100. RR>60 and RR>80 are optional.`);
+      if (f.r6 !== '') { r6 = Number(f.r6); if (isNaN(r6) || r6 < 0 || r6 > 100) return err('RR>60 must be 0–100 (or leave it blank).'); }
+      if (f.r8 !== '') { r8 = Number(f.r8); if (isNaN(r8) || r8 < 0 || r8 > 100) return err('RR>80 must be 0–100 (or leave it blank).'); }
       h = [r.b, r.i, r.a];
     }
     let fio = null;
@@ -713,77 +2239,139 @@ class Component extends DCLogic {
     let intv = f.intv === '' ? 8 : Number(f.intv);
     if (isNaN(intv) || intv <= 0 || intv > 48) return err('Histogram interval must be 0.5–48 hours.');
     const init = (f.init || '').trim().toUpperCase().slice(0, 4);
-    const entry = { id: f.editId || (Date.now() + '' + Math.floor(Math.random() * 1000)), ts: this.isoFromLocal(f.ts), init, intv, mode: f.mode, s: { ...f.s }, f: fio, target: f.target, h, rr, md: !!f.md, iv: (f.iv || '').trim() };
+    const entry = { id: f.editId || (Date.now() + '' + Math.floor(Math.random() * 1000)), ts: this.isoFromLocal(f.ts), init, intv, mode: f.mode, s: f.mode === 'SPRINT' ? {} : { ...f.s }, sp: spSave || undefined, f: fio, target: f.target, tg, h, rr, r6, r8, md: !!f.md, iv: (f.iv || '').trim() };
     this.sendOp(f.editId ? { op: 'edit', room: f.room, entry } : { op: 'add', room: f.room, entry });
     if (init) { this.lastInit = init; try { localStorage.setItem('nicu_resp_initials', init); } catch (e) {} }
     this.setState({ form: null, err: '' });
   }
   doConfirm() {
     const c = this.state.confirm; if (!c) return;
-    if (c.type === 'reset') { this.sendOp({ op: 'reset', room: c.room }); this.setState({ confirm: null, view: { t: 'grid' } }); return; }
+    if (c.type === 'reset') { this.sendOp({ op: 'archive', room: c.room, aid: Date.now() + '' + Math.floor(Math.random() * 1000) }); this.setState({ confirm: null, view: { t: 'grid' } }); return; }
     if (c.type === 'del') { this.sendOp({ op: 'del', room: c.room, id: c.id }); }
+    if (c.type === 'delArchive') { this.sendOp({ op: 'delArchive', id: c.aid }); }
     this.setState({ confirm: null });
   }
 
   renderVals() {
     const MODES = this.modes(), TG = this.targets(), pfx = this.prefix(), N = this.count(), rrLbl = 'RR>' + this.rrT();
-    const view = this.state.view, f = this.state.form;
+    const bedKeys = this.beds().map(b => b.k).slice().reverse();
+    const view = this.viewNow(), f = this.state.form;
     const now = new Date();
     const todayStr = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][now.getDay()]} · ${this.mos()[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
     const live = [], ranf = [], empty = [], counts = {};
-    for (let n = N; n >= 1; n--) {
+    for (const n of bedKeys) {
       const es = this.entriesOf(n), latest = es[0];
-      const label = `${pfx}-${n}`;
+      const label = this.bedLabel(n);
       if (!latest) { empty.push({ label, start: () => this.openEditor(n) }); continue; }
       counts[latest.mode] = (counts[latest.mode] || 0) + 1;
       if (latest.mode === 'RANF') { ranf.push({ label, ago: this.ago(latest.ts), open: () => this.openRoom(n) }); continue; }
-      const prev = es[1] || null, M = MODES[latest.mode] || MODES.RA, T = TG[latest.target] || TG.std;
+      const prev = es[1] || null, M = this.modeView(latest), T = this.targetOf(latest);
       const band = this.bandsFor(latest, prev);
+      const tal = this.tally(es);
+      const pT = prev && prev.h && prev.mode !== 'RANF' ? this.targetOf(prev) : null;
+      const pTgtDiff = !!(pT && (pT.lo !== T.lo || pT.hi !== T.hi));
       live.push({
+        hasPrevTgtNote: pTgtDiff, prevTgtNote: pTgtDiff ? `Prev histogram used a different target: ${pT.lo}–${pT.hi}%` : '',
         label, bg: M.bg, bd: M.bd, tx: M.tx, solid: M.solid, modeLabel: M.label,
         targetRange: `${T.lo}–${T.hi}%`, ago: this.ago(latest.ts),
         curSet: this.concise(latest), curMeta: `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}`,
         hasPrev: !!prev, prevSet: prev ? this.concise(prev) : '', prevMeta: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '',
+        isSprint: latest.mode === 'SPRINT', sprintLine: latest.mode === 'SPRINT' ? this.sprintLine(latest) : '',
+        hasTally: tal.has, tB: tal.b + '%', tI: tal.i + '%', tA: tal.a + '%', tHrs: tal.hrs + ' h · ' + tal.n + (tal.n === 1 ? ' entry' : ' entries'),
         hasHisto: !!band,
+        gridCols: band ? `34px repeat(${band.n},1fr)` : '34px repeat(4,1fr)',
         cols: band ? band.cols : [], hasPrevBand: !!band && band.hasPrevBand,
-        rrCur: latest.rr != null ? latest.rr + '%' : '–', rrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
         open: () => this.openRoom(n), add: ev => { ev.stopPropagation(); this.openEditor(n); }
       });
     }
-    const order = ['HFOV','SIMV','NAVA','CPAP','HFNC','NC','RA','RANF'];
-    const legend = order.filter(k => counts[k]).map(k => ({ label: k === 'RANF' ? 'RA·NF' : (k === 'NAVA' ? 'NAVA' : MODES[k].label), color: MODES[k].solid, count: counts[k] }));
+    const order = ['HFOV','SIMV','NAVA','SPRINT','CPAP','HFNC','NC','RA','RANF'];
+    const legend = order.filter(k => counts[k]).map(k => ({
+      label: k === 'RANF' ? 'RA·NF' : (k === 'SPRINT' ? 'Sprint' : MODES[k].label),
+      color: k === 'SPRINT' ? 'linear-gradient(90deg,#E07C26,#33A35C)' : MODES[k].solid,
+      count: counts[k]
+    }));
     if (empty.length) legend.push({ label: 'Empty', color: '#C9D2D9', count: empty.length });
 
     // room detail
-    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvCols: [], rvHasPrevBand: false, rvRrCur: '', rvRrPrev: '', rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9', rvMove: () => {}, rvCurLeg: '', rvPrevLeg: '' };
+    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvCols: [], rvGridCols: '76px repeat(4,1fr)', rvHasPrevBand: false, rvHasCmpTgtNote: false, rvCmpTgtNote: '', rvALbl: 'NOW', rvPLbl: '—', rvAWhen: '', scrubPosA: 0, scrubPosP: 0, onScrubA: () => {}, onScrubP: () => {}, rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9', rvMove: () => {}, rvCurLeg: '', rvPrevLeg: '', rvIsSprint: false, rvSprintLine: '', rvHasScrub: false, scrubMax: 0, scrubPos: 0, onScrub: () => {}, rvCmpWhen: '', rvHNow: [], rvHasHCmp: false, rvHCmp: [], rvHNowTxt: '', rvHCmpTxt: '', rvTalHas: false, rvTalB: '', rvTalI: '', rvTalA: '', rvTalHrs: '', rvTalBar: [] };
     if (view.t === 'room') {
-      const n = view.r, es = this.entriesOf(n), latest = es[0] || null, prev = es[1] || null;
-      const M = latest ? (MODES[latest.mode] || MODES.RA) : null;
-      const T = latest ? (TG[latest.target] || TG.std) : TG.std;
-      const band = this.bandsFor(latest, prev);
+      const n = view.r, es = this.entriesOf(n), latest = es[0] || null;
+      const len = es.length;
+      const sel = (this.state.cmp || {})[String(n)];
+      let aIdx = 0, pIdx = Math.min(1, Math.max(0, len - 1));
+      if (sel) {
+        const selA = typeof sel === 'string' ? null : sel.a;
+        const selP = typeof sel === 'string' ? sel : sel.p;
+        if (selA) { const ix = es.findIndex(e => e.id === selA); if (ix >= 0) aIdx = ix; }
+        if (selP) { const ix = es.findIndex(e => e.id === selP); if (ix >= 0) pIdx = ix; }
+        if (pIdx <= aIdx) pIdx = Math.min(len - 1, aIdx + 1);
+      }
+      const aE = es[aIdx] || null, pE = pIdx > aIdx ? (es[pIdx] || null) : null;
+      const setSel = (ai, pi) => {
+        ai = Math.max(0, Math.min(len - 1, ai)); pi = Math.max(0, Math.min(len - 1, pi));
+        if (pi <= ai) { pi = Math.min(len - 1, ai + 1); if (pi === ai) ai = Math.max(0, pi - 1); }
+        this.setState(s => ({ cmp: { ...s.cmp, [String(n)]: { a: es[ai] ? es[ai].id : null, p: es[pi] ? es[pi].id : null } } }));
+      };
+      const M = latest ? this.modeView(latest) : null;
+      const T = latest ? this.targetOf(latest) : TG.std;
+      const Ta = aE ? this.targetOf(aE) : T;
+      const band = this.bandsFor(aE, pE);
       const meta = (this.state.data.meta || {})[String(n)] || {};
       const c24 = es.filter(e => Date.now() - new Date(e.ts).getTime() <= 24 * 3600000).length;
+      const segNow = this.segs(aE), segCmp = this.segs(pE);
+      const cT = pE && pE.h && pE.mode !== 'RANF' ? this.targetOf(pE) : null;
+      const cmpTgtDiff = !!(aE && cT && (cT.lo !== Ta.lo || cT.hi !== Ta.hi));
+      const rvTal = this.tally(es);
       rv = {
-        rvLabel: `${pfx}-${n}`,
+        rvTalHas: rvTal.has, rvTalB: rvTal.b + '%', rvTalI: rvTal.i + '%', rvTalA: rvTal.a + '%',
+        rvTalHrs: rvTal.hrs + ' h logged \u00b7 ' + rvTal.n + (rvTal.n === 1 ? ' entry' : ' entries'),
+        rvTalBar: [{ w: rvTal.b + '%', bg: '#3E97CE' }, { w: rvTal.i + '%', bg: '#33A35C' }, { w: rvTal.a + '%', bg: '#D14848' }],
+        rvLabel: `${this.bedLabel(n)}`,
         rvBg: M ? M.bg : '#FFFFFF', rvBd: M ? M.bd : '#E2E8EE', rvTx: M ? M.tx : '#3D4C59', rvSolid: M ? M.solid : '#8895A0',
         rvModeLabel: M ? M.label : '', rvTarget: latest && latest.mode !== 'RANF' ? `${T.lo}–${T.hi}%` : '—',
         rvAgo: latest ? this.ago(latest.ts) : '', rvHasLatest: !!latest,
+        rvIsSprint: !!latest && latest.mode === 'SPRINT',
+        rvSprintLine: latest && latest.mode === 'SPRINT' ? this.sprintLine(latest) : '',
         rvHasHisto: !!band,
+        rvGridCols: band ? `76px repeat(${band.n},1fr)` : '76px repeat(4,1fr)',
         rvCols: band ? band.cols : [], rvHasPrevBand: !!band && band.hasPrevBand,
-        rvRrCur: latest && latest.rr != null ? latest.rr + '%' : '–', rvRrPrev: prev && prev.rr != null ? prev.rr + '%' : '',
+        rvHasCmpTgtNote: cmpTgtDiff,
+        rvCmpTgtNote: cmpTgtDiff ? `Older compared entry used a different SpO₂ target (${cT.lo}–${cT.hi}%) — bins are labeled for the newer entry's ${Ta.lo}–${Ta.hi}%` : '',
+        rvHasScrub: len > 2,
+        scrubMax: Math.max(0, len - 1),
+        scrubPosA: Math.max(0, (len - 1) - aIdx),
+        scrubPosP: Math.max(0, (len - 1) - pIdx),
+        onScrubA: ev => { const pos = Number(ev.target.value); setSel((len - 1) - pos, pIdx); },
+        onScrubP: ev => { const pos = Number(ev.target.value); const pi = (len - 1) - pos; setSel(pi <= aIdx ? Math.max(0, pi - 1) : aIdx, pi); },
+        rvAWhen: aE ? this.fmtStamp(aE.ts) : '—',
+        rvCmpWhen: pE ? this.fmtStamp(pE.ts) : '—',
+        rvALbl: aE ? this.fmtStamp(aE.ts) : 'NOW',
+        rvPLbl: pE ? this.fmtStamp(pE.ts) : '—',
+        rvHNow: segNow || [], rvHasHCmp: !!segCmp, rvHCmp: segCmp || [],
+        rvHNowTxt: aE && aE.h ? `${aE.h[0]} / ${aE.h[1]} / ${aE.h[2]}` : '',
+        rvHCmpTxt: pE && pE.h ? `${pE.h[0]} / ${pE.h[1]} / ${pE.h[2]}` : '',
         rvCount: es.length, rvIsEmpty: !es.length, rvHasEntries: !!es.length,
         rvEntries: es.map((e, ix) => ({
           ...this.entryRow(e, es[ix + 1]),
-          rowBg: ix === 0 ? '#F0FAFC' : (ix === 1 ? '#F6F3FD' : '#FFFFFF'),
-          rowEdge: ix === 0 ? '#06B6D4' : (ix === 1 ? '#A78BFA' : '#E2E8EE'),
-          edit: () => this.openEdit(n, e),
-          del: () => this.setState({ confirm: { type: 'del', room: n, id: e.id, when: this.fmtWhen(e.ts) } })
+          rowBg: ix === aIdx ? '#F0FAFC' : (ix === pIdx ? '#F6F3FD' : '#FFFFFF'),
+          rowEdge: ix === aIdx ? '#06B6D4' : (ix === pIdx ? '#A78BFA' : '#E2E8EE'),
+          rowCur: len > 1 ? 'pointer' : 'default',
+          click: () => {
+            if (len < 2) return;
+            let ai = aIdx, pi = pIdx;
+            if (ix <= ai) ai = ix;
+            else if (ix >= pi) pi = ix;
+            else { if (ix - ai <= pi - ix) ai = ix; else pi = ix; }
+            setSel(ai, pi);
+          },
+          edit: ev => { ev.stopPropagation(); this.openEdit(n, e); },
+          del: ev => { ev.stopPropagation(); this.setState({ confirm: { type: 'del', room: n, id: e.id, when: this.fmtWhen(e.ts) } }); }
         })),
         rvAdd: () => this.openEditor(n),
         rvReset: () => this.setState({ confirm: { type: 'reset', room: n } }),
         rvMove: () => this.setState({ move: { from: n } }),
-        rvCurLeg: latest ? `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}` : '',
-        rvPrevLeg: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '—',
+        rvCurLeg: aE ? `${this.fmtStamp(aE.ts)}${aE.init ? ' · ' + aE.init : ''}` : '',
+        rvPrevLeg: pE ? `${this.fmtStamp(pE.ts)}${pE.init ? ' · ' + pE.init : ''}` : '—',
         rvName: meta.name || '', rvMrn: meta.mrn || '',
         onName: ev => this.sendOp({ op: 'meta', room: n, patch: { name: ev.target.value } }),
         onMrn: ev => this.sendOp({ op: 'meta', room: n, patch: { mrn: ev.target.value } }),
@@ -794,34 +2382,71 @@ class Component extends DCLogic {
 
     // editor
     const eo = !!f;
-    let ed = { eTitle: '', eTs: '', eInit: '', modeChips: [], hasFields: false, eFields: [], showFio2: false, eFLo: '', eFHi: '', showHisto: false, targetChips: [], hBval: '', hBph: '', hIval: '', hIph: '', hAval: '', hAph: '', hBsub: '', hIsub: '', hAsub: '', sumMsg: '', sumColor: '#7A8A98', eRr: '', showRanfNote: false, eIv: '', eIntv: '', onIntv: () => {}, saveLabel: 'Save entry', mdNo: () => {}, mdYes: () => {}, mdNoBg: '#FFFFFF', mdNoTx: '#3D4C59', mdNoBd: '#C9D2D9', mdYesBg: '#FFFFFF', mdYesTx: '#3D4C59', mdYesBd: '#C9D2D9' };
+    let ed = { eTitle: '', eTs: '', eInit: '', modeChips: [], isSprintForm: false, spHiChips: [], spLoChips: [], eSpHiH: '', eSpLoH: '', eSpStart: '', onSpHiH: () => {}, onSpLoH: () => {}, onSpStart: () => {}, hasSpFields: false, spFields: [], hasSpPreview: false, spPreview: '', hasFields: false, eFields: [], showFio2: false, eFLo: '', eFHi: '', showHisto: false, targetChips: [], showCustomTgt: false, eTLo: '', eTHi: '', hBval: '', hBph: '', hIval: '', hIph: '', hAval: '', hAph: '', hBsub: '', hIsub: '', hAsub: '', sumMsg: '', sumColor: '#7A8A98', eRr: '', eR6: '', eR8: '', showRanfNote: false, eIv: '', eIntv: '', onIntv: () => {}, saveLabel: 'Save entry', mdNo: () => {}, mdYes: () => {}, mdNoBg: '#FFFFFF', mdNoTx: '#3D4C59', mdNoBd: '#C9D2D9', mdYesBg: '#FFFFFF', mdYesTx: '#3D4C59', mdYesBd: '#C9D2D9' };
     if (eo) {
-      const T = TG[f.target] || TG.std;
+      const isCustom = f.target === 'custom';
+      const Tf = isCustom ? { lo: f.tLo !== '' ? f.tLo : '–', hi: f.tHi !== '' ? f.tHi : '–' } : (TG[f.target] || TG.std);
       const r = this.resolveHisto(f);
       let sumMsg = 'Enter any two — the third fills in automatically.', sumColor = '#7A8A98';
       if (r.blanks === 0) { const s = r.b + r.i + r.a; if (s === 100) { sumMsg = 'Σ = 100 ✓'; sumColor = '#1B7A3D'; } else { sumMsg = `Σ = ${s} — must equal 100`; sumColor = '#B42318'; } }
       else if (r.blanks === 1) { const okAuto = r.b >= 0 && r.i >= 0 && r.a >= 0; sumMsg = okAuto ? `Σ = 100 ✓ (auto-filled ${r.auto === 'b' ? 'Below' : r.auto === 'i' ? 'In' : 'Above'})` : 'Values exceed 100%'; sumColor = okAuto ? '#1B7A3D' : '#B42318'; }
-      ed = {
-        eTitle: f.editId ? `Edit entry — ${pfx}-${f.room}` : `New entry — ${pfx}-${f.room}`,
-        saveLabel: f.editId ? 'Save changes' : 'Save entry',
-        eTs: f.ts, eInit: f.init, eIntv: f.intv, onIntv: this.uf('intv'),
-        modeChips: Object.keys(MODES).map(k => {
-          const m = MODES[k], on = f.mode === k;
-          return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: k } })) };
-        }),
-        hasFields: !!f.mode && MODES[f.mode].fields.length > 0,
-        eFields: f.mode ? MODES[f.mode].fields.map(([k, label, ph]) => ({ label, ph, val: f.s[k] ?? '', on: this.us(k) })) : [],
-        showFio2: !!f.mode && f.mode !== 'RA' && f.mode !== 'RANF',
-        eFLo: f.fLo, eFHi: f.fHi,
-        showHisto: !!f.mode && f.mode !== 'RANF',
-        targetChips: Object.keys(TG).map(k => {
+      const isSprint = f.mode === 'SPRINT';
+      const sp = f.sp || this.defaultSp();
+      const mk = k => {
+        const m = MODES[k], on = f.mode === k;
+        return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: k } })) };
+      };
+      const sprintOn = isSprint;
+      const modeChips = [mk('HFOV'), mk('SIMV'), mk('NAVA'), mk('CPAP'), mk('HFNC'), mk('NC'),
+        { label: 'Sprint ⇄', bg: sprintOn ? 'linear-gradient(90deg,#E07C26,#33A35C)' : '#FFFFFF', tx: sprintOn ? '#FFFFFF' : '#98510F', bd: sprintOn ? '#E07C26' : '#E0A268', pick: () => this.setState(s => ({ err: '', form: { ...s.form, mode: 'SPRINT', sp: s.form.sp || this.defaultSp() } })) },
+        mk('RA'), mk('RANF')];
+      const spChip = (k, side) => {
+        const m = MODES[k], on = sp[side] === k;
+        return { label: m.label, bg: on ? m.solid : '#FFFFFF', tx: on ? '#FFFFFF' : m.tx, bd: on ? m.solid : m.bd, pick: () => this.setState(s => ({ err: '', form: { ...s.form, sp: { ...s.form.sp, [side]: k } } })) };
+      };
+      const spFields = [];
+      if (isSprint) {
+        if (sp.hi && MODES[sp.hi]) MODES[sp.hi].fields.forEach(([k, label, ph]) => spFields.push({ label: `${sp.hi} — ${label}`, ph, val: sp.hiS[k] ?? '', on: this.uspS('hiS', k) }));
+        if (sp.lo && sp.lo !== 'RA' && MODES[sp.lo]) MODES[sp.lo].fields.forEach(([k, label, ph]) => spFields.push({ label: `${sp.lo} — ${label}`, ph, val: sp.loS[k] ?? '', on: this.uspS('loS', k) }));
+      }
+      let spPreview = '';
+      const hh = Number(sp.hiH), lh = Number(sp.loH);
+      if (isSprint && sp.hi && sp.lo && hh > 0 && lh > 0 && /^\d{1,2}:\d{2}$/.test(sp.start || '')) {
+        const add = (t, h) => { const p2 = t.split(':').map(Number); const tot = ((p2[0] * 60 + p2[1] + Math.round(h * 60)) % 1440 + 1440) % 1440; return `${this.pad(Math.floor(tot / 60))}:${this.pad(tot % 60)}`; };
+        const t1 = add(sp.start, hh), t2 = add(t1, lh);
+        spPreview = `${sp.hi} ${sp.start}–${t1} → ${sp.lo} ${t1}–${t2} → repeats`;
+      }
+      const tgKeys = Object.keys(TG);
+      const targetChips = [
+        ...tgKeys.map(k => {
           const t = TG[k], on = f.target === k;
           return { name: t.name, range: `${t.lo}–${t.hi}%`, bg: on ? '#0E7490' : '#FFFFFF', tx: on ? '#FFFFFF' : '#3D4C59', bd: on ? '#0E7490' : '#C9D2D9', pick: () => this.setState(s => ({ form: { ...s.form, target: k } })) };
         }),
+        { name: 'Custom', range: f.tLo !== '' && f.tHi !== '' ? `${f.tLo}–${f.tHi}%` : 'set…', bg: isCustom ? '#0E7490' : '#FFFFFF', tx: isCustom ? '#FFFFFF' : '#3D4C59', bd: isCustom ? '#0E7490' : '#C9D2D9', pick: () => this.setState(s => ({ form: { ...s.form, target: 'custom' } })) }
+      ];
+      ed = {
+        eTitle: f.editId ? `Edit entry — ${this.bedLabel(f.room)}` : `New entry — ${this.bedLabel(f.room)}`,
+        saveLabel: f.editId ? 'Save changes' : 'Save entry',
+        eTs: f.ts, eInit: f.init, eIntv: f.intv, onIntv: this.uf('intv'),
+        modeChips,
+        isSprintForm: isSprint,
+        spHiChips: ['CPAP', 'HFNC', 'NC'].map(k => spChip(k, 'hi')),
+        spLoChips: ['CPAP', 'HFNC', 'NC', 'RA'].filter(k => k !== sp.hi).map(k => spChip(k, 'lo')),
+        eSpHiH: sp.hiH, eSpLoH: sp.loH, eSpStart: sp.start,
+        onSpHiH: this.usp('hiH'), onSpLoH: this.usp('loH'), onSpStart: this.usp('start'),
+        hasSpFields: spFields.length > 0, spFields,
+        hasSpPreview: !!spPreview, spPreview,
+        hasFields: !isSprint && !!f.mode && !!MODES[f.mode] && MODES[f.mode].fields.length > 0,
+        eFields: !isSprint && f.mode && MODES[f.mode] ? MODES[f.mode].fields.map(([k, label, ph]) => ({ label, ph, val: f.s[k] ?? '', on: this.us(k) })) : [],
+        showFio2: !!f.mode && f.mode !== 'RA' && f.mode !== 'RANF',
+        eFLo: f.fLo, eFHi: f.fHi,
+        showHisto: !!f.mode && f.mode !== 'RANF',
+        targetChips,
+        showCustomTgt: isCustom, eTLo: f.tLo, eTHi: f.tHi,
         hBval: f.b, hIval: f.i, hAval: f.a,
         hBph: r.auto === 'b' && r.b >= 0 ? String(r.b) : '', hIph: r.auto === 'i' && r.i >= 0 ? String(r.i) : '', hAph: r.auto === 'a' && r.a >= 0 ? String(r.a) : '',
-        hBsub: `<${T.lo}%`, hIsub: `${T.lo}–${T.hi}%`, hAsub: `>${T.hi}%`,
-        sumMsg, sumColor, eRr: f.rr,
+        hBsub: `<${Tf.lo}%`, hIsub: `${Tf.lo}–${Tf.hi}%`, hAsub: `>${Tf.hi}%`,
+        sumMsg, sumColor, eRr: f.rr, eR6: f.r6, eR8: f.r8,
         showRanfNote: f.mode === 'RANF',
         eIv: f.iv || '',
         mdNo: () => this.setState(s2 => ({ form: { ...s2.form, md: false } })),
@@ -834,11 +2459,11 @@ class Component extends DCLogic {
     // PDF report
     const rptRooms = [], rptPages = [];
     if (view.t === 'report') {
-      for (let n = N; n >= 1; n--) {
+      for (const n of bedKeys) {
         const es = this.entriesOf(n); if (!es.length) continue;
-        const latest = es[0], prev = es[1] || null, M = MODES[latest.mode] || MODES.RA, T = TG[latest.target] || TG.std;
+        const latest = es[0], prev = es[1] || null, M = this.modeView(latest), T = this.targetOf(latest);
         rptRooms.push({
-          label: `${pfx}-${n}`, solid: M.solid, support: this.modeShort(latest),
+          label: `${this.bedLabel(n)}`, solid: M.solid, support: this.modeShort(latest),
           fio2: latest.f ? (latest.f[0] === latest.f[1] ? latest.f[0] + '%' : `${latest.f[0]}–${latest.f[1]}%`) : '21%',
           tgt: latest.mode === 'RANF' ? '—' : `${T.lo}–${T.hi}%`,
           cur: latest.h ? `${latest.h[0]} / ${latest.h[1]} / ${latest.h[2]} · ${latest.rr != null ? latest.rr : '–'}%` : '—',
@@ -848,31 +2473,80 @@ class Component extends DCLogic {
         if (!view.full) continue;
         const meta = (this.state.data.meta || {})[String(n)] || {};
         rptPages.push({
-          label: `${pfx}-${n}`, solid: M.solid, modeLabel: M.label,
+          label: `${this.bedLabel(n)}`, solid: M.solid, modeLabel: M.label,
           name: meta.name || '—', mrn: meta.mrn || '—', count: es.length,
           rows: es.map((e, ix) => this.entryRow(e, es[ix + 1]))
         });
       }
     }
 
+    // archive
+    const archives = this.state.data.archives || {};
+    const arKeys = Object.keys(archives).sort((a, b) => ((archives[a].archivedAt || '') < (archives[b].archivedAt || '') ? 1 : -1));
+    const arList = arKeys.map(id => {
+      const ar = archives[id];
+      const es = (ar.entries || []).slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
+      const open = this.state.arOpen === id;
+      return {
+        label: `${this.bedLabel(ar.room)}`,
+        when: ar.archivedAt ? this.fmtDateFull(ar.archivedAt) : '—',
+        name: (ar.meta && ar.meta.name) || '—', mrn: (ar.meta && ar.meta.mrn) || '—',
+        count: es.length,
+        lastWhen: ar.lastTs ? this.fmtDateFull(ar.lastTs) : (es[0] ? this.fmtDateFull(es[0].ts) : '—'),
+        open, toggleLbl: open ? 'Hide entries' : 'View entries',
+        toggle: () => this.setState({ arOpen: open ? null : id }),
+        rows: open ? es.map((e, ix) => this.entryRow(e, es[ix + 1])) : [],
+        restore: () => this.setState({ restore: { id } }),
+        exportA: () => {
+          const blob = new Blob([JSON.stringify(ar, null, 2)], { type: 'application/json' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `nicu-archive-${this.bedLabel(ar.room)}-${(ar.archivedAt || '').slice(0, 10)}.json`;
+          a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        },
+        delA: () => this.setState({ confirm: { type: 'delArchive', aid: id, label: `${this.bedLabel(ar.room)} (archived ${ar.archivedAt ? this.fmtDateFull(ar.archivedAt) : ''})` } })
+      };
+    });
+
     const mv = this.state.move;
     let moveTargets = [];
     if (mv) {
-      for (let n = N; n >= 1; n--) {
+      for (const n of bedKeys) {
         if (n === mv.from) continue;
         const occ = this.entriesOf(n).length > 0;
         moveTargets.push({
-          label: `${pfx}-${n}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
+          label: `${this.bedLabel(n)}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
           bg: occ ? '#EDF0F2' : '#FFFFFF', tx: occ ? '#B4BEC7' : '#0E7490', bd: occ ? '#E2E8EE' : '#9CC3CF',
           pick: () => { this.sendOp({ op: 'move', room: mv.from, to: n }); this.setState({ move: null, view: { t: 'room', r: n } }); }
         });
       }
     }
+    const rs = this.state.restore;
+    let restoreTargets = [];
+    if (rs) {
+      for (const n of bedKeys) {
+        const occ = this.entriesOf(n).length > 0;
+        restoreTargets.push({
+          label: `${this.bedLabel(n)}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
+          bg: occ ? '#EDF0F2' : '#FFFFFF', tx: occ ? '#B4BEC7' : '#0E7490', bd: occ ? '#E2E8EE' : '#9CC3CF',
+          pick: () => { this.sendOp({ op: 'restoreArchive', id: rs.id, to: n }); this.setState({ restore: null, view: { t: 'room', r: n } }); }
+        });
+      }
+    }
+    const rsAr = rs ? archives[rs.id] : null;
 
     const c = this.state.confirm;
     return {
-      moveOpen: !!mv, moveFrom: mv ? `${pfx}-${mv.from}` : '', moveTargets,
+      ...this.layoutVals(view),
+      moveOpen: !!mv, moveFrom: mv ? `${this.bedLabel(mv.from)}` : '', moveTargets,
       cancelMove: () => this.setState({ move: null }),
+      restoreOpen: !!rs, restoreFrom: rsAr ? `${this.bedLabel(rsAr.room)} archive` : 'archive', restoreTargets,
+      cancelRestore: () => this.setState({ restore: null }),
+      isArchive: view.t === 'archive',
+      arLabel: arKeys.length ? `Archive (${arKeys.length})` : 'Archive',
+      arCountLbl: `${arKeys.length} archived ${arKeys.length === 1 ? 'bundle' : 'bundles'}`,
+      arEmpty: !arKeys.length, arList,
+      openArchive: () => { this.setState({ view: { t: 'archive' } }); window.scrollTo(0, 0); },
       exportJson: () => {
         const d = new Date(), p = this.pad.bind(this);
         const blob = new Blob([JSON.stringify(this.state.data, null, 2)], { type: 'application/json' });
@@ -892,7 +2566,7 @@ class Component extends DCLogic {
               const j = JSON.parse(rd.result);
               if (!j || typeof j.rooms !== 'object') { alert('Not a valid backup file.'); return; }
               if (confirm('Replace ALL current data with this backup? This overwrites every room for everyone.')) {
-                this.sendOp({ op: 'import', data: { rooms: j.rooms || {}, meta: j.meta || {} } });
+                this.sendOp({ op: 'import', data: { rooms: j.rooms || {}, meta: j.meta || {}, archives: j.archives || {} } });
               }
             } catch (e) { alert('Could not read that file as JSON.'); }
           };
@@ -905,7 +2579,7 @@ class Component extends DCLogic {
       openReport: () => { this.setState({ view: { t: 'report', full: true } }); window.scrollTo(0, 0); },
       openSnapshot: () => { this.setState({ view: { t: 'report', full: false } }); window.scrollTo(0, 0); },
       doPrint: () => window.print(),
-      todayStr, legend, rrLbl,
+      todayStr, legend, rrLbl, rrMid: this.rrT(),
       showSync: !!this.state.sync,
       syncLabel: this.state.sync === 'live' ? 'Shared · live' : 'This device only',
       syncDot: this.state.sync === 'live' ? '#33A35C' : '#BFA10E',
@@ -917,16 +2591,17 @@ class Component extends DCLogic {
       ...rv,
       editorOpen: eo, ...ed,
       onTs: this.uf('ts'), onInit: this.uf('init'), onFLo: this.uf('fLo'), onFHi: this.uf('fHi'),
-      hBon: this.uf('b'), hIon: this.uf('i'), hAon: this.uf('a'), onRr: this.uf('rr'), onIv: this.uf('iv'),
-      rrFieldLabel: `Tachypnea — % time RR>${this.rrT()}`,
+      onTLo: this.uf('tLo'), onTHi: this.uf('tHi'),
+      hBon: this.uf('b'), hIon: this.uf('i'), hAon: this.uf('a'), onRr: this.uf('rr'), onR6: this.uf('r6'), onR8: this.uf('r8'), onIv: this.uf('iv'),
       hasErr: !!this.state.err, errMsg: this.state.err,
       saveEntry: () => this.saveEntry(),
       closeEditor: () => this.setState({ form: null, err: '' }),
       swallow: ev => ev.stopPropagation(),
       confirmOpen: !!c,
-      cTitle: c ? (c.type === 'reset' ? `Reset ${pfx}-${c.room}?` : 'Delete this entry?') : '',
-      cMsg: c ? (c.type === 'reset' ? 'This permanently clears every entry for this room. This cannot be undone.' : `The entry from ${c.when || ''} will be permanently deleted.`) : '',
-      cBtn: c ? (c.type === 'reset' ? 'Yes, clear room' : 'Delete') : '',
+      cTitle: c ? (c.type === 'reset' ? `Archive & clear ${this.bedLabel(c.room)}?` : (c.type === 'delArchive' ? 'Delete archived bundle?' : 'Delete this entry?')) : '',
+      cMsg: c ? (c.type === 'reset' ? 'Every entry and the patient info move to the Archive (button in the header), identified by room and archive date. The room clears for a new patient.' : (c.type === 'delArchive' ? `The archived data for ${c.label || ''} will be permanently deleted. Export it first if you need a copy.` : `The entry from ${c.when || ''} will be permanently deleted.`)) : '',
+      cBtn: c ? (c.type === 'reset' ? 'Archive & clear' : 'Delete') : '',
+      cBtnBg: c && c.type === 'reset' ? '#0E7490' : '#B42318',
       doConfirm: () => this.doConfirm(),
       cancelConfirm: () => this.setState({ confirm: null })
     };
