@@ -7,79 +7,56 @@ Static app (index.html + support.js) plus one serverless function (`/api/data`) 
 stores entries in Netlify Blobs, so everyone with the URL sees the same live board
 (it polls every 5 seconds).
 
-## Any NICU, its own layout
+## Three NICUs, one site
 
-A unit that arrives with no layout is asked to build one. The layout builder is a
-grid canvas:
+The site serves three fixed NICUs, each with its own private board, password and
+permanent bed layout:
 
-- **Add** — drag across cells to drop a run of beds, auto-numbered from the prefix
-  and next-number fields (free text, so `12A`, `Bay 3-2` or bare numbers all work).
-- **Arrange** — drag any bed to move it; click to select, drag a box to multi-select,
-  double-click to rename in place, Delete to remove. Undo/redo and ⌘Z.
-- **Bay** — drag a dashed outline around beds that share an open bay.
-- **Erase** — drag over beds to remove them.
-- **Floorplan underlay** — drop in a PNG or JPG of the unit sketch and trace beds
-  over it with an opacity slider. The image is a guide only.
-- **Starters** — U-shape around a central core, single row, double row, or pods.
-- Gaps are allowed anywhere, so corridors, walls and cores stay empty.
+| NICU | Code |
+|---|---|
+| Thimphu | `THIMPHU` |
+| Walnut Creek | `WALNUTCREEK` |
+| San Leandro | `SANLEANDRO` |
 
-**Save & lock** asks for a 4-digit PIN. The builder then disappears and the locked
-layout informs the whole app — cards, logs, reports, archives and the unit map all
-use the unit's own bed labels. It stays editable from **Unit** in the header with
-that PIN.
+- **Home page** — three tiles. Pick your NICU, enter its password, and the device
+  remembers it. A bookmark like `/?unit=SANLEANDRO` opens straight to that NICU's
+  password box. **Unit → Switch NICU / sign out** forgets it on that device.
+- **Passwords** are set by the admin in the admin tool and stored only as salted
+  PBKDF2 hashes (blob `auth`). A NICU stays closed until it has one. Changing a
+  password signs out every device using the old one. Eight wrong tries trigger a
+  two-minute cool-down for that NICU.
+- **No patient identifiers** — bed labels only. The server refuses name/MRN writes and
+  strips them from imports.
 
-The header carries a slim colour strip that expands to the full unit map: beds
-coloured by the support in use, grey for empty. Clicking an empty bed admits a baby
-and starts its first histogram.
+## Admin tool (layouts + passwords)
 
-## The home page
-
-There is no shared default board. The home page is a unit directory:
-
-- Units are **private by default**. A unit appears on the directory only if it turns on
-  *Home page listing* in Unit settings, and even then a visitor sees just the unit name
-  and a bed-occupancy bar — never the code, entry counts or dates.
-- Clicking a listed unit asks for its code (5 wrong tries triggers a 60-second cooldown).
-- Anyone with a code for an unlisted unit joins directly.
-- A "What OWL does" panel explains the tool; the italic paragraph is a placeholder for
-  copy coming from the OWL website.
-- A **Give feedback** button mails sangoram+histogram@gmail.com with the unit code in
-  the subject.
-
-## Admin console
-
-Set two environment variables in Netlify (Site configuration -> Environment variables):
+Set two environment variables in Netlify (Site configuration -> Environment variables,
+all deploy contexts):
 
     OWL_ADMIN_TOKEN   any long random string
     OWL_ADMIN_PIN     six digits
 
-Visit `/?admin=<token>`, then enter the PIN (three wrong attempts locks that device out
-for five minutes). The console lists every unit on the deployment — code, name, beds,
-occupied, entries, last entry — and can **Open** a unit (joins it on this device),
-export its **JSON**, or **Delete** it. While you are inside another unit a purple
-ADMIN VIEW banner shows, and anything you save is stamped `ADMIN` in that unit's log.
+Open `/?admin=<token>` and enter the PIN (three wrong tries locks that device out for
+five minutes). One card per NICU:
 
-Without the env vars the admin console is unreachable, and `/api/data?whoami` reports
-`adminConfigured: false`.
+- **Build / Edit layout** — the grid layout builder: drag runs of beds, rename by
+  double-click, group open bays, trace over a floorplan image, starters, undo/redo.
+- **Save draft** keeps it in the admin tool only. **Make permanent** publishes it: the
+  NICU's board, reports, archives and unit map follow it, and the unit cannot change
+  it. Re-open it here any time to adjust.
+- **Set / Change password**, **Open board** (purple ADMIN VIEW; saves are stamped
+  ADMIN), **Export JSON**.
 
-## Multiple NICUs on one deployment
+Moving or renaming a bed keeps its history (beds have stable internal keys). Erasing a
+bed and drawing a new one does not.
 
-Each new unit gets a shareable code (`OWL-LJFC4` style — five characters). Anyone joining with that code
-lands on the same board; the function keys the Blobs store by code
-(`unit-OWL-LJF`), so units on the same deployment never see each other's data.
-`OWL-KSLN` is the production home unit (San Leandro) and inherits the pre-code data that
-used to live under the `store` key; it does not exist on branch/demo deploys. It keeps
-full features including patient identifiers.
+## San Leandro keeps its history
 
-A link carrying the code — `https://yoursite.netlify.app/?unit=OWL-KSLN` — joins and
-saves that unit on the device automatically, so a unit can bookmark one URL on every
-workstation and iPad instead of typing the code.
-
-Trial units — any code-generated unit other than the home unit — behave conservatively:
-- **TRIAL** badge in the header with a 30-day idle countdown.
-- No patient identifiers at all: bed labels only.
-- "Fill with sample entries" in Unit settings, to see it populated before typing
-  real numbers.
+On the production deploy, `SANLEANDRO` is seeded on first use from the earlier live
+data (the original single-board `store` key; or `unit-OWL-KSLN` if the demo ever ran in
+production), with any names/MRNs stripped. The old key is left untouched as a backup.
+Until its layout is made permanent, San Leandro shows the standard 20 beds (ICN-1 to
+ICN-20). Build its layout by moving and renaming those 20 beds.
 
 ## Clinical features
 - Beds colour-coded by respiratory support severity (HFOV purple, SIMV red,
@@ -130,16 +107,14 @@ Branches and deploy contexts), keep the SAME data.mjs in every branch, and share
 `/api/data?whoami`. Seed a demo with production data via Backup on production ->
 Import on the demo URL (writes only to the demo store).
 
-Trial units set up their own layouts on the demo fork. If a unit wants to keep going,
-give them their own deployment of this same folder and have them Import the JSON
-backup exported from the trial.
+Preview and branch deploys use their own store, so San Leandro starts empty there and
+the admin sets that deploy's passwords separately.
 
 ## Important
 - Drag-and-drop upload in the Netlify UI will NOT work — it skips installing the
   function's dependency. Use Option A or B.
 - No database setup needed: Netlify Blobs is built into every Netlify account.
-- The URL (plus unit code) is the only access control. The layout PIN protects the
-  layout, not the data. Avoid real patient identifiers unless you add authentication
-  — trial units already suppress them.
+- Each NICU's password is a light gate, not a medical-record login. Keep to bed labels
+  only — the tool does not accept patient identifiers.
 - Without the backend (e.g. opening index.html locally) the app still works, saving
   to that browser only ("This device only" badge).

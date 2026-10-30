@@ -63,7 +63,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           </sc-for>
         </sc-if>
         <sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
-        <button onClick="{{ openUnit }}" title="Unit layout, code and settings" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Unit</button>
+        <button onClick="{{ openUnit }}" title="Unit map and sign-out" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Unit</button>
         <button onClick="{{ exportJson }}" title="Download a JSON backup of all data" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Backup</button>
         <button onClick="{{ importJson }}" title="Restore from a JSON backup" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Import</button>
         <button onClick="{{ openArchive }}" title="Archived room bundles" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ arLabel }}</button>
@@ -97,68 +97,42 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   </sc-if>
 
   <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="Welcome" style="max-width:780px;margin:0 auto;padding:30px 16px 0">
-      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:16px;padding:26px 24px;display:flex;flex-direction:column;gap:15px">
-        <div style="font-size:23px;font-weight:700;letter-spacing:-0.015em">Set up your unit</div>
-        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:580px;text-wrap:pretty">OWL works off your unit's own shape. Draw your beds on a grid — optionally over a photo or scan of your floorplan — label them exactly as your unit numbers them, group open bays, then lock the layout. Every board, report and histogram after that follows it.</div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px">
-          <button onClick="{{ startSetup }}" style="min-height:44px;background:#0E7490;border:1px solid #0E7490;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 18px" style-hover="background:#0B5C73">Build my NICU layout</button>
-          <button onClick="{{ seedExample }}" style="min-height:44px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="border-color:#0E7490;color:#0E7490">Start from a 20-room example</button>
-        </div>
-        <div style="height:1px;background:#EDF1F4"></div>
-        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-          <div style="font-size:11.5px;color:#5A6B7A;line-height:1.45">Your unit code is <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0E7490;letter-spacing:0.06em">{{ unitCode }}</span> — everyone on your unit uses it to reach this same board.</div>
-          <button onClick="{{ leaveUnit }}" style="min-height:32px;background:none;border:none;color:#5A6B7A;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 4px;text-decoration:underline">Not your unit? Go back</button>
-        </div>
+    <div data-screen-label="Not ready" style="max-width:780px;margin:0 auto;padding:30px 16px 0">
+      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:16px;padding:26px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:23px;font-weight:700;letter-spacing:-0.015em">{{ unitName }} is almost ready</div>
+        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:580px;text-wrap:pretty">This NICU's bed layout hasn't been made permanent yet. The administrator sets it up once in the admin tool; after that every board, report and histogram here follows it.</div>
+        <div><button onClick="{{ leaveUnit }}" style="min-height:40px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 14px">Switch NICU</button></div>
       </div>
     </div>
   </sc-if>
 
   <sc-if value="{{ isDirectory }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="Unit directory" style="max-width:900px;margin:0 auto;padding:26px 16px 0;display:flex;flex-direction:column;gap:14px">
+    <div data-screen-label="Choose your NICU" style="max-width:900px;margin:0 auto;padding:26px 16px 0;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;flex-direction:column;gap:6px">
-        <div style="font-size:24px;font-weight:700;letter-spacing:-0.015em">Choose your unit</div>
-        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:620px;text-wrap:pretty">Units are private by default and reached with a code — the same one everyone on your unit uses, so no unit ever sees another's board. Any unit that chooses to be listed appears below.</div>
+        <div style="font-size:24px;font-weight:700;letter-spacing:-0.015em">Choose your NICU</div>
+        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:620px;text-wrap:pretty">Each NICU has its own private board and its own password. This device remembers the NICU you sign in to.</div>
       </div>
-
-      <sc-if value="{{ dirLoading }}" hint-placeholder-val="{{ true }}">
-        <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:20px;font-size:13px;color:#7A8A98">Loading units…</div>
-      </sc-if>
-      <sc-if value="{{ dirEmpty }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#FFFFFF;border:1px dashed #C9D2D9;border-radius:14px;padding:18px;font-size:13px;color:#5A6B7A;line-height:1.55">No units are listed publicly. If your unit already runs OWL, enter its code below.</div>
-      </sc-if>
-
-      <sc-if value="{{ dirHasUnits }}" hint-placeholder-val="{{ false }}">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px">
-          <sc-for list="{{ dirUnits }}" as="u" hint-placeholder-count="0">
-            <button onClick="{{ u.click }}" style="text-align:left;background:{{ u.bg }};border:1.5px solid {{ u.bd }};border-radius:13px;padding:13px;cursor:pointer;display:flex;flex-direction:column;gap:7px;min-height:112px" style-hover="border-color:#0E7490">
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                <span style="font-size:14.5px;font-weight:700;color:#16232E;line-height:1.25">{{ u.name }}</span>
-                <sc-if value="{{ u.isTrial }}" hint-placeholder-val="{{ false }}">
-                  <span style="font-size:8.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#E07C26;border-radius:4px;padding:2px 5px">TRIAL</span>
-                </sc-if>
-              </div>
-              <div style="display:flex;gap:4px;align-items:center">
-                <sc-for list="{{ u.strip }}" as="m" hint-placeholder-count="0">
-                  <span style="width:6px;height:13px;border-radius:2px;background:{{ m.color }};display:inline-block"></span>
-                </sc-for>
-              </div>
-            </button>
-          </sc-for>
-        </div>
-      </sc-if>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">
+        <sc-for list="{{ nicuTiles }}" as="u" hint-placeholder-count="3">
+          <button onClick="{{ u.click }}" style="text-align:left;background:{{ u.bg }};border:1.5px solid {{ u.bd }};border-radius:13px;padding:15px;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-height:96px" style-hover="border-color:#0E7490">
+            <span style="font-size:17px;font-weight:700;color:#16232E;line-height:1.25">{{ u.name }}</span>
+            <span style="font-size:11.5px;font-weight:600;color:{{ u.stTx }}">{{ u.status }}</span>
+          </button>
+        </sc-for>
+      </div>
 
       <sc-if value="{{ gateOpen }}" hint-placeholder-val="{{ false }}">
         <div style="background:#FFFFFF;border:1.5px solid #0E7490;border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:10px">
-          <div style="font-size:14.5px;font-weight:700">Enter the code for {{ gateName }}</div>
+          <div style="font-size:14.5px;font-weight:700">Password for {{ gateName }}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <input value="{{ gateCode }}" onChange="{{ onGateCode }}" placeholder="OWL-XXXXX" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:16px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;min-height:46px;width:170px;box-sizing:border-box">
-            <button onClick="{{ gateSubmit }}" style="min-height:46px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">Enter unit</button>
+            <input type="password" autocomplete="current-password" value="{{ gatePw }}" onChange="{{ onGatePw }}" onKeyDown="{{ gateKey }}" placeholder="NICU password" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:16px;min-height:46px;width:220px;box-sizing:border-box">
+            <button onClick="{{ gateSubmit }}" style="min-height:46px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">{{ gateBtn }}</button>
             <button onClick="{{ gateCancel }}" style="min-height:46px;background:none;border:none;color:#5A6B7A;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 8px">Cancel</button>
           </div>
           <sc-if value="{{ gateHasErr }}" hint-placeholder-val="{{ false }}">
             <div style="font-size:12.5px;color:#A32222;font-weight:600">{{ gateErr }}</div>
           </sc-if>
+          <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">Ask your unit lead for the password. Bed labels only — never enter patient names or MRNs.</div>
         </div>
       </sc-if>
 
@@ -167,7 +141,6 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:stretch">
           <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:9px">
             <div style="font-size:13px;color:#5A6B7A;line-height:1.6;text-wrap:pretty">OWL turns bedside saturation histograms into a unit-wide picture. Every bed carries its respiratory support, FiO₂, target range and a cumulative oxygenation tally, so a glance across the board shows where time is being spent below, inside and above target.</div>
-            <div style="font-size:12.5px;color:#7A8A98;line-height:1.55;font-style:italic">More on the approach, and the evidence behind it, is coming from the OWL site — this space is reserved for it.</div>
           </div>
           <div style="flex:1;min-width:250px;background:#F6F9FB;border:1px dashed #C9D2D9;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:8px">
             <div style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">A bed on the board</div>
@@ -191,22 +164,6 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="font-size:11px;color:#7A8A98;line-height:1.45">Blue below target, green in target, red above — weighted across every histogram entered.</div>
           </div>
         </div>
-        <div style="height:1px;background:#EDF1F4"></div>
-        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">New to OWL?</div>
-        <div style="font-size:13px;color:#5A6B7A;line-height:1.55;max-width:600px;text-wrap:pretty">Set up your own unit in a few minutes: draw your beds on a grid — over a photo of your floorplan if you have one — label them with your unit's own numbering, then lock it. You get a private unit code to share with your team.</div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px">
-          <button onClick="{{ startSetup }}" style="min-height:44px;background:#0E7490;border:1px solid #0E7490;border-radius:10px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 18px" style-hover="background:#0B5C73">Set up a new NICU</button>
-          <button onClick="{{ seedExample }}" style="min-height:44px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:10px;color:#3D4C59;font-size:13.5px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="border-color:#0E7490;color:#0E7490">Start from a 20-room example</button>
-        </div>
-        <div style="height:1px;background:#EDF1F4"></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <span style="font-size:11.5px;font-weight:700;color:#5A6B7A">Have a code for a unit that isn't listed?</span>
-          <input value="{{ joinCode }}" onChange="{{ onJoinCode }}" placeholder="OWL-XXXXX" style="border:1px solid #C9D2D9;border-radius:9px;padding:9px 11px;font-size:14px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;min-height:40px;width:150px;box-sizing:border-box">
-          <button onClick="{{ doJoin }}" style="min-height:40px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 13px" style-hover="background:#EAF4F7">Join</button>
-          <sc-if value="{{ joinHasErr }}" hint-placeholder-val="{{ false }}">
-            <span style="font-size:12px;color:#A32222;font-weight:600">{{ joinErr }}</span>
-          </sc-if>
-        </div>
       </div>
       <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:0 2px 8px">
         <span style="font-size:11.5px;color:#7A8A98">Questions, or something that would make this work better on your unit?</span>
@@ -216,13 +173,14 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   </sc-if>
 
   <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="Admin" style="max-width:1080px;margin:0 auto;padding:22px 16px 0;display:flex;flex-direction:column;gap:12px">
+    <div data-screen-label="Admin tool" style="max-width:1080px;margin:0 auto;padding:22px 16px 0;display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
-        <div style="font-size:21px;font-weight:700;letter-spacing:-0.015em">Units on this deployment</div>
+        <div style="font-size:21px;font-weight:700;letter-spacing:-0.015em">NICU setup · admin tool</div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ admStore }}</div>
         <div style="flex:1"></div>
         <button onClick="{{ admRefresh }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Refresh</button>
       </div>
+      <div style="font-size:12.5px;color:#5A6B7A;line-height:1.55;max-width:720px">Build each NICU's bed layout, then <strong>Make permanent</strong> — the unit's board, reports and map follow it and the unit cannot change it. Set a password for each NICU; a NICU stays closed until it has one.</div>
       <sc-if value="{{ admGateOpen }}" hint-placeholder-val="{{ false }}">
         <div style="background:#FFFFFF;border:1.5px solid #0E7490;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;max-width:400px">
           <div style="font-size:14.5px;font-weight:700">Admin PIN</div>
@@ -238,28 +196,52 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="background:#FBE8E8;border:1px solid #E08585;border-radius:11px;padding:12px;font-size:13px;color:#A32222;font-weight:600">{{ admMsg }}</div>
       </sc-if>
       <sc-if value="{{ admHasUnits }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;overflow:hidden">
-          <div style="display:grid;grid-template-columns:128px 1fr 62px 78px 74px 140px 196px;gap:0;background:#F6F9FB;border-bottom:1px solid #E2E8EE;padding:8px 12px;font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#7A8A98">
-            <div>Code</div><div>Unit</div><div>Beds</div><div>Occupied</div><div>Entries</div><div>Last entry</div><div></div>
-          </div>
-          <sc-for list="{{ admUnits }}" as="u" hint-placeholder-count="0">
-            <div style="display:grid;grid-template-columns:128px 1fr 62px 78px 74px 140px 196px;gap:0;align-items:center;border-bottom:1px solid #EDF1F4;padding:9px 12px">
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#0E7490">{{ u.code }}</div>
-              <div style="font-size:13px;font-weight:600;color:#16232E;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.name }}</div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#3D4C59">{{ u.beds }}</div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#3D4C59">{{ u.occupied }}</div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#3D4C59">{{ u.entries }}</div>
-              <div style="font-size:11.5px;color:#5A6B7A">{{ u.when }}</div>
-              <div style="display:flex;gap:6px;justify-content:flex-end">
-                <button onClick="{{ u.open }}" style="min-height:30px;background:#FFFFFF;border:1px solid #0E7490;border-radius:8px;color:#0E7490;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Open</button>
-                <button onClick="{{ u.exp }}" style="min-height:30px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 9px">JSON</button>
-                <button onClick="{{ u.del }}" style="min-height:30px;background:#FFFFFF;border:1px solid #E0A0A0;border-radius:8px;color:#B42318;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 9px">Delete</button>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+          <sc-for list="{{ admUnits }}" as="u" hint-placeholder-count="3">
+            <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:11px">
+              <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+                <span style="font-size:17px;font-weight:700;color:#16232E">{{ u.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ u.code }}</span>
               </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;width:74px">Layout</span>
+                  <span style="font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:{{ u.layBg }};color:{{ u.layTx }}">{{ u.layStatus }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;width:74px">Password</span>
+                  <span style="font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:{{ u.pwBg }};color:{{ u.pwTx }}">{{ u.pwStatus }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;width:74px">Data</span>
+                  <span style="font-size:11.5px;color:#3D4C59">{{ u.dataLine }}</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button onClick="{{ u.edit }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:8px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 11px">{{ u.editLabel }}</button>
+                <button onClick="{{ u.pw }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:8px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 11px">{{ u.pwLabel }}</button>
+                <button onClick="{{ u.open }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 10px">Open board</button>
+                <button onClick="{{ u.exp }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 10px">Export JSON</button>
+              </div>
+              <sc-if value="{{ u.pwOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F6F9FB;border:1px solid #E2E8EE;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px">
+                  <input type="text" autocomplete="off" value="{{ u.pwV }}" onChange="{{ u.onPwV }}" placeholder="New password (4+ characters)" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:14px;min-height:40px;box-sizing:border-box;width:100%">
+                  <div style="font-size:11px;color:#7A8A98;line-height:1.45">Shown here as you type so you can read it out to the unit. Saving replaces the old password — devices signed in with it will be asked again.</div>
+                  <sc-if value="{{ u.pwHasErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#A32222;font-weight:600">{{ u.pwErr }}</div></sc-if>
+                  <div style="display:flex;gap:6px;justify-content:flex-end">
+                    <button onClick="{{ u.pwCancel }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:600;cursor:pointer;padding:0 11px">Cancel</button>
+                    <button onClick="{{ u.pwSave }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:8px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Save password</button>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ u.hasNote }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:11.5px;color:#136B31;font-weight:600">{{ u.note }}</div>
+              </sc-if>
             </div>
           </sc-for>
         </div>
       </sc-if>
-      <div style="font-size:11.5px;color:#7A8A98;line-height:1.5;max-width:620px">Opening a unit joins it on this device with its code. Use <strong>Unit → Leave unit</strong> to come back out.</div>
+      <div style="font-size:11.5px;color:#7A8A98;line-height:1.5;max-width:720px">San Leandro starts from the existing live board, whose beds are numbered 1–20. When you build its layout, move and rename those beds rather than erasing and redrawing them, so each bed keeps its history.</div>
     </div>
   </sc-if>
 
@@ -271,7 +253,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="flex:1"></div>
         <button onClick="{{ edCancel }}" style="min-height:36px;background:none;border:none;color:#5A6B7A;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 8px">Cancel</button>
         <button onClick="{{ edSaveDraft }}" style="min-height:36px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Save draft</button>
-        <button onClick="{{ edLock }}" style="min-height:36px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 14px" style-hover="background:#0B5C73">Save &amp; lock layout</button>
+        <button onClick="{{ edLock }}" style="min-height:36px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 14px" style-hover="background:#0B5C73">Make permanent</button>
       </div>
       <sc-if value="{{ edHasErr }}" hint-placeholder-val="{{ false }}">
         <div style="background:#FBE8E8;border:1px solid #E08585;border-radius:9px;padding:8px 11px;font-size:12.5px;color:#A32222;font-weight:600;margin-bottom:10px">{{ edErr }}</div>
@@ -316,7 +298,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="width:300px;display:flex;flex-direction:column;gap:10px">
           <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
             <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Unit &amp; numbering</div>
-            <input value="{{ edName }}" onChange="{{ onEdName }}" placeholder="Unit name (e.g. San Leandro ICN)" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box;width:100%">
+            <input value="{{ edName }}" onChange="{{ onEdName }}" placeholder="Display name (e.g. San Leandro ICN)" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box;width:100%">
             <div style="display:flex;gap:6px">
               <input value="{{ edPrefix }}" onChange="{{ onEdPrefix }}" placeholder="Prefix" style="flex:1;min-width:0;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box">
               <input value="{{ edNext }}" onChange="{{ onEdNext }}" placeholder="Next #" style="width:78px;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:40px;box-sizing:border-box">
@@ -377,7 +359,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
                 <input value="{{ edRows }}" onChange="{{ onEdRows }}" style="border:1px solid #C9D2D9;border-radius:8px;padding:8px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:38px;box-sizing:border-box;width:100%">
               </label>
             </div>
-            <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">Locking hides the builder. It stays editable from <strong>Unit</strong> in the header with your PIN.</div>
+            <div style="font-size:11.5px;color:#7A8A98;line-height:1.45"><strong>Make permanent</strong> locks this layout for the unit. Only this admin tool can change it later. Moving or renaming a bed keeps its history; erasing a bed does not.</div>
           </div>
         </div>
       </div>
@@ -723,7 +705,6 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
               <div style="font-size:15px;font-weight:700">{{ a.label }}</div>
               <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#5B4A82;background:#F1EBFB;border:1px solid #D8C8F2;border-radius:6px;padding:2.5px 7px;text-transform:uppercase">Archived {{ a.when }}</div>
-              <div style="font-size:11.5px;color:#4A5865">Patient: <span style="font-weight:600">{{ a.name }}</span> · MRN <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ a.mrn }}</span></div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ a.count }} entries · last entry {{ a.lastWhen }}</div>
               <div style="flex:1"></div>
               <button onClick="{{ a.toggle }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ a.toggleLbl }}</button>
@@ -825,7 +806,6 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap">
             <div style="font-size:17px;font-weight:700">{{ p.label }}</div>
             <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#FFFFFF;background:{{ p.solid }};border-radius:6px;padding:2.5px 7px;text-transform:uppercase">{{ p.modeLabel }}</div>
-            <div style="font-size:11.5px;color:#4A5865">Patient: <span style="font-weight:600">{{ p.name }}</span> · MRN: <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ p.mrn }}</span></div>
             <div style="flex:1"></div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ p.count }} entries · newest first</div>
           </div>
@@ -1121,60 +1101,21 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   <sc-if value="{{ unitOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeUnit }}" style="position:fixed;inset:0;z-index:118;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
       <div data-screen-label="Unit settings" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(460px,100%);max-height:88vh;overflow-y:auto;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:13px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
-        <div style="font-size:16px;font-weight:700">Unit settings</div>
+        <div style="font-size:16px;font-weight:700">{{ unitName }}</div>
         <div style="display:flex;flex-direction:column;gap:4px">
           <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Layout</div>
           <div style="font-size:13px;font-weight:600;color:#16232E">{{ layoutStatus }}</div>
           <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">{{ layoutDetail }}</div>
           <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
-            <button onClick="{{ editLayout }}" style="min-height:38px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 13px" style-hover="background:#EAF4F7">Edit layout</button>
             <button onClick="{{ openMapFromUnit }}" style="min-height:38px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 13px">View unit map</button>
           </div>
         </div>
         <div style="height:1px;background:#EDF1F4"></div>
         <div style="display:flex;flex-direction:column;gap:6px">
-          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Home page listing</div>
-          <button onClick="{{ toggleListed }}" style="display:flex;align-items:center;gap:9px;background:none;border:none;padding:0;cursor:pointer;text-align:left">
-            <span style="width:38px;height:22px;border-radius:999px;background:{{ listedBg }};border:1px solid {{ listedBd }};position:relative;flex:none;display:inline-block">
-              <span style="position:absolute;top:2px;left:{{ listedX }};width:16px;height:16px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(22,35,46,0.3)"></span>
-            </span>
-            <span style="font-size:12.5px;font-weight:600;color:#3D4C59">{{ listedLabel }}</span>
-          </button>
-          <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">{{ listedHelp }}</div>
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">This device</div>
+          <div style="font-size:12px;color:#5A6B7A;line-height:1.45">Signed in to {{ unitName }}. Bed labels only — no patient names or MRNs.</div>
+          <div><button onClick="{{ leaveUnit }}" title="Sign out of this NICU on this device" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Switch NICU / sign out</button></div>
         </div>
-        <div style="height:1px;background:#EDF1F4"></div>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Unit code</div>
-          <sc-if value="{{ hasCode }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:700;letter-spacing:0.08em;color:#0E7490">{{ unitCode }}</div>
-              <button onClick="{{ copyCode }}" style="min-height:32px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">{{ copyLabel }}</button>
-              <button onClick="{{ leaveUnit }}" title="Sign out of this unit on this device" style="min-height:32px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#5A6B7A;font-size:11.5px;font-weight:600;cursor:pointer;padding:0 10px">Leave unit</button>
-            </div>
-            <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">Share this with your unit — anyone who joins with it sees this board.</div>
-          </sc-if>
-          <sc-if value="{{ noCode }}" hint-placeholder-val="{{ true }}">
-            <div style="font-size:12px;color:#5A6B7A;line-height:1.45">This board is the site's main unit and has no shareable code.</div>
-          </sc-if>
-        </div>
-        <sc-if value="{{ isAdminView }}" hint-placeholder-val="{{ false }}">
-    <div data-noprint="1" style="max-width:1180px;margin:0 auto;padding:10px 16px 0">
-      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#F1E7FB;border:1px solid #B583E3;border-radius:11px;padding:8px 12px">
-        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#8A46CF;border-radius:5px;padding:3px 7px">ADMIN VIEW</span>
-        <span style="font-size:12px;color:#6B21A8;font-weight:600">You are in another unit's board. Anything you save is stamped ADMIN in their log.</span>
-        <span style="flex:1"></span>
-        <button onClick="{{ exitAdminView }}" style="min-height:30px;background:#FFFFFF;border:1px solid #B583E3;border-radius:8px;color:#6B21A8;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Leave this unit</button>
-      </div>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ showTrial }}" hint-placeholder-val="{{ false }}">
-          <div style="background:#FCF0E2;border:1px solid #E0A268;border-radius:10px;padding:10px 11px;display:flex;flex-direction:column;gap:7px">
-            <div style="font-size:12px;font-weight:700;color:#98510F">{{ trialText }}</div>
-            <div style="font-size:11.5px;color:#98510F;line-height:1.45">Trial units hold bed labels only — no patient identifiers. For a permanent, unit-only instance, ask for your own deployment.</div>
-            <button onClick="{{ loadSample }}" style="min-height:36px;background:#FFFFFF;border:1px solid #E0A268;border-radius:9px;color:#98510F;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Fill with sample entries</button>
-          </div>
-        </sc-if>
         <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap">
           <a href="{{ feedbackHref }}" style="min-height:40px;display:inline-flex;align-items:center;color:#0E7490;font-size:12px;font-weight:700;text-decoration:underline">Give feedback</a>
           <button onClick="{{ closeUnit }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">Done</button>
@@ -1224,19 +1165,24 @@ class Component extends DCLogic {
     this.code = '';
     let q = null; try { q = new URLSearchParams(window.location.search); } catch (e) {}
     this.adminTok = (q && q.get('admin')) || '';
-    const urlUnit = ((q && q.get('unit')) || '').toUpperCase().replace(/[^A-Z0-9-]/g, '');
-    try { this.code = urlUnit || (localStorage.getItem('owl_unit') || '').toUpperCase(); } catch (e) { this.code = urlUnit; }
-    if (urlUnit) { try { localStorage.setItem('owl_unit', urlUnit); } catch (e) {} }
+    const urlUnit = ((q && q.get('unit')) || '').toUpperCase().replace(/[^A-Z]/g, '');
+    let saved = ''; try { saved = (localStorage.getItem('owl_unit') || '').toUpperCase(); } catch (e) {}
+    this.adm = null; try { this.adm = JSON.parse(sessionStorage.getItem('owl_admin') || 'null'); } catch (e) {}
+    this.pass = '';
+    if (this.adminTok) this.code = '';
+    else if (urlUnit && this.NICUS()[urlUnit] && urlUnit !== saved) { this.code = ''; this.preGate = urlUnit; }
+    else this.code = this.NICUS()[saved] ? saved : '';
+    if (this.code) { try { this.pass = localStorage.getItem('owl_pass:' + this.code) || ''; } catch (e) {} }
     this.stripUnitParam = !!urlUnit;
-    this.isHome = this.code === 'OWL-KSLN';
+    this.isHome = false;
     this.KEY = 'nicu_resp_v1' + (this.code ? ':' + this.code : '');
     let data = { rooms: {} };
     try { const raw = localStorage.getItem(this.KEY); if (raw) { const p = JSON.parse(raw); if (p && p.rooms) data = p; } } catch (e) {}
     let li = ''; try { li = localStorage.getItem('nicu_resp_initials') || ''; } catch (e) {}
-    try { this.adminView = localStorage.getItem('owl_admin_view') === '1'; } catch (e) { this.adminView = false; }
+    try { this.adminView = localStorage.getItem('owl_admin_view') === '1' && !!this.adm && !!this.code; } catch (e) { this.adminView = false; }
     this.lastInit = this.adminView ? 'ADMIN' : li;
     this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null, restore: null, cmp: {}, arOpen: null, ed: null, map: false, unit: false, pin: null, join: '', copied: false, dir: null, dirLoading: false, gate: null, joinErr: '', adm: null, admLoading: false, admMsg: '', admStore: '', admGate: null };
-    this.API = '/api/data' + (this.code ? '?unit=' + encodeURIComponent(this.code) : ''); this.remote = false; this.lastWrite = 0;
+    this.API = '/api/data' + (this.code ? '?unit=' + encodeURIComponent(this.code) + (this.adminView ? '&' + this.storedAdminQS() : '') : ''); this.remote = false; this.lastWrite = 0;
     this.onStorage = (ev) => {
       if (ev.key === this.KEY && ev.newValue) { try { const p = JSON.parse(ev.newValue); if (p && p.rooms) this.setState({ data: p }); } catch (e) {} }
     };
@@ -1251,17 +1197,26 @@ class Component extends DCLogic {
       try { const u = new URL(window.location.href); u.searchParams.delete('unit'); window.history.replaceState({}, '', u.toString()); } catch (e) {}
     }
     if (this.adminTok) this.loadAdmin();
-    if (!this.code) { this.loadDirectory(); this.setState({ sync: '' }); return; }
-    fetch(this.API).then(r => (r.ok ? r.json() : Promise.reject())).then(j => {
+    if (!this.code) {
+      this.loadDirectory(); this.setState({ sync: '' });
+      if (this.preGate) this.setState({ gate: { code: this.preGate, name: this.NICUS()[this.preGate], pw: '', err: '' } });
+      return;
+    }
+    fetch(this.API, { headers: this.hdrs() }).then(r => {
+      if (r.status === 401 || r.status === 403 || r.status === 404 || r.status === 429) {
+        return r.json().catch(() => ({})).then(j => { this.authFailed(r.status, j && j.message); return Promise.reject('auth'); });
+      }
+      return r.ok ? r.json() : Promise.reject();
+    }).then(j => {
       this.remote = true;
       this.setState(j && j.rooms ? { data: j, sync: 'live' } : { sync: 'live' });
       this.pollId = setInterval(() => {
         if (Date.now() - this.lastWrite < 4000) return;
-        fetch(this.API).then(r => (r.ok ? r.json() : null)).then(j2 => {
+        fetch(this.API, { headers: this.hdrs() }).then(r => { if (r.status === 401 || r.status === 403) { this.authFailed(r.status); return null; } return r.ok ? r.json() : null; }).then(j2 => {
           if (j2 && j2.rooms && JSON.stringify(j2) !== JSON.stringify(this.state.data)) this.setState({ data: j2 });
         }).catch(() => {});
       }, 5000);
-    }).catch(() => this.setState({ sync: 'local' }));
+    }).catch(why => { if (why !== 'auth') this.setState({ sync: 'local' }); });
   }
   componentDidUpdate() { if (this.hitEl && this.cursorNow) this.hitEl.style.cursor = this.cursorNow; }
   componentWillUnmount() { window.removeEventListener('storage', this.onStorage); window.removeEventListener('pointerup', this.onUp); window.removeEventListener('keydown', this.onKey); if (this.pollId) clearInterval(this.pollId); }
@@ -1295,34 +1250,70 @@ class Component extends DCLogic {
     for (let i = 0; i < v.length; i++) { h ^= v.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
     return h.toString(36);
   }
+  NICUS() { return { THIMPHU: 'Thimphu', WALNUTCREEK: 'Walnut Creek', SANLEANDRO: 'San Leandro' }; }
+  hdrs() { return this.pass ? { 'x-unit-pass': this.pass } : {}; }
+  storedAdminQS() { const a = this.adm || {}; return 'admin=' + encodeURIComponent(a.tok || '') + (a.pin ? '&pin=' + encodeURIComponent(a.pin) : ''); }
+  authFailed(status, msg) {
+    if (this.pollId) { clearInterval(this.pollId); this.pollId = null; }
+    const code = this.code, name = this.NICUS()[code] || code;
+    try { localStorage.removeItem('owl_pass:' + code); localStorage.removeItem('owl_unit'); localStorage.removeItem('owl_admin_view'); } catch (e) {}
+    this.code = ''; this.pass = ''; this.remote = false; this.adminView = false;
+    const err = msg || (status === 401 ? 'The password for ' + name + ' has changed — enter the new one.' : status === 403 ? name + ' is not open yet.' : 'Please sign in again.');
+    this.setState({ data: { rooms: {} }, sync: '', view: { t: 'grid' }, gate: { code, name, pw: '', err } });
+    this.loadDirectory();
+  }
   loadDirectory() {
     this.setState({ dirLoading: true });
-    fetch('/api/data?directory')
+    fetch('/api/data?units')
       .then(r => (r.ok ? r.json() : Promise.reject()))
       .then(j => this.setState({ dir: (j && j.units) || [], dirLoading: false }))
-      .catch(() => this.setState({ dir: [], dirLoading: false }));
+      .catch(() => this.setState({ dir: null, dirLoading: false }));
   }
   adminQS() { return 'admin=' + encodeURIComponent(this.adminTok) + (this.admPin ? '&pin=' + encodeURIComponent(this.admPin) : ''); }
+  rememberAdmin() { this.adm = { tok: this.adminTok, pin: this.admPin || '' }; try { sessionStorage.setItem('owl_admin', JSON.stringify(this.adm)); } catch (e) {} }
   loadAdmin() {
+    if (!this.admPin && this.adm && this.adm.tok === this.adminTok) this.admPin = this.adm.pin || '';
     this.setState({ admLoading: true });
     fetch('/api/data?directory&' + this.adminQS())
-      .then(r => r.json().then(j => ({ ok: r.ok, j })))
+      .then(r => r.json().then(j => ({ ok: r.ok, j })).catch(() => ({ ok: false, j: null })))
       .then(({ ok, j }) => {
         if (ok && j && j.admin) {
+          this.rememberAdmin();
           this.setState({ adm: j.units || [], admLoading: false, admMsg: '', admGate: null });
           fetch('/api/data?whoami').then(r2 => (r2.ok ? r2.json() : null)).then(w => {
             if (w) this.setState({ admStore: w.host + ' · store ' + w.store });
           }).catch(() => {});
           return;
         }
-        if (j && j.pinRequired) { this.setState({ admLoading: false, admGate: { pin: '', err: '' } }); return; }
-        this.setState({ adm: [], admLoading: false, admMsg: 'That admin token was not accepted.' });
+        if (j && j.pinRequired) { this.admPin = ''; this.setState({ admLoading: false, admGate: { pin: '', err: '' } }); return; }
+        this.setState({ adm: [], admLoading: false, admMsg: 'That admin link was not accepted. Check OWL_ADMIN_TOKEN in Netlify.' });
       })
-      .catch(() => this.setState({ adm: [], admLoading: false, admMsg: 'Admin listing unavailable — check OWL_ADMIN_TOKEN on the site.' }));
+      .catch(() => this.setState({ adm: [], admLoading: false, admMsg: 'Admin tool unavailable — check OWL_ADMIN_TOKEN on the site.' }));
   }
   adminOpen(code) {
-    try { localStorage.setItem('owl_admin_view', '1'); localStorage.setItem('nicu_resp_initials', 'ADMIN'); } catch (e) {}
-    this.joinUnit(code);
+    this.rememberAdmin();
+    try { localStorage.setItem('owl_admin_view', '1'); localStorage.setItem('owl_unit', code); localStorage.setItem('nicu_resp_initials', 'ADMIN'); } catch (e) {}
+    window.location.href = '/';
+  }
+  adminEditLayout(code) {
+    fetch('/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS())
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(j => {
+        this.code = code; this.pass = '';
+        this.API = '/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS();
+        this.remote = true;
+        this.setState({ data: j && j.rooms ? j : { rooms: {} } }, () => this.startSetup());
+      })
+      .catch(() => this.setState({ admMsg: 'Could not load ' + (this.NICUS()[code] || code) + '.' }));
+  }
+  adminSavePassword(code) {
+    const p = this.state.admPw; if (!p || p.code !== code) return;
+    const v = String(p.v || '');
+    if (v.length < 4) { this.setState({ admPw: { ...p, err: 'Use at least four characters.' } }); return; }
+    fetch('/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'setPassword', password: v }) })
+      .then(r => { if (!r.ok) return r.text().then(t => Promise.reject(t)); return r.json(); })
+      .then(() => { this.setState({ admPw: null, admNote: { code, text: 'Password saved.' } }); this.loadAdmin(); })
+      .catch(t => this.setState({ admPw: { ...p, err: (typeof t === 'string' && t) || 'Could not save the password.' } }));
   }
   adminExport(code) {
     fetch('/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS())
@@ -1336,20 +1327,27 @@ class Component extends DCLogic {
       })
       .catch(() => this.setState({ admMsg: 'Could not export ' + code + '.' }));
   }
-  verifyAndJoin(code, onErr) {
-    const c = String(code || '').trim().toUpperCase();
-    if (!/^[A-Z0-9-]{3,16}$/.test(c)) { onErr('Enter a unit code like OWL-LJFC4.'); return; }
-    fetch('/api/data?unit=' + encodeURIComponent(c))
-      .then(r => {
-        if (r.ok) { this.joinUnit(c); return; }
-        if (r.status === 404) onErr('No unit on this site uses that code.');
-        else onErr('Could not reach the server. Try again.');
+  signIn() {
+    const g = this.state.gate; if (!g) return;
+    const pw = String(g.pw || '');
+    if (!pw) { this.setState({ gate: { ...g, err: 'Enter the password.' } }); return; }
+    this.setState({ gate: { ...g, busy: true, err: '' } });
+    fetch('/api/data?unit=' + encodeURIComponent(g.code), { headers: { 'x-unit-pass': pw } })
+      .then(r => r.json().catch(() => ({})).then(j => ({ r, j })))
+      .then(({ r, j }) => {
+        if (r.ok) {
+          try { localStorage.setItem('owl_unit', g.code); localStorage.setItem('owl_pass:' + g.code, pw); localStorage.removeItem('owl_admin_view'); } catch (e) {}
+          window.location.href = '/';
+          return;
+        }
+        this.setState({ gate: { ...g, busy: false, pw: '', err: (j && j.message) || 'Could not sign in.' } });
       })
-      .catch(() => onErr('Could not reach the server. Try again.'));
+      .catch(() => this.setState({ gate: { ...g, busy: false, err: 'Could not reach the server. Try again.' } }));
   }
 
   /* ---------- unit layout ---------- */
-  layoutOf() { const L = this.state.data.layout; return L && L.beds && L.beds.length ? L : null; }
+  // Units only ever see a permanent layout; drafts live in the admin tool until made permanent.
+  layoutOf() { const L = this.state.data.layout; if (!(L && L.beds && L.beds.length)) return null; if (!this.adminTok && L.permanent === false) return null; return L; }
   beds() {
     const L = this.layoutOf();
     if (L) return L.beds;
@@ -1595,7 +1593,19 @@ class Component extends DCLogic {
     const cols = Math.max(8, Math.max(...beds.map(b => b.cx), ...bays.map(y => y.x1)) + 2);
     const rows = Math.max(5, Math.max(...beds.map(b => b.cy), ...bays.map(y => y.y1)) + 2);
     const old = this.layoutOf();
-    const layout = { name: e.name || '', cols, rows, prefix: e.prefix, beds, bays, sketch: e.sketch, opacity: e.opacity, locked: !!lock, pin: pin || (old && old.pin) || '', updatedAt: new Date().toISOString() };
+    const layout = { name: e.name || '', cols, rows, prefix: e.prefix, beds, bays, sketch: e.sketch, opacity: e.opacity, locked: !!lock, permanent: !!lock, updatedAt: new Date().toISOString() };
+    if (this.adminTok) {
+      const code = this.code;
+      this.lastWrite = Date.now();
+      fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'layout', layout }) })
+        .then(r => (r.ok ? r.json() : Promise.reject()))
+        .then(() => { this.setState({ admNote: { code, text: lock ? 'Layout saved and made permanent.' : 'Draft layout saved — not yet visible to the unit.' } }); this.loadAdmin(); })
+        .catch(() => this.setState({ admMsg: 'Could not save the layout for ' + (this.NICUS()[code] || code) + '.' }));
+      this.code = ''; this.API = '/api/data'; this.remote = false;
+      this.setState({ view: { t: 'grid' }, ed: null, pin: null, confirm: null, data: { rooms: {} } });
+      window.scrollTo(0, 0);
+      return;
+    }
     this.sendOp({ op: 'layout', layout });
     this.setState({ view: { t: 'grid' }, ed: null, pin: null });
     window.scrollTo(0, 0);
@@ -1690,70 +1700,64 @@ class Component extends DCLogic {
     const left = Math.max(0, 30 - daysIdle);
     return {
       inApp: view.t !== 'welcome' && view.t !== 'setup' && view.t !== 'directory' && view.t !== 'admin',
-      hasCodeChip: !!this.code && view.t !== 'directory' && view.t !== 'admin',
-      hasUnitName: !!(L && L.name), unitName: (L && L.name) || '',
-      showIds: !this.code || this.isHome, hideIds: !!this.code && !this.isHome,
-      showTrial: !!this.code && !this.isHome && view.t !== 'setup' && view.t !== 'welcome' && view.t !== 'directory',
+      hasCodeChip: false,
+      hasUnitName: !!this.code && view.t !== 'directory' && view.t !== 'admin', unitName: (L && L.name) || this.NICUS()[this.code] || '',
+      showIds: false, hideIds: true,
+      showTrial: false,
       trialText: `Trial unit ${this.code} · bed labels only, no patient identifiers · clears after 30 days idle (${left} left)`,
       isWelcome: view.t === 'welcome', isSetup: view.t === 'setup',
       isDirectory: view.t === 'directory', isAdmin: view.t === 'admin',
       dirLoading: !!this.state.dirLoading,
-      dirHasUnits: !!(this.state.dir && this.state.dir.length),
-      dirEmpty: !this.state.dirLoading && !!this.state.dir && !this.state.dir.length,
-      dirUnits: (this.state.dir || []).map(u => {
-        const sel = this.state.gate && this.state.gate.id === u.id;
-        const filled = Math.max(0, Math.min(14, u.occupied || 0));
-        const total = Math.max(filled, Math.min(14, u.beds || 0));
-        const strip = [];
-        for (let i = 0; i < total; i++) strip.push({ color: i < filled ? '#0E7490' : '#D5DEE6' });
+      nicuTiles: Object.keys(this.NICUS()).map(c => {
+        const info = (this.state.dir || []).find(u => u.code === c);
+        const open = info ? !!info.open : null;
+        const sel = this.state.gate && this.state.gate.code === c;
         return {
-          name: u.name || 'Unnamed unit',
-          isTrial: u.code !== 'OWL-KSLN' && u.id !== this.hashCode('OWL-KSLN'),
-          strip,
+          name: this.NICUS()[c],
+          status: open === false ? 'Not open yet' : (sel ? 'Enter the password below' : 'Sign in →'),
+          stTx: open === false ? '#98510F' : '#0E7490',
           bg: sel ? '#EAF4F7' : '#FFFFFF', bd: sel ? '#0E7490' : '#E2E8EE',
-          click: () => this.setState({ gate: { id: u.id, name: u.name || 'this unit', code: '', err: '' } })
+          click: () => this.setState({ gate: { code: c, name: this.NICUS()[c], pw: '', err: open === false ? this.NICUS()[c] + ' is not open yet — the administrator has not set its password.' : '' } })
         };
       }),
       gateOpen: !!this.state.gate,
       gateName: (this.state.gate && this.state.gate.name) || '',
-      gateCode: (this.state.gate && this.state.gate.code) || '',
-      onGateCode: ev => { const v = ev.target.value.toUpperCase(); this.setState(st => ({ gate: { ...st.gate, code: v, err: '' } })); },
+      gatePw: (this.state.gate && this.state.gate.pw) || '',
+      onGatePw: ev => { const v = ev.target.value; this.setState(st => ({ gate: { ...st.gate, pw: v, err: '' } })); },
+      gateKey: ev => { if (ev.key === 'Enter') { ev.preventDefault(); this.signIn(); } },
+      gateBtn: this.state.gate && this.state.gate.busy ? 'Checking…' : 'Sign in',
       gateHasErr: !!(this.state.gate && this.state.gate.err),
       gateErr: (this.state.gate && this.state.gate.err) || '',
       gateCancel: () => this.setState({ gate: null }),
-      gateSubmit: () => {
-        const g = this.state.gate; if (!g) return;
-        const tries = (this.gateTries || 0);
-        if (this.coolUntil && Date.now() < this.coolUntil) {
-          const secs = Math.ceil((this.coolUntil - Date.now()) / 1000);
-          this.setState({ gate: { ...g, err: `Too many attempts — wait ${secs}s.` } });
-          return;
-        }
-        const typed = String(g.code || '').trim().toUpperCase();
-        if (this.hashCode(typed) !== g.id) {
-          this.gateTries = tries + 1;
-          if (this.gateTries >= 5) { this.coolUntil = Date.now() + 60000; this.gateTries = 0; }
-          this.setState({ gate: { ...g, err: `That code does not match ${g.name}.` } });
-          return;
-        }
-        this.gateTries = 0;
-        this.verifyAndJoin(typed, msg => this.setState({ gate: { ...this.state.gate, err: msg } }));
-      },
+      gateSubmit: () => this.signIn(),
       joinHasErr: !!this.state.joinErr, joinErr: this.state.joinErr || '',
       admStore: this.state.admStore || '',
       admDenied: !!this.state.admMsg, admMsg: this.state.admMsg || '',
       admHasUnits: !!(this.state.adm && this.state.adm.length),
-      admUnits: (this.state.adm || []).map(u => ({
-        code: u.code, name: u.name || '—', beds: String(u.beds || 0), occupied: String(u.occupied || 0), entries: String(u.entries || 0),
-        when: u.lastTs ? this.fmtDateFull(u.lastTs) : '—',
-        open: () => this.adminOpen(u.code),
-        exp: () => this.adminExport(u.code),
-        del: () => {
-          if (!window.confirm('Delete unit ' + u.code + ' and all of its data? This cannot be undone.')) return;
-          fetch('/api/data?unit=' + encodeURIComponent(u.code) + '&admin=' + encodeURIComponent(this.adminTok), { method: 'DELETE' })
-            .then(() => this.loadAdmin());
-        }
-      })),
+      admUnits: (this.state.adm || []).map(u => {
+        const pw = this.state.admPw && this.state.admPw.code === u.code ? this.state.admPw : null;
+        const note = this.state.admNote && this.state.admNote.code === u.code ? this.state.admNote.text : '';
+        const lay = u.permanent ? ['Permanent · ' + u.beds + ' beds', '#E6F5EA', '#136B31'] : u.hasLayout ? ['Draft · ' + u.beds + ' beds · not live', '#FCF0E2', '#98510F'] : ['Not built yet', '#EDF0F2', '#4A5560'];
+        return {
+          code: u.code, name: u.name || this.NICUS()[u.code] || u.code,
+          layStatus: lay[0], layBg: lay[1], layTx: lay[2],
+          pwStatus: u.hasPassword ? 'Set · ' + this.fmtDateFull(u.passwordSetAt || new Date().toISOString()) : 'Not set — NICU closed',
+          pwBg: u.hasPassword ? '#E6F5EA' : '#FBE8E8', pwTx: u.hasPassword ? '#136B31' : '#A32222',
+          dataLine: (u.occupied || 0) + ' occupied · ' + (u.entries || 0) + ' entries' + (u.lastTs ? ' · last ' + this.fmtDateFull(u.lastTs) : ''),
+          editLabel: u.permanent ? 'Edit layout' : u.hasLayout ? 'Continue layout' : 'Build layout',
+          edit: () => this.adminEditLayout(u.code),
+          pwLabel: u.hasPassword ? 'Change password' : 'Set password',
+          pw: () => this.setState({ admPw: { code: u.code, v: '', err: '' }, admNote: null }),
+          pwOpen: !!pw, pwV: pw ? pw.v : '',
+          onPwV: ev => { const v = ev.target.value; this.setState(st => ({ admPw: { ...st.admPw, v, err: '' } })); },
+          pwHasErr: !!(pw && pw.err), pwErr: (pw && pw.err) || '',
+          pwCancel: () => this.setState({ admPw: null }),
+          pwSave: () => this.adminSavePassword(u.code),
+          open: () => this.adminOpen(u.code),
+          exp: () => this.adminExport(u.code),
+          hasNote: !!note, note
+        };
+      }),
       admRefresh: () => this.loadAdmin(),
       admGateOpen: !!this.state.admGate,
       admPin: (this.state.admGate && this.state.admGate.pin) || '',
@@ -1774,6 +1778,7 @@ class Component extends DCLogic {
           .then(({ ok, j }) => {
             if (ok && j && j.admin) {
               this.admTries = 0;
+              this.rememberAdmin();
               this.setState({ adm: j.units || [], admGate: null, admMsg: '' });
               fetch('/api/data?whoami').then(r2 => (r2.ok ? r2.json() : null)).then(w => {
                 if (w) this.setState({ admStore: w.host + ' · store ' + w.store });
@@ -1787,13 +1792,10 @@ class Component extends DCLogic {
           })
           .catch(() => this.setState({ admGate: { ...g, err: 'Could not reach the server.' } }));
       },
-      exitAdminView: () => { try { localStorage.removeItem('owl_admin_view'); localStorage.removeItem('owl_unit'); } catch (e) {} window.location.reload(); },
+      exitAdminView: () => { try { localStorage.removeItem('owl_admin_view'); localStorage.removeItem('owl_unit'); } catch (e) {} window.location.href = '/?admin=' + encodeURIComponent((this.adm && this.adm.tok) || ''); },
       joinCode: this.state.join,
       onJoinCode: ev => this.setState({ join: ev.target.value }),
-      doJoin: () => this.verifyAndJoin(this.state.join, msg => this.setState({ joinErr: msg })),
-      startSetup: () => this.startSetup(),
-      seedExample: () => { if (!this.code) this.setCode(this.newCode()); this.sendOp({ op: 'layout', layout: this.exampleLayout() }); this.setState({ view: { t: 'grid' } }); },
-      edTitle: L ? 'Edit unit layout' : 'New NICU layout',
+      edTitle: (L ? 'Edit layout · ' : 'Build layout · ') + (this.NICUS()[this.code] || ''),
       edSummary: e ? `${e.beds.length} bed${e.beds.length === 1 ? '' : 's'}${e.bays.length ? ' \u00b7 ' + e.bays.length + ' bay' + (e.bays.length === 1 ? '' : 's') : ''} \u00b7 ${e.cols}\u00d7${e.rows} grid` : '',
       edTools: toolDefs.map(([k, label, icon, hint]) => ({
         label, icon, hint,
@@ -1870,11 +1872,11 @@ class Component extends DCLogic {
       edCols: e ? String(e.cols) : '', onEdCols: ev => this.edSet({ cols: Math.max(4, Math.min(40, Number(ev.target.value) || 16)) }),
       edRows: e ? String(e.rows) : '', onEdRows: ev => this.edSet({ rows: Math.max(3, Math.min(24, Number(ev.target.value) || 9)) }),
       edHasErr: !!(e && e.err), edErr: (e && e.err) || '',
-      edCancel: () => this.setState({ ed: null, view: { t: 'grid' } }),
+      edCancel: () => { if (this.adminTok) { this.code = ''; this.API = '/api/data'; this.remote = false; this.setState({ ed: null, view: { t: 'grid' }, data: { rooms: {} } }); return; } this.setState({ ed: null, view: { t: 'grid' } }); },
       edSaveDraft: () => this.saveLayout(false, null),
       edLock: () => {
-        if (!e || !e.beds.length) { this.edSet({ err: 'Place at least one bed before locking.' }); return; }
-        this.setState({ pin: { mode: 'lock', v1: '', v2: '', err: '' } });
+        if (!e || !e.beds.length) { this.edSet({ err: 'Place at least one bed before making it permanent.' }); return; }
+        this.setState({ confirm: { type: 'permanent', title: 'Make this layout permanent?', msg: 'The ' + (this.NICUS()[this.code] || '') + ' board, reports and map switch to these ' + e.beds.length + ' beds now. The unit cannot change it; you can still edit it here later.', btn: 'Make permanent', bg: '#0E7490' } });
       },
       pinOpen: !!p,      pinOpen: !!p, pinNeeds2: !!(p && p.mode === 'lock'),
       pinTitle: p && p.mode === 'lock' ? 'Lock this layout' : 'Unlock the layout',
@@ -1911,7 +1913,7 @@ class Component extends DCLogic {
       openUnit: () => this.setState({ unit: true, copied: false }),
       closeUnit: () => this.setState({ unit: false }),
       openMapFromUnit: () => this.setState({ unit: false, map: true }),
-      layoutStatus: L ? (L.locked ? 'Setup complete · locked' : 'Draft layout · not locked') : 'No layout yet',
+      layoutStatus: L ? (L.permanent ? 'Permanent layout · set by the administrator' : 'Standard 20-bed layout') : 'Standard 20-bed layout',
       layoutDetail: L ? `${L.beds.length} beds${L.bays && L.bays.length ? ', ' + L.bays.length + ' bay' + (L.bays.length === 1 ? '' : 's') : ''} · last saved ${this.fmtDateFull(L.updatedAt || new Date().toISOString())}` : 'Draw your unit once and everything else follows it.',
       editLayout: () => { if (L && L.locked && L.pin) this.setState({ unit: false, pin: { mode: 'unlock', v1: '', v2: '', err: '' } }); else this.startSetup(); },
       isListed: !!(L && L.listed === true),
@@ -1926,12 +1928,12 @@ class Component extends DCLogic {
         if (!L) return;
         this.sendOp({ op: 'layout', layout: { ...L, listed: !(L.listed === true), updatedAt: new Date().toISOString() } });
       },
-      feedbackHref: 'mailto:sangoram+histogram@gmail.com?subject=' + encodeURIComponent('OWL feedback' + (this.code ? ' — ' + this.code : '')),
+      feedbackHref: 'mailto:sangoram+histogram@gmail.com?subject=' + encodeURIComponent('OWL feedback' + (this.code ? ' — ' + (this.NICUS()[this.code] || this.code) : '')),
       hasCode: !!this.code, noCode: !this.code, unitCode: this.code,
       isAdminView: !!this.adminView,
       copyLabel: this.state.copied ? 'Copied' : 'Copy',
       copyCode: () => { try { navigator.clipboard.writeText(this.code); } catch (er) {} this.setState({ copied: true }); },
-      leaveUnit: () => { try { localStorage.removeItem('owl_unit'); } catch (er) {} window.location.reload(); },
+      leaveUnit: () => { try { localStorage.removeItem('owl_unit'); localStorage.removeItem('owl_pass:' + this.code); localStorage.removeItem('owl_admin_view'); } catch (er) {} window.location.href = '/'; },
       loadSample: () => this.loadSample()
     };
   }
@@ -2053,7 +2055,7 @@ class Component extends DCLogic {
     });
     if (this.remote) {
       this.lastWrite = Date.now();
-      fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(op) })
+      fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/json', ...this.hdrs() }, body: JSON.stringify(op) })
         .then(r => (r.ok ? r.json() : null)).then(j => { if (j && j.rooms) this.setState({ data: j }); }).catch(() => {});
     }
   }
@@ -2263,6 +2265,7 @@ class Component extends DCLogic {
   }
   doConfirm() {
     const c = this.state.confirm; if (!c) return;
+    if (c.type === 'permanent') { this.setState({ confirm: null }); this.saveLayout(true, null); return; }
     if (c.type === 'reset') { this.sendOp({ op: 'archive', room: c.room, aid: Date.now() + '' + Math.floor(Math.random() * 1000) }); this.setState({ confirm: null, view: { t: 'grid' } }); return; }
     if (c.type === 'del') { this.sendOp({ op: 'del', room: c.room, id: c.id }); }
     if (c.type === 'delArchive') { this.sendOp({ op: 'delArchive', id: c.aid }); }
@@ -2615,10 +2618,10 @@ class Component extends DCLogic {
       closeEditor: () => this.setState({ form: null, err: '' }),
       swallow: ev => ev.stopPropagation(),
       confirmOpen: !!c,
-      cTitle: c ? (c.type === 'reset' ? `Archive & clear ${this.bedLabel(c.room)}?` : (c.type === 'delArchive' ? 'Delete archived bundle?' : 'Delete this entry?')) : '',
-      cMsg: c ? (c.type === 'reset' ? 'Every entry and the patient info move to the Archive (button in the header), identified by room and archive date. The room clears for a new patient.' : (c.type === 'delArchive' ? `The archived data for ${c.label || ''} will be permanently deleted. Export it first if you need a copy.` : `The entry from ${c.when || ''} will be permanently deleted.`)) : '',
-      cBtn: c ? (c.type === 'reset' ? 'Archive & clear' : 'Delete') : '',
-      cBtnBg: c && c.type === 'reset' ? '#0E7490' : '#B42318',
+      cTitle: c && c.type === 'permanent' ? c.title : c ? (c.type === 'reset' ? `Archive & clear ${this.bedLabel(c.room)}?` : (c.type === 'delArchive' ? 'Delete archived bundle?' : 'Delete this entry?')) : '',
+      cMsg: c && c.type === 'permanent' ? c.msg : c ? (c.type === 'reset' ? 'Every entry and the patient info move to the Archive (button in the header), identified by room and archive date. The room clears for a new patient.' : (c.type === 'delArchive' ? `The archived data for ${c.label || ''} will be permanently deleted. Export it first if you need a copy.` : `The entry from ${c.when || ''} will be permanently deleted.`)) : '',
+      cBtn: c && c.type === 'permanent' ? c.btn : c ? (c.type === 'reset' ? 'Archive & clear' : 'Delete') : '',
+      cBtnBg: c && (c.type === 'reset' || c.type === 'permanent') ? '#0E7490' : '#B42318',
       doConfirm: () => this.doConfirm(),
       cancelConfirm: () => this.setState({ confirm: null })
     };
