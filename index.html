@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O.W.L. - Oxygen With Love Histogram Tracking Tool</title>
+<meta name="description" content="A free tool for NICUs to aid precision delivery and decision support around that precious molecule of life.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E7490'/%3E%3Ccircle cx='11.5' cy='14' r='4.5' fill='%23fff'/%3E%3Ccircle cx='20.5' cy='14' r='4.5' fill='%23fff'/%3E%3Ccircle cx='11.5' cy='14' r='1.9' fill='%230E7490'/%3E%3Ccircle cx='20.5' cy='14' r='1.9' fill='%230E7490'/%3E%3Cpath d='M16 19.5l2.4 4.2h-4.8z' fill='%23fff'/%3E%3C/svg%3E">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -26,29 +29,342 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
   <div data-noprint="1" style="position:sticky;top:0;z-index:40;background:rgba(255,255,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #E2E8EE">
     <div style="max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
-        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">NICU Histogram Tracking Digital Binder</div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-0.01em">O.W.L. <span style="font-weight:500;color:#5A6B7A">- Oxygen With Love Histogram Tracking Tool</span></div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ todayStr }}</div>
         <sc-if value="{{ showSync }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:2.5px 8px 2.5px 6px;letter-spacing:0.03em">
             <span style="width:7px;height:7px;border-radius:50%;background:{{ syncDot }};display:inline-block"></span>{{ syncLabel }}
           </div>
         </sc-if>
+        <sc-if value="{{ hasUnitName }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:11.5px;font-weight:700;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:2.5px 9px">{{ unitName }}</div>
+        </sc-if>
+        <sc-if value="{{ hasCodeChip }}" hint-placeholder-val="{{ false }}">
+          <div title="The unit you are charting into" style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.07em;color:#0E7490;background:#EAF4F7;border:1px solid #9CC3CF;border-radius:999px;padding:2.5px 9px">{{ unitCode }}</div>
+        </sc-if>
+        <div style="flex-basis:100%;height:0"></div>
+        <div style="font-size:11px;color:#7A8A98;line-height:1.45;max-width:660px;text-wrap:pretty">A free tool for NICUs to aid precision delivery and decision support around that precious molecule of life.</div>
       </div>
       <div style="flex:1"></div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
-        <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="0">
-          <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:3px 8px 3px 6px">
-            <span style="width:9px;height:9px;border-radius:3px;background:{{ lg.color }};display:inline-block"></span>{{ lg.label }} {{ lg.count }}
-          </div>
-        </sc-for>
+        <sc-if value="{{ hasMap }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ openMap }}" title="Expand the unit map" style="display:flex;align-items:center;gap:2px;min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;cursor:pointer;padding:0 9px" style-hover="border-color:#0E7490">
+            <sc-for list="{{ mapStrip }}" as="m" hint-placeholder-count="0">
+              <span style="width:7px;height:15px;border-radius:2px;background:{{ m.color }};display:inline-block"></span>
+            </sc-for>
+            <span style="font-size:10.5px;font-weight:700;color:#3D4C59;margin-left:5px">Unit map</span>
+          </button>
+        </sc-if>
+        <sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ legend }}" as="lg" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:#3D4C59;background:#FFFFFF;border:1px solid #E2E8EE;border-radius:999px;padding:3px 8px 3px 6px">
+              <span style="width:9px;height:9px;border-radius:3px;background:{{ lg.color }};display:inline-block"></span>{{ lg.label }} {{ lg.count }}
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ openUnit }}" title="Unit map and sign-out" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Unit</button>
         <button onClick="{{ exportJson }}" title="Download a JSON backup of all data" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Backup</button>
         <button onClick="{{ importJson }}" title="Restore from a JSON backup" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Import</button>
         <button onClick="{{ openArchive }}" title="Archived room bundles" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ arLabel }}</button>
         <button onClick="{{ openSnapshot }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#EAF4F7">Current NICU Snapshot Report</button>
         <button onClick="{{ openReport }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="background:#0B5C73">Complete Histogram Log Report</button>
+        </sc-if>
       </div>
     </div>
   </div>
+
+  <sc-if value="{{ isAdminView }}" hint-placeholder-val="{{ false }}">
+    <div data-noprint="1" style="max-width:1180px;margin:0 auto;padding:10px 16px 0">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#F1E7FB;border:1px solid #B583E3;border-radius:11px;padding:8px 12px">
+        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#8A46CF;border-radius:5px;padding:3px 7px">ADMIN VIEW</span>
+        <span style="font-size:12px;color:#6B21A8;font-weight:600">You are in another unit's board. Anything you save is stamped ADMIN in their log.</span>
+        <span style="flex:1"></span>
+        <button onClick="{{ exitAdminView }}" style="min-height:30px;background:#FFFFFF;border:1px solid #B583E3;border-radius:8px;color:#6B21A8;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Leave this unit</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showTrial }}" hint-placeholder-val="{{ false }}">
+    <div data-noprint="1" style="max-width:1180px;margin:0 auto;padding:10px 16px 0">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#FCF0E2;border:1px solid #E0A268;border-radius:11px;padding:8px 12px">
+        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.08em;color:#FFFFFF;background:#E07C26;border-radius:5px;padding:3px 7px">TRIAL</span>
+        <span style="font-size:12px;color:#98510F;font-weight:600">{{ trialText }}</span>
+        <span style="flex:1"></span>
+        <button onClick="{{ openUnit }}" style="min-height:30px;background:#FFFFFF;border:1px solid #E0A268;border-radius:8px;color:#98510F;font-size:11.5px;font-weight:700;cursor:pointer;padding:0 10px">Unit settings</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Not ready" style="max-width:780px;margin:0 auto;padding:30px 16px 0">
+      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:16px;padding:26px 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:23px;font-weight:700;letter-spacing:-0.015em">{{ unitName }} is almost ready</div>
+        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:580px;text-wrap:pretty">This NICU's bed layout hasn't been made permanent yet. The administrator sets it up once in the admin tool; after that every board, report and histogram here follows it.</div>
+        <div><button onClick="{{ leaveUnit }}" style="min-height:40px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 14px">Switch NICU</button></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isDirectory }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Choose your NICU" style="max-width:900px;margin:0 auto;padding:26px 16px 0;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:24px;font-weight:700;letter-spacing:-0.015em">Choose your NICU</div>
+        <div style="font-size:13.5px;color:#5A6B7A;line-height:1.6;max-width:620px;text-wrap:pretty">Each NICU has its own private board and its own password. This device remembers the NICU you sign in to.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">
+        <sc-for list="{{ nicuTiles }}" as="u" hint-placeholder-count="3">
+          <button onClick="{{ u.click }}" style="text-align:left;background:{{ u.bg }};border:1.5px solid {{ u.bd }};border-radius:13px;padding:15px;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-height:96px" style-hover="border-color:#0E7490">
+            <span style="font-size:17px;font-weight:700;color:#16232E;line-height:1.25">{{ u.name }}</span>
+            <span style="font-size:11.5px;font-weight:600;color:{{ u.stTx }}">{{ u.status }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ gateOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1.5px solid #0E7490;border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:14.5px;font-weight:700">Password for {{ gateName }}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input type="password" autocomplete="current-password" value="{{ gatePw }}" onChange="{{ onGatePw }}" onKeyDown="{{ gateKey }}" placeholder="NICU password" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:16px;min-height:46px;width:220px;box-sizing:border-box">
+            <button onClick="{{ gateSubmit }}" style="min-height:46px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">{{ gateBtn }}</button>
+            <button onClick="{{ gateCancel }}" style="min-height:46px;background:none;border:none;color:#5A6B7A;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 8px">Cancel</button>
+          </div>
+          <sc-if value="{{ gateHasErr }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12.5px;color:#A32222;font-weight:600">{{ gateErr }}</div>
+          </sc-if>
+          <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">Ask your unit lead for the password. Bed labels only — never enter patient names or MRNs.</div>
+        </div>
+      </sc-if>
+
+      <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">What OWL does</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:stretch">
+          <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:13px;color:#5A6B7A;line-height:1.6;text-wrap:pretty">OWL turns bedside saturation histograms into a unit-wide picture. Every bed carries its respiratory support, FiO₂, target range and a cumulative oxygenation tally, so a glance across the board shows where time is being spent below, inside and above target.</div>
+          </div>
+          <div style="flex:1;min-width:250px;background:#F6F9FB;border:1px dashed #C9D2D9;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">A bed on the board</div>
+            <div style="background:#E6F5EA;border:1.5px solid #6BC488;border-radius:9px;padding:9px;display:flex;flex-direction:column;gap:7px">
+              <div style="display:flex;align-items:center;gap:7px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#16232E">ICN-4</span>
+                <span style="font-size:8.5px;font-weight:700;letter-spacing:0.06em;color:#136B31;background:#FFFFFF;border-radius:4px;padding:2px 6px">ROOM AIR</span>
+              </div>
+              <div style="display:flex;align-items:baseline;gap:9px;background:rgba(255,255,255,0.7);border-radius:7px;padding:5px 8px">
+                <span style="font-size:8.5px;font-weight:700;letter-spacing:0.07em;color:#7A8A98">CUMULATIVE</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#3E97CE">4%</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#33A35C">91%</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#D14848">5%</span>
+              </div>
+              <div style="display:flex;height:9px;border-radius:5px;overflow:hidden">
+                <span style="width:4%;background:#3E97CE"></span>
+                <span style="width:91%;background:#33A35C"></span>
+                <span style="width:5%;background:#D14848"></span>
+              </div>
+            </div>
+            <div style="font-size:11px;color:#7A8A98;line-height:1.45">Blue below target, green in target, red above — weighted across every histogram entered.</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:0 2px 8px">
+        <span style="font-size:11.5px;color:#7A8A98">Questions, or something that would make this work better on your unit?</span>
+        <a href="{{ feedbackHref }}" style="min-height:34px;display:inline-flex;align-items:center;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;text-decoration:none;padding:0 12px">Give feedback</a>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Admin tool" style="max-width:1080px;margin:0 auto;padding:22px 16px 0;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+        <div style="font-size:21px;font-weight:700;letter-spacing:-0.015em">NICU setup · admin tool</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#5A6B7A">{{ admStore }}</div>
+        <div style="flex:1"></div>
+        <button onClick="{{ admRefresh }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Refresh</button>
+      </div>
+      <div style="font-size:12.5px;color:#5A6B7A;line-height:1.55;max-width:720px">Build each NICU's bed layout, then <strong>Make permanent</strong> — the unit's board, reports and map follow it and the unit cannot change it. Set a password for each NICU; a NICU stays closed until it has one.</div>
+      <sc-if value="{{ admGateOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1.5px solid #0E7490;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;max-width:400px">
+          <div style="font-size:14.5px;font-weight:700">Admin PIN</div>
+          <div style="font-size:12.5px;color:#5A6B7A;line-height:1.5">Enter the six-digit PIN set on this site. Three wrong attempts locks this device out for five minutes.</div>
+          <input value="{{ admPin }}" onChange="{{ onAdmPin }}" placeholder="000000" inputmode="numeric" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:19px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.3em;min-height:46px;box-sizing:border-box;width:100%">
+          <sc-if value="{{ admGateErr }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;color:#A32222;font-weight:600">{{ admGateMsg }}</div>
+          </sc-if>
+          <button onClick="{{ admGateSubmit }}" style="min-height:42px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">Unlock admin</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ admDenied }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FBE8E8;border:1px solid #E08585;border-radius:11px;padding:12px;font-size:13px;color:#A32222;font-weight:600">{{ admMsg }}</div>
+      </sc-if>
+      <sc-if value="{{ admHasUnits }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+          <sc-for list="{{ admUnits }}" as="u" hint-placeholder-count="3">
+            <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:11px">
+              <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+                <span style="font-size:17px;font-weight:700;color:#16232E">{{ u.name }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ u.code }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;width:74px">Layout</span>
+                  <span style="font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:{{ u.layBg }};color:{{ u.layTx }}">{{ u.layStatus }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;width:74px">Password</span>
+                  <span style="font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:{{ u.pwBg }};color:{{ u.pwTx }}">{{ u.pwStatus }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98;width:74px">Data</span>
+                  <span style="font-size:11.5px;color:#3D4C59">{{ u.dataLine }}</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button onClick="{{ u.edit }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:8px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 11px">{{ u.editLabel }}</button>
+                <button onClick="{{ u.pw }}" style="min-height:34px;background:#FFFFFF;border:1px solid #0E7490;border-radius:8px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 11px">{{ u.pwLabel }}</button>
+                <button onClick="{{ u.open }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 10px">Open board</button>
+                <button onClick="{{ u.exp }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 10px">Export JSON</button>
+              </div>
+              <sc-if value="{{ u.pwOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F6F9FB;border:1px solid #E2E8EE;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px">
+                  <input type="text" autocomplete="off" value="{{ u.pwV }}" onChange="{{ u.onPwV }}" placeholder="New password (4+ characters)" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:14px;min-height:40px;box-sizing:border-box;width:100%">
+                  <div style="font-size:11px;color:#7A8A98;line-height:1.45">Shown here as you type so you can read it out to the unit. Saving replaces the old password — devices signed in with it will be asked again.</div>
+                  <sc-if value="{{ u.pwHasErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#A32222;font-weight:600">{{ u.pwErr }}</div></sc-if>
+                  <div style="display:flex;gap:6px;justify-content:flex-end">
+                    <button onClick="{{ u.pwCancel }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:600;cursor:pointer;padding:0 11px">Cancel</button>
+                    <button onClick="{{ u.pwSave }}" style="min-height:34px;background:#0E7490;border:1px solid #0E7490;border-radius:8px;color:#FFFFFF;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Save password</button>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ u.hasNote }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:11.5px;color:#136B31;font-weight:600">{{ u.note }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="font-size:11.5px;color:#7A8A98;line-height:1.5;max-width:720px">San Leandro starts from the existing live board, whose beds are numbered 1–20. When you build its layout, move and rename those beds rather than erasing and redrawing them, so each bed keeps its history.</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isSetup }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Layout builder" style="max-width:1280px;margin:0 auto;padding:12px 14px 0">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="font-size:18px;font-weight:700">{{ edTitle }}</div>
+        <div style="font-size:12px;color:#5A6B7A">{{ edSummary }}</div>
+        <div style="flex:1"></div>
+        <button onClick="{{ edCancel }}" style="min-height:36px;background:none;border:none;color:#5A6B7A;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 8px">Cancel</button>
+        <button onClick="{{ edSaveDraft }}" style="min-height:36px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Save draft</button>
+        <button onClick="{{ edLock }}" style="min-height:36px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 14px" style-hover="background:#0B5C73">Make permanent</button>
+      </div>
+      <sc-if value="{{ edHasErr }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FBE8E8;border:1px solid #E08585;border-radius:9px;padding:8px 11px;font-size:12.5px;color:#A32222;font-weight:600;margin-bottom:10px">{{ edErr }}</div>
+      </sc-if>
+      <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:min(640px,100%);background:#FFFFFF;border:1px solid #E2E8EE;border-radius:14px;padding:10px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:9px">
+            <sc-for list="{{ edTools }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.pick }}" title="{{ t.hint }}" style="display:flex;align-items:center;gap:6px;min-height:36px;background:{{ t.bg }};border:1px solid {{ t.bd }};border-radius:9px;color:{{ t.tx }};font-size:12.5px;font-weight:700;cursor:pointer;padding:0 12px">
+                <span style="font-size:13px;line-height:1">{{ t.icon }}</span>{{ t.label }}
+              </button>
+            </sc-for>
+            <div style="width:1px;height:24px;background:#E2E8EE;margin:0 2px"></div>
+            <button onClick="{{ edUndo }}" title="Undo (⌘Z)" style="min-height:36px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:{{ edUndoTx }};font-size:12.5px;font-weight:700;cursor:{{ edUndoCur }};padding:0 11px">↶ Undo</button>
+            <button onClick="{{ edRedo }}" title="Redo (⇧⌘Z)" style="min-height:36px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:{{ edRedoTx }};font-size:12.5px;font-weight:700;cursor:{{ edRedoCur }};padding:0 11px">↷ Redo</button>
+            <div style="flex:1"></div>
+            <div style="font-size:11.5px;color:#5A6B7A;max-width:340px;line-height:1.35;text-align:right">{{ edHint }}</div>
+          </div>
+          <div style="overflow:auto;border:1px solid #E2E8EE;border-radius:10px;background:#FBFCFD">
+            <div style="position:relative;width:{{ edW }};height:{{ edH }}">
+              <div style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none">{{ edSketchEl }}</div>
+              <sc-for list="{{ edBays }}" as="b" hint-placeholder-count="0">
+                <div style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;border:2px dashed #0E7490;border-radius:11px;background:rgba(14,116,144,0.05);pointer-events:none">
+                  <div style="position:absolute;top:-9px;left:9px;background:#FFFFFF;font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#0E7490;padding:0 5px;white-space:nowrap">{{ b.name }}</div>
+                </div>
+              </sc-for>
+              <div onPointerDown="{{ edDown }}" onPointerMove="{{ edMove }}" onPointerLeave="{{ edLeave }}" onDoubleClick="{{ edDbl }}" ref="{{ edHitRef }}" style="position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;background-image:linear-gradient(to right,rgba(22,35,46,0.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(22,35,46,0.08) 1px,transparent 1px);background-size:{{ edCellPx }} {{ edCellPx }}"></div>
+              <sc-for list="{{ edBeds }}" as="b" hint-placeholder-count="0">
+                <div style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;background:{{ b.bg }};border:1.5px solid {{ b.bd }};border-radius:7px;display:flex;align-items:center;justify-content:center;pointer-events:none">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;color:{{ b.tx }};text-align:center;line-height:1.1;padding:1px;overflow:hidden">{{ b.label }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ edHasDrag }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:{{ edDL }};top:{{ edDT }};width:{{ edDW }};height:{{ edDH }};box-sizing:border-box;border:2px solid {{ edDragBd }};background:{{ edDragBg }};border-radius:8px;pointer-events:none"></div>
+              </sc-if>
+              <sc-if value="{{ edEditing }}" hint-placeholder-val="{{ false }}">
+                <input ref="{{ edEditRef }}" value="{{ edEditV }}" onChange="{{ onEdEditV }}" onKeyDown="{{ onEdEditKey }}" onBlur="{{ onEdEditDone }}" style="position:absolute;left:{{ edEditL }};top:{{ edEditT }};width:{{ edEditW }};height:{{ edEditH }};box-sizing:border-box;border:2px solid #0E7490;border-radius:7px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:700;padding:0 3px;z-index:6;background:#FFFFFF">
+              </sc-if>
+            </div>
+          </div>
+        </div>
+        <div style="width:300px;display:flex;flex-direction:column;gap:10px">
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Unit &amp; numbering</div>
+            <input value="{{ edName }}" onChange="{{ onEdName }}" placeholder="Display name (e.g. San Leandro ICN)" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box;width:100%">
+            <div style="display:flex;gap:6px">
+              <input value="{{ edPrefix }}" onChange="{{ onEdPrefix }}" placeholder="Prefix" style="flex:1;min-width:0;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box">
+              <input value="{{ edNext }}" onChange="{{ onEdNext }}" placeholder="Next #" style="width:78px;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:40px;box-sizing:border-box">
+            </div>
+            <div style="font-size:11.5px;color:#5A6B7A;line-height:1.45">New beds label as <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:#0E7490">{{ edSample }}</span>. Leave the prefix blank for bare numbers. Double-click any bed on the canvas to rename it.</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input value="{{ edRun }}" onChange="{{ onEdRun }}" placeholder="Qty" style="width:64px;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:40px;box-sizing:border-box">
+              <button onClick="{{ edSeedRun }}" style="flex:1;min-height:40px;background:#EAF4F7;border:1px solid #9CC3CF;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:#DBEDF3">Add a run of beds</button>
+            </div>
+            <button onClick="{{ edUShape }}" title="Lays that many beds around three sides of a central core — undo if it is not what you wanted" style="min-height:40px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:#0E7490;color:#0E7490">U-shape starter (replaces beds)</button>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Selection · {{ edSelCount }}</div>
+            <sc-if value="{{ edHasOne }}" hint-placeholder-val="{{ false }}">
+              <input value="{{ edRename }}" onChange="{{ onEdRename }}" placeholder="Bed label" style="border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:40px;box-sizing:border-box;width:100%">
+            </sc-if>
+            <sc-if value="{{ edHasSel }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:6px">
+                <input value="{{ edBayName }}" onChange="{{ onEdBayName }}" placeholder="Bay name" style="flex:1;min-width:0;border:1px solid #C9D2D9;border-radius:8px;padding:9px 10px;font-size:13px;min-height:40px;box-sizing:border-box">
+                <button onClick="{{ edGroupBay }}" style="min-height:40px;background:#EAF4F7;border:1px solid #9CC3CF;border-radius:9px;color:#0E7490;font-size:12.5px;font-weight:700;cursor:pointer;padding:0 12px">Group as bay</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ edNoSel }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">With <strong>Arrange</strong>, click a bed to select it, drag a box over several, then group them as an open bay.</div>
+            </sc-if>
+            <sc-if value="{{ edHasBays }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <sc-for list="{{ edBayList }}" as="y" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:7px;background:#F6F9FB;border-radius:8px;padding:6px 8px">
+                    <span style="font-size:12px;font-weight:600;color:#3D4C59;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ y.name }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ y.n }}</span>
+                    <button onClick="{{ y.del }}" style="background:none;border:none;color:#B42318;font-size:11px;font-weight:700;cursor:pointer;padding:2px 4px">Remove</button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Floorplan underlay</div>
+            <div style="font-size:11.5px;color:#5A6B7A;line-height:1.45">Drop in a PNG or JPG of your unit sketch and trace beds over it. The image is a guide only — it is not saved with reports.</div>
+            <button onClick="{{ edPickSketch }}" style="min-height:40px;background:#FFFFFF;border:1.5px dashed #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:#0E7490;color:#0E7490">{{ edSketchLabel }}</button>
+            <sc-if value="{{ edHasSketch }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="range" min="0.05" max="1" step="0.05" value="{{ edOpacity }}" onChange="{{ onEdOpacity }}" style="flex:1;accent-color:#0E7490">
+                <button onClick="{{ edClearSketch }}" style="background:none;border:none;color:#B42318;font-size:11.5px;font-weight:700;cursor:pointer;padding:2px 4px">Remove</button>
+              </div>
+            </sc-if>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E8EE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Canvas</div>
+            <div style="display:flex;gap:8px">
+              <label style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <span style="font-size:10.5px;font-weight:600;color:#5A6B7A">Columns</span>
+                <input value="{{ edCols }}" onChange="{{ onEdCols }}" style="border:1px solid #C9D2D9;border-radius:8px;padding:8px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:38px;box-sizing:border-box;width:100%">
+              </label>
+              <label style="flex:1;display:flex;flex-direction:column;gap:3px">
+                <span style="font-size:10.5px;font-weight:600;color:#5A6B7A">Rows</span>
+                <input value="{{ edRows }}" onChange="{{ onEdRows }}" style="border:1px solid #C9D2D9;border-radius:8px;padding:8px 10px;font-size:13px;font-family:'IBM Plex Mono',monospace;min-height:38px;box-sizing:border-box;width:100%">
+              </label>
+            </div>
+            <div style="font-size:11.5px;color:#7A8A98;line-height:1.45"><strong>Make permanent</strong> locks this layout for the unit. Only this admin tool can change it later. Moving or renaming a bed keeps its history; erasing a bed does not.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 
   <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Unit board" style="max-width:1180px;margin:0 auto;padding:14px 14px 0">
@@ -68,6 +384,16 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
               <div style="flex:1"></div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6B7A;white-space:nowrap">{{ r.ago }}</div>
             </div>
+            <sc-if value="{{ r.hasTally }}" hint-placeholder-val="{{ true }}">
+              <div title="Time-weighted across every histogram logged for this bed" style="display:flex;align-items:baseline;gap:8px;background:rgba(255,255,255,0.72);border-radius:9px;padding:5px 9px">
+                <span style="font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Cumulative</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#2A7FB8">{{ r.tB }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#137F3B">{{ r.tI }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#C43A3A">{{ r.tA }}</span>
+                <span style="flex:1"></span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A8A98;white-space:nowrap">{{ r.tHrs }}</span>
+              </div>
+            </sc-if>
             <div style="display:flex;flex-direction:column;gap:3px">
               <div style="display:flex;align-items:center;gap:6px;font-size:12px;min-width:0">
                 <span style="width:8px;height:8px;border-radius:50%;background:#06B6D4;flex:none"></span>
@@ -165,7 +491,37 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           <button onClick="{{ rvMove }}" title="Move this patient's data to another room" style="min-height:40px;background:rgba(255,255,255,0.75);border:1.5px solid {{ rvBd }};border-radius:10px;color:{{ rvTx }};font-size:13px;font-weight:600;cursor:pointer;padding:0 14px" style-hover="background:#FFFFFF">Move room…</button>
           <button onClick="{{ rvAdd }}" style="min-height:40px;background:#0E7490;border:none;border-radius:10px;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer;padding:0 16px" style-hover="background:#0B5C73">+ New entry</button>
         </div>
+        <sc-if value="{{ rvTalHas }}" hint-placeholder-val="{{ true }}">
+          <div style="background:rgba(255,255,255,0.78);border-radius:12px;padding:10px 12px 9px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
+              <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#5A6B7A">Cumulative oxygenation</span>
+              <span style="flex:1"></span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ rvTalHrs }}</span>
+            </div>
+            <div style="display:flex;gap:18px;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;gap:1px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:700;color:#2A7FB8;line-height:1">{{ rvTalB }}</span>
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98">Under target</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:1px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:700;color:#137F3B;line-height:1">{{ rvTalI }}</span>
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98">In target</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:1px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:700;color:#C43A3A;line-height:1">{{ rvTalA }}</span>
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98">Over target</span>
+              </div>
+            </div>
+            <div style="display:flex;height:9px;border-radius:5px;overflow:hidden;background:#EDF1F4">
+              <sc-for list="{{ rvTalBar }}" as="sg" hint-placeholder-count="3">
+                <div style="width:{{ sg.w }};background:{{ sg.bg }}"></div>
+              </sc-for>
+            </div>
+            <div style="font-size:10.5px;color:#7A8A98;line-height:1.4">Time-weighted across every histogram logged in this room, using each entry's own target band.</div>
+          </div>
+        </sc-if>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <sc-if value="{{ showIds }}" hint-placeholder-val="{{ true }}">
           <label style="flex:2;min-width:170px;display:flex;flex-direction:column;gap:2px">
             <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">Patient name</span>
             <input value="{{ rvName }}" onChange="{{ onName }}" placeholder="—" style="background:rgba(255,255,255,0.65);border:none;border-bottom:1.5px solid {{ rvBd }};padding:5px 8px;font-size:13px;font-weight:600;border-radius:7px 7px 0 0;min-height:34px;box-sizing:border-box;width:100%">
@@ -174,6 +530,10 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">MRN #</span>
             <input value="{{ rvMrn }}" onChange="{{ onMrn }}" placeholder="—" style="background:rgba(255,255,255,0.65);border:none;border-bottom:1.5px solid {{ rvBd }};padding:5px 8px;font-size:13px;font-weight:600;font-family:'IBM Plex Mono',monospace;border-radius:7px 7px 0 0;min-height:34px;box-sizing:border-box;width:100%">
           </label>
+          </sc-if>
+          <sc-if value="{{ hideIds }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:2;min-width:200px;font-size:11.5px;font-weight:600;color:{{ rvTx }};background:rgba(255,255,255,0.6);border-radius:8px;padding:7px 10px;line-height:1.4">Trial unit — bed labels only. No patient identifiers are stored.</div>
+          </sc-if>
           <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-start">
             <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">Compliance</span>
             <div style="font-size:11.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:{{ rvCompTx }};background:{{ rvCompBg }};border:1px solid {{ rvCompBd }};border-radius:7px;padding:7px 10px">{{ rvComp }}</div>
@@ -345,7 +705,6 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
             <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
               <div style="font-size:15px;font-weight:700">{{ a.label }}</div>
               <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#5B4A82;background:#F1EBFB;border:1px solid #D8C8F2;border-radius:6px;padding:2.5px 7px;text-transform:uppercase">Archived {{ a.when }}</div>
-              <div style="font-size:11.5px;color:#4A5865">Patient: <span style="font-weight:600">{{ a.name }}</span> · MRN <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ a.mrn }}</span></div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ a.count }} entries · last entry {{ a.lastWhen }}</div>
               <div style="flex:1"></div>
               <button onClick="{{ a.toggle }}" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">{{ a.toggleLbl }}</button>
@@ -447,7 +806,6 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap">
             <div style="font-size:17px;font-weight:700">{{ p.label }}</div>
             <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;color:#FFFFFF;background:{{ p.solid }};border-radius:6px;padding:2.5px 7px;text-transform:uppercase">{{ p.modeLabel }}</div>
-            <div style="font-size:11.5px;color:#4A5865">Patient: <span style="font-weight:600">{{ p.name }}</span> · MRN: <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ p.mrn }}</span></div>
             <div style="flex:1"></div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7A8A98">{{ p.count }} entries · newest first</div>
           </div>
@@ -714,6 +1072,78 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
     </div>
   </sc-if>
 
+  <sc-if value="{{ mapOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMap }}" style="position:fixed;inset:0;z-index:115;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Unit map" onClick="{{ swallow }}" style="background:#FFFFFF;border-radius:16px;padding:16px;max-width:min(1140px,100%);max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:11px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <div style="font-size:16.5px;font-weight:700">{{ mapTitle }}</div>
+          <div style="font-size:11.5px;color:#7A8A98;max-width:520px;line-height:1.4">Colour follows the support in use. Grey beds are empty — click one to start its first histogram.</div>
+          <div style="flex:1"></div>
+          <button onClick="{{ closeMap }}" style="min-height:32px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Close</button>
+        </div>
+        <div style="position:relative;width:{{ mapW }};height:{{ mapH }}">
+          <sc-for list="{{ mapBays }}" as="b" hint-placeholder-count="0">
+            <div style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;border:1.5px dashed #B4BEC7;border-radius:11px;pointer-events:none">
+              <div style="position:absolute;top:-8px;left:9px;background:#FFFFFF;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#7A8A98;padding:0 5px;white-space:nowrap">{{ b.name }}</div>
+            </div>
+          </sc-for>
+          <sc-for list="{{ mapBeds }}" as="b" hint-placeholder-count="0">
+            <div onClick="{{ b.click }}" title="{{ b.title }}" style="position:absolute;left:{{ b.l }};top:{{ b.t }};width:{{ b.w }};height:{{ b.h }};box-sizing:border-box;background:{{ b.bg }};border:1.5px solid {{ b.bd }};border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px" style-hover="box-shadow:0 4px 12px rgba(22,35,46,0.2)">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:{{ b.tx }};line-height:1.05;text-align:center">{{ b.label }}</span>
+              <span style="font-size:8px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:{{ b.tx }};opacity:0.85;line-height:1.05;text-align:center">{{ b.mode }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ unitOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeUnit }}" style="position:fixed;inset:0;z-index:118;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Unit settings" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(460px,100%);max-height:88vh;overflow-y:auto;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:13px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
+        <div style="font-size:16px;font-weight:700">{{ unitName }}</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">Layout</div>
+          <div style="font-size:13px;font-weight:600;color:#16232E">{{ layoutStatus }}</div>
+          <div style="font-size:11.5px;color:#7A8A98;line-height:1.45">{{ layoutDetail }}</div>
+          <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <button onClick="{{ openMapFromUnit }}" style="min-height:38px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12.5px;font-weight:600;cursor:pointer;padding:0 13px">View unit map</button>
+          </div>
+        </div>
+        <div style="height:1px;background:#EDF1F4"></div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#7A8A98">This device</div>
+          <div style="font-size:12px;color:#5A6B7A;line-height:1.45">Signed in to {{ unitName }}. Bed labels only — no patient names or MRNs.</div>
+          <div><button onClick="{{ leaveUnit }}" title="Sign out of this NICU on this device" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Switch NICU / sign out</button></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+          <a href="{{ feedbackHref }}" style="min-height:40px;display:inline-flex;align-items:center;color:#0E7490;font-size:12px;font-weight:700;text-decoration:underline">Give feedback</a>
+          <button onClick="{{ closeUnit }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">Done</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ pinOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelPin }}" style="position:fixed;inset:0;z-index:122;background:rgba(22,35,46,0.55);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Layout PIN" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(400px,100%);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:11px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
+        <div style="font-size:15.5px;font-weight:700">{{ pinTitle }}</div>
+        <div style="font-size:12.5px;color:#5A6B7A;line-height:1.5">{{ pinMsg }}</div>
+        <input value="{{ pin1 }}" onChange="{{ onPin1 }}" placeholder="4-digit PIN" inputmode="numeric" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:19px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.35em;min-height:46px;box-sizing:border-box;width:100%">
+        <sc-if value="{{ pinNeeds2 }}" hint-placeholder-val="{{ false }}">
+          <input value="{{ pin2 }}" onChange="{{ onPin2 }}" placeholder="Confirm PIN" inputmode="numeric" style="border:1px solid #C9D2D9;border-radius:9px;padding:11px 12px;font-size:19px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.35em;min-height:46px;box-sizing:border-box;width:100%">
+        </sc-if>
+        <sc-if value="{{ pinHasErr }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:#A32222;font-weight:600">{{ pinErr }}</div>
+        </sc-if>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button onClick="{{ cancelPin }}" style="min-height:40px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:13px;font-weight:600;cursor:pointer;padding:0 14px">Cancel</button>
+          <button onClick="{{ submitPin }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">{{ pinBtn }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ cancelConfirm }}" style="position:fixed;inset:0;z-index:120;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
       <div data-screen-label="Confirm dialog" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(380px,100%);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px;box-shadow:0 18px 50px rgba(22,35,46,0.3)">
@@ -732,31 +1162,64 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.KEY = 'nicu_resp_v1';
+    this.code = '';
+    let q = null; try { q = new URLSearchParams(window.location.search); } catch (e) {}
+    this.adminTok = (q && q.get('admin')) || '';
+    const urlUnit = ((q && q.get('unit')) || '').toUpperCase().replace(/[^A-Z]/g, '');
+    let saved = ''; try { saved = (localStorage.getItem('owl_unit') || '').toUpperCase(); } catch (e) {}
+    this.adm = null; try { this.adm = JSON.parse(sessionStorage.getItem('owl_admin') || 'null'); } catch (e) {}
+    this.pass = '';
+    if (this.adminTok) this.code = '';
+    else if (urlUnit && this.NICUS()[urlUnit] && urlUnit !== saved) { this.code = ''; this.preGate = urlUnit; }
+    else this.code = this.NICUS()[saved] ? saved : '';
+    if (this.code) { try { this.pass = localStorage.getItem('owl_pass:' + this.code) || ''; } catch (e) {} }
+    this.stripUnitParam = !!urlUnit;
+    this.isHome = false;
+    this.KEY = 'nicu_resp_v1' + (this.code ? ':' + this.code : '');
     let data = { rooms: {} };
     try { const raw = localStorage.getItem(this.KEY); if (raw) { const p = JSON.parse(raw); if (p && p.rooms) data = p; } } catch (e) {}
     let li = ''; try { li = localStorage.getItem('nicu_resp_initials') || ''; } catch (e) {}
-    this.lastInit = li;
-    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null, restore: null, cmp: {}, arOpen: null };
-    this.API = '/api/data'; this.remote = false; this.lastWrite = 0;
+    try { this.adminView = localStorage.getItem('owl_admin_view') === '1' && !!this.adm && !!this.code; } catch (e) { this.adminView = false; }
+    this.lastInit = this.adminView ? 'ADMIN' : li;
+    this.state = { data, view: { t: 'grid' }, form: null, confirm: null, err: '', sync: '', move: null, restore: null, cmp: {}, arOpen: null, ed: null, map: false, unit: false, pin: null, join: '', copied: false, dir: null, dirLoading: false, gate: null, joinErr: '', adm: null, admLoading: false, admMsg: '', admStore: '', admGate: null };
+    this.API = '/api/data' + (this.code ? '?unit=' + encodeURIComponent(this.code) + (this.adminView ? '&' + this.storedAdminQS() : '') : ''); this.remote = false; this.lastWrite = 0;
     this.onStorage = (ev) => {
       if (ev.key === this.KEY && ev.newValue) { try { const p = JSON.parse(ev.newValue); if (p && p.rooms) this.setState({ data: p }); } catch (e) {} }
     };
   }
   componentDidMount() {
     window.addEventListener('storage', this.onStorage);
-    fetch(this.API).then(r => (r.ok ? r.json() : Promise.reject())).then(j => {
+    this.onUp = () => this.edUp();
+    window.addEventListener('pointerup', this.onUp);
+    this.onKey = ev => this.edKey(ev);
+    window.addEventListener('keydown', this.onKey);
+    if (this.stripUnitParam) {
+      try { const u = new URL(window.location.href); u.searchParams.delete('unit'); window.history.replaceState({}, '', u.toString()); } catch (e) {}
+    }
+    if (this.adminTok) this.loadAdmin();
+    if (!this.code) {
+      this.loadDirectory(); this.setState({ sync: '' });
+      if (this.preGate) this.setState({ gate: { code: this.preGate, name: this.NICUS()[this.preGate], pw: '', err: '' } });
+      return;
+    }
+    fetch(this.API, { headers: this.hdrs() }).then(r => {
+      if (r.status === 401 || r.status === 403 || r.status === 404 || r.status === 429) {
+        return r.json().catch(() => ({})).then(j => { this.authFailed(r.status, j && j.message); return Promise.reject('auth'); });
+      }
+      return r.ok ? r.json() : Promise.reject();
+    }).then(j => {
       this.remote = true;
       this.setState(j && j.rooms ? { data: j, sync: 'live' } : { sync: 'live' });
       this.pollId = setInterval(() => {
         if (Date.now() - this.lastWrite < 4000) return;
-        fetch(this.API).then(r => (r.ok ? r.json() : null)).then(j2 => {
+        fetch(this.API, { headers: this.hdrs() }).then(r => { if (r.status === 401 || r.status === 403) { this.authFailed(r.status); return null; } return r.ok ? r.json() : null; }).then(j2 => {
           if (j2 && j2.rooms && JSON.stringify(j2) !== JSON.stringify(this.state.data)) this.setState({ data: j2 });
         }).catch(() => {});
       }, 5000);
-    }).catch(() => this.setState({ sync: 'local' }));
+    }).catch(why => { if (why !== 'auth') this.setState({ sync: 'local' }); });
   }
-  componentWillUnmount() { window.removeEventListener('storage', this.onStorage); if (this.pollId) clearInterval(this.pollId); }
+  componentDidUpdate() { if (this.hitEl && this.cursorNow) this.hitEl.style.cursor = this.cursorNow; }
+  componentWillUnmount() { window.removeEventListener('storage', this.onStorage); window.removeEventListener('pointerup', this.onUp); window.removeEventListener('keydown', this.onKey); if (this.pollId) clearInterval(this.pollId); }
 
   modes() {
     return {
@@ -779,6 +1242,701 @@ class Component extends DCLogic {
   rrT() { return this.props.rrThreshold ?? 70; }
   prefix() { return this.props.unitPrefix ?? 'ICN'; }
   count() { return Math.max(1, Math.min(60, this.props.roomCount ?? 20)); }
+
+  /* ---------- unit directory, code gate, admin ---------- */
+  hashCode(str) {
+    let h = 0x811c9dc5;
+    const v = String(str).toUpperCase();
+    for (let i = 0; i < v.length; i++) { h ^= v.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return h.toString(36);
+  }
+  NICUS() { return { THIMPHU: 'Thimphu', WALNUTCREEK: 'Walnut Creek', SANLEANDRO: 'San Leandro' }; }
+  hdrs() { return this.pass ? { 'x-unit-pass': this.pass } : {}; }
+  storedAdminQS() { const a = this.adm || {}; return 'admin=' + encodeURIComponent(a.tok || '') + (a.pin ? '&pin=' + encodeURIComponent(a.pin) : ''); }
+  authFailed(status, msg) {
+    if (this.pollId) { clearInterval(this.pollId); this.pollId = null; }
+    const code = this.code, name = this.NICUS()[code] || code;
+    try { localStorage.removeItem('owl_pass:' + code); localStorage.removeItem('owl_unit'); localStorage.removeItem('owl_admin_view'); } catch (e) {}
+    this.code = ''; this.pass = ''; this.remote = false; this.adminView = false;
+    const err = msg || (status === 401 ? 'The password for ' + name + ' has changed — enter the new one.' : status === 403 ? name + ' is not open yet.' : 'Please sign in again.');
+    this.setState({ data: { rooms: {} }, sync: '', view: { t: 'grid' }, gate: { code, name, pw: '', err } });
+    this.loadDirectory();
+  }
+  loadDirectory() {
+    this.setState({ dirLoading: true });
+    fetch('/api/data?units')
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(j => this.setState({ dir: (j && j.units) || [], dirLoading: false }))
+      .catch(() => this.setState({ dir: null, dirLoading: false }));
+  }
+  adminQS() { return 'admin=' + encodeURIComponent(this.adminTok) + (this.admPin ? '&pin=' + encodeURIComponent(this.admPin) : ''); }
+  rememberAdmin() { this.adm = { tok: this.adminTok, pin: this.admPin || '' }; try { sessionStorage.setItem('owl_admin', JSON.stringify(this.adm)); } catch (e) {} }
+  loadAdmin() {
+    if (!this.admPin && this.adm && this.adm.tok === this.adminTok) this.admPin = this.adm.pin || '';
+    this.setState({ admLoading: true });
+    fetch('/api/data?directory&' + this.adminQS())
+      .then(r => r.json().then(j => ({ ok: r.ok, j })).catch(() => ({ ok: false, j: null })))
+      .then(({ ok, j }) => {
+        if (ok && j && j.admin) {
+          this.rememberAdmin();
+          this.setState({ adm: j.units || [], admLoading: false, admMsg: '', admGate: null });
+          fetch('/api/data?whoami').then(r2 => (r2.ok ? r2.json() : null)).then(w => {
+            if (w) this.setState({ admStore: w.host + ' · store ' + w.store });
+          }).catch(() => {});
+          return;
+        }
+        if (j && j.pinRequired) { this.admPin = ''; this.setState({ admLoading: false, admGate: { pin: '', err: '' } }); return; }
+        this.setState({ adm: [], admLoading: false, admMsg: 'That admin link was not accepted. Check OWL_ADMIN_TOKEN in Netlify.' });
+      })
+      .catch(() => this.setState({ adm: [], admLoading: false, admMsg: 'Admin tool unavailable — check OWL_ADMIN_TOKEN on the site.' }));
+  }
+  adminOpen(code) {
+    this.rememberAdmin();
+    try { localStorage.setItem('owl_admin_view', '1'); localStorage.setItem('owl_unit', code); localStorage.setItem('nicu_resp_initials', 'ADMIN'); } catch (e) {}
+    window.location.href = '/';
+  }
+  adminEditLayout(code) {
+    fetch('/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS())
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(j => {
+        this.code = code; this.pass = '';
+        this.API = '/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS();
+        this.remote = true;
+        this.setState({ data: j && j.rooms ? j : { rooms: {} } }, () => this.startSetup());
+      })
+      .catch(() => this.setState({ admMsg: 'Could not load ' + (this.NICUS()[code] || code) + '.' }));
+  }
+  adminSavePassword(code) {
+    const p = this.state.admPw; if (!p || p.code !== code) return;
+    const v = String(p.v || '');
+    if (v.length < 4) { this.setState({ admPw: { ...p, err: 'Use at least four characters.' } }); return; }
+    fetch('/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'setPassword', password: v }) })
+      .then(r => { if (!r.ok) return r.text().then(t => Promise.reject(t)); return r.json(); })
+      .then(() => { this.setState({ admPw: null, admNote: { code, text: 'Password saved.' } }); this.loadAdmin(); })
+      .catch(t => this.setState({ admPw: { ...p, err: (typeof t === 'string' && t) || 'Could not save the password.' } }));
+  }
+  adminExport(code) {
+    fetch('/api/data?unit=' + encodeURIComponent(code) + '&' + this.adminQS())
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(j => {
+        const blob = new Blob([JSON.stringify({ unit: code, exportedAt: new Date().toISOString(), ...j }, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'owl-' + code.toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.json';
+        a.click();
+      })
+      .catch(() => this.setState({ admMsg: 'Could not export ' + code + '.' }));
+  }
+  signIn() {
+    const g = this.state.gate; if (!g) return;
+    const pw = String(g.pw || '');
+    if (!pw) { this.setState({ gate: { ...g, err: 'Enter the password.' } }); return; }
+    this.setState({ gate: { ...g, busy: true, err: '' } });
+    fetch('/api/data?unit=' + encodeURIComponent(g.code), { headers: { 'x-unit-pass': pw } })
+      .then(r => r.json().catch(() => ({})).then(j => ({ r, j })))
+      .then(({ r, j }) => {
+        if (r.ok) {
+          try { localStorage.setItem('owl_unit', g.code); localStorage.setItem('owl_pass:' + g.code, pw); localStorage.removeItem('owl_admin_view'); } catch (e) {}
+          window.location.href = '/';
+          return;
+        }
+        this.setState({ gate: { ...g, busy: false, pw: '', err: (j && j.message) || 'Could not sign in.' } });
+      })
+      .catch(() => this.setState({ gate: { ...g, busy: false, err: 'Could not reach the server. Try again.' } }));
+  }
+
+  /* ---------- unit layout ---------- */
+  // Units only ever see a permanent layout; drafts live in the admin tool until made permanent.
+  layoutOf() { const L = this.state.data.layout; if (!(L && L.beds && L.beds.length)) return null; if (!this.adminTok && L.permanent === false) return null; return L; }
+  beds() {
+    const L = this.layoutOf();
+    if (L) return L.beds;
+    const N = this.count(), p = this.prefix();
+    return Array.from({ length: N }, (_, i) => ({ k: String(i + 1), label: p ? `${p}-${i + 1}` : String(i + 1), cx: (i % 10) * 2 + 1, cy: i < 10 ? 2 : 6, bay: null }));
+  }
+  bedLabel(k) { const b = this.beds().find(x => String(x.k) === String(k)); return b ? b.label : `${this.prefix()}-${k}`; }
+  bayNameOf(k) {
+    const b = this.beds().find(x => String(x.k) === String(k));
+    const L = this.layoutOf();
+    if (!b || !b.bay || !L || !L.bays) return '\uffff';
+    const y = L.bays.find(v => v.id === b.bay);
+    return y && y.name ? y.name : '\uffff';
+  }
+  // Board order: bay first (alphabetical/natural by bay name, unbayed beds last),
+  // then the bed label read the way a person reads it — A1, A2, A10, B1.
+  sortedBedKeys() {
+    const nat = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+    return this.beds().map(b => b.k).slice().sort((x, y) => {
+      const bx = this.bayNameOf(x), by = this.bayNameOf(y);
+      if (bx !== by) return nat(bx, by);
+      return nat(this.bedLabel(x), this.bedLabel(y));
+    });
+  }
+  needsSetup() { return !this.layoutOf() && !Object.keys(this.state.data.rooms || {}).length; }
+  viewNow() {
+    const v = this.state.view;
+    if (v.t === 'setup') return v;
+    if (this.adminTok) return { t: 'admin' };
+    if (!this.code) return { t: 'directory' };
+    if (this.needsSetup()) return { t: 'welcome' };
+    return v;
+  }
+  cell() { return 40; }
+  geom() { const L = this.layoutOf(); return { cols: (L && L.cols) || 16, rows: (L && L.rows) || 9 }; }
+  nextNum(beds, prefix) {
+    let mx = 0;
+    beds.forEach(b => { const m = String(b.label).match(/(\d+)\s*$/); if (m) mx = Math.max(mx, Number(m[1])); });
+    return mx + 1;
+  }
+  newCode() { const c = 'ACDEFGHJKLMNPQRTUVWXY34679'; let s = ''; for (let i = 0; i < 5; i++) s += c[Math.floor(Math.random() * c.length)]; return 'OWL-' + s; }
+  setCode(code) {
+    this.code = code;
+    try { localStorage.setItem('owl_unit', code); } catch (e) {}
+    this.KEY = 'nicu_resp_v1:' + code;
+    this.API = '/api/data?unit=' + encodeURIComponent(code);
+  }
+  joinUnit(raw) {
+    const code = String(raw || '').trim().toUpperCase();
+    if (!code) return;
+    this.setCode(code);
+    window.location.reload();
+  }
+  startSetup() {
+    const L = this.layoutOf(), g = this.geom();
+    if (!L && !this.code) this.setCode(this.newCode());
+    const beds = L ? L.beds.map(b => ({ ...b })) : (this.needsSetup() ? [] : this.beds().map(b => ({ ...b })));
+    const prefix = L && L.prefix != null ? L.prefix : this.prefix();
+    const ed = {
+      cols: g.cols, rows: g.rows, beds, bays: L && L.bays ? L.bays.map(b => ({ ...b })) : [],
+      sketch: (L && L.sketch) || '', opacity: L && L.opacity != null ? L.opacity : 0.4,
+      tool: 'arrange', prefix, next: String(this.nextNum(beds, prefix)), run: '6',
+      sel: [], bayName: '', name: (L && L.name) || '', err: '', drag: null, hover: null,
+      editK: null, editV: '', hist: [], hp: 0
+    };
+    ed.hist = [this.snap(ed)];
+    this.setState({ view: { t: 'setup' }, unit: false, map: false, pin: null, ed });
+    window.scrollTo(0, 0);
+  }
+  snap(e) { return JSON.stringify({ beds: e.beds, bays: e.bays, cols: e.cols, rows: e.rows }); }
+  edSet(patch) { this.setState(s => (s.ed ? { ed: { ...s.ed, ...patch } } : {})); }
+  // Structural edits go through edCommit so undo/redo has a history to walk.
+  edCommit(patch) {
+    this.setState(s => {
+      if (!s.ed) return {};
+      const ed = { ...s.ed, ...patch };
+      ed.cols = Math.min(40, Math.max(ed.cols, ...ed.beds.map(b => b.cx + 2), ...ed.bays.map(y => y.x1 + 2), 8));
+      ed.rows = Math.min(24, Math.max(ed.rows, ...ed.beds.map(b => b.cy + 2), ...ed.bays.map(y => y.y1 + 2), 5));
+      const sn = this.snap(ed);
+      if (s.ed.hist[s.ed.hp] !== sn) {
+        ed.hist = s.ed.hist.slice(0, s.ed.hp + 1).concat([sn]).slice(-50);
+        ed.hp = ed.hist.length - 1;
+      }
+      return { ed };
+    });
+  }
+  edStep(dir) {
+    this.setState(s => {
+      if (!s.ed) return {};
+      const hp = s.ed.hp + dir;
+      if (hp < 0 || hp >= s.ed.hist.length) return {};
+      const st = JSON.parse(s.ed.hist[hp]);
+      return { ed: { ...s.ed, beds: st.beds, bays: st.bays, cols: st.cols, rows: st.rows, hp, sel: [], drag: null, editK: null, err: '' } };
+    });
+  }
+  bedAt(beds, x, y) { return beds.find(b => b.cx === x && b.cy === y) || null; }
+  uid(sfx) { return 'b' + Date.now().toString(36) + Math.floor(Math.random() * 1e5).toString(36) + (sfx || ''); }
+  edPos(ev) {
+    const e = this.state.ed, c = this.cell();
+    const t = ev.currentTarget || ev.target, r = t.getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.min((e ? e.cols : 1) - 1, Math.floor((ev.clientX - r.left) / c))),
+      y: Math.max(0, Math.min((e ? e.rows : 1) - 1, Math.floor((ev.clientY - r.top) / c)))
+    };
+  }
+  edDown(ev) {
+    const e = this.state.ed; if (!e) return;
+    const p = this.edPos(ev), bed = this.bedAt(e.beds, p.x, p.y);
+    const mode = e.tool === 'add' ? 'paint' : (e.tool === 'bay' ? 'bay' : (e.tool === 'erase' ? 'erase' : (bed ? 'move' : 'marquee')));
+    const drag = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, mode };
+    this.dragNow = drag;
+    const sel = mode === 'move' ? (e.sel.indexOf(bed.k) >= 0 ? e.sel : [bed.k]) : (mode === 'marquee' ? [] : e.sel);
+    this.edSet({ editK: null, err: '', sel, drag });
+  }
+  edMove(ev) {
+    const e = this.state.ed; if (!e) return;
+    const p = this.edPos(ev);
+    const d = this.dragNow;
+    if (!d) { if (!e.hover || e.hover.x !== p.x || e.hover.y !== p.y) this.edSet({ hover: p }); return; }
+    if (p.x !== d.x1 || p.y !== d.y1) { d.x1 = p.x; d.y1 = p.y; this.edSet({ drag: { ...d }, hover: p }); }
+  }
+  edDbl(ev) {
+    const e = this.state.ed; if (!e) return;
+    const p = this.edPos(ev), bed = this.bedAt(e.beds, p.x, p.y);
+    if (bed) this.edSet({ editK: bed.k, editV: bed.label, sel: [bed.k], drag: null });
+  }
+  edUp() {
+    const e = this.state.ed, d = this.dragNow;
+    this.dragNow = null;
+    if (!e || !d) return;
+    const x0 = Math.min(d.x0, d.x1), x1 = Math.max(d.x0, d.x1);
+    const y0 = Math.min(d.y0, d.y1), y1 = Math.max(d.y0, d.y1);
+    const inRect = b => b.cx >= x0 && b.cx <= x1 && b.cy >= y0 && b.cy <= y1;
+    if (d.mode === 'paint') {
+      const beds = e.beds.slice(); let num = Math.max(1, Number(e.next) || 1), made = [];
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        if (this.bedAt(beds, x, y)) continue;
+        const b = { k: this.uid(String(made.length)), label: e.prefix ? `${e.prefix}-${num}` : String(num), cx: x, cy: y, bay: null };
+        beds.push(b); made.push(b); num++;
+      }
+      const single = made.length === 1 && x0 === x1 && y0 === y1;
+      this.edCommit({ beds, next: String(num), drag: null, sel: made.map(b => b.k), editK: single ? made[0].k : null, editV: single ? made[0].label : '' });
+    } else if (d.mode === 'move') {
+      const dx = d.x1 - d.x0, dy = d.y1 - d.y0;
+      if (!dx && !dy) { this.edSet({ drag: null }); return; }
+      const group = e.sel.length ? e.sel : [];
+      const moving = e.beds.filter(b => group.indexOf(b.k) >= 0);
+      const ok = moving.length && moving.every(b => {
+        const nx = b.cx + dx, ny = b.cy + dy;
+        if (nx < 0 || ny < 0 || nx > 39 || ny > 23) return false;
+        const t = this.bedAt(e.beds, nx, ny);
+        return !t || group.indexOf(t.k) >= 0;
+      });
+      if (!ok) { this.edSet({ drag: null, err: 'That spot is taken — drop the bed on empty cells.' }); return; }
+      this.edCommit({ beds: e.beds.map(b => (group.indexOf(b.k) >= 0 ? { ...b, cx: b.cx + dx, cy: b.cy + dy } : b)), drag: null, err: '' });
+    } else if (d.mode === 'marquee') {
+      this.edSet({ sel: e.beds.filter(inRect).map(b => b.k), drag: null });
+    } else if (d.mode === 'bay') {
+      this.edCommit({ bays: e.bays.concat([{ id: 'y' + Date.now().toString(36), name: e.bayName || `Bay ${e.bays.length + 1}`, x0, y0, x1, y1 }]), drag: null, bayName: '' });
+    } else if (d.mode === 'erase') {
+      this.edCommit({
+        beds: e.beds.filter(b => !inRect(b)),
+        bays: e.bays.filter(y => !(y.x0 >= x0 && y.x1 <= x1 && y.y0 >= y0 && y.y1 <= y1)),
+        sel: [], drag: null
+      });
+    } else this.edSet({ drag: null });
+  }
+  edKey(ev) {
+    const e = this.state.ed; if (!e) return;
+    const tag = (ev.target && ev.target.tagName) || '';
+    const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    if ((ev.metaKey || ev.ctrlKey) && (ev.key === 'z' || ev.key === 'Z')) { ev.preventDefault(); this.edStep(ev.shiftKey ? 1 : -1); return; }
+    if ((ev.metaKey || ev.ctrlKey) && (ev.key === 'y' || ev.key === 'Y')) { ev.preventDefault(); this.edStep(1); return; }
+    if (typing) return;
+    if (ev.key === 'Escape') { this.dragNow = null; this.edSet({ sel: [], editK: null, drag: null }); return; }
+    if ((ev.key === 'Delete' || ev.key === 'Backspace') && e.sel.length) {
+      ev.preventDefault();
+      this.edCommit({ beds: e.beds.filter(b => e.sel.indexOf(b.k) < 0), sel: [] });
+    }
+  }
+  seedRun() {
+    const e = this.state.ed; if (!e) return;
+    const qty = Math.max(1, Math.min(60, Number(e.run) || 6));
+    const beds = e.beds.slice(); let num = Math.max(1, Number(e.next) || 1), placed = 0;
+    const cols = Math.max(e.cols, Math.min(40, qty + 1));
+    for (let y = 0; y < 24 && placed < qty; y++) for (let x = 0; x < cols && placed < qty; x++) {
+      if (this.bedAt(beds, x, y)) continue;
+      beds.push({ k: this.uid(String(placed)), label: e.prefix ? `${e.prefix}-${num}` : String(num), cx: x, cy: y, bay: null });
+      num++; placed++;
+    }
+    this.edCommit({ beds, cols, next: String(num), sel: [], err: '' });
+  }
+  uShape() {
+    const e = this.state.ed; if (!e) return;
+    const qty = Math.max(3, Math.min(60, Number(e.run) || 12));
+    const side = Math.max(2, Math.ceil((qty + 2) / 3));
+    const W = Math.min(38, side + 1), H = Math.min(22, side);
+    const path = [];
+    for (let y = 1; y <= H; y++) path.push([1, y]);
+    for (let x = 2; x <= W; x++) path.push([x, H]);
+    for (let y = H - 1; y >= 1; y--) path.push([W, y]);
+    let num = Math.max(1, Number(e.next) || 1);
+    const beds = path.slice(0, qty).map((p, i) => ({ k: this.uid('u' + i), label: e.prefix ? `${e.prefix}-${num + i}` : String(num + i), cx: p[0], cy: p[1], bay: null }));
+    this.edCommit({ beds, bays: [], next: String(num + beds.length), sel: [], err: '', cols: Math.min(40, W + 2), rows: Math.min(24, H + 2) });
+  }
+    pickSketch() {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/png,image/jpeg';
+    inp.onchange = () => {
+      const file = inp.files && inp.files[0]; if (!file) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const max = 1400, sc = Math.min(1, max / Math.max(img.width, img.height));
+          const cv = document.createElement('canvas');
+          cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          this.edSet({ sketch: cv.toDataURL('image/jpeg', 0.7) });
+        };
+        img.src = String(rd.result);
+      };
+      rd.readAsDataURL(file);
+    };
+    inp.click();
+  }
+  saveLayout(lock, pin) {
+    const e = this.state.ed; if (!e) return;
+    if (!e.beds.length) { this.edSet({ err: 'Place at least one bed before saving.' }); return; }
+    // Crop the empty margins: shift everything up and left, then size the grid to what is used.
+    const bays = e.bays.map(y => ({ ...y }));
+    const xs = e.beds.map(b => b.cx).concat(bays.map(y => y.x0));
+    const ys = e.beds.map(b => b.cy).concat(bays.map(y => y.y0));
+    const sx = Math.min(...xs), sy = Math.min(...ys);
+    bays.forEach(y => { y.x0 -= sx; y.x1 -= sx; y.y0 -= sy; y.y1 -= sy; });
+    const beds = e.beds.slice()
+      .map(b => ({ ...b, cx: b.cx - sx, cy: b.cy - sy }))
+      .sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx))
+      .map(b => {
+        const y = bays.find(v => b.cx >= v.x0 && b.cx <= v.x1 && b.cy >= v.y0 && b.cy <= v.y1);
+        return { k: b.k, label: b.label, cx: b.cx, cy: b.cy, bay: y ? y.id : null };
+      });
+    const cols = Math.max(8, Math.max(...beds.map(b => b.cx), ...bays.map(y => y.x1)) + 2);
+    const rows = Math.max(5, Math.max(...beds.map(b => b.cy), ...bays.map(y => y.y1)) + 2);
+    const old = this.layoutOf();
+    const layout = { name: e.name || '', cols, rows, prefix: e.prefix, beds, bays, sketch: e.sketch, opacity: e.opacity, locked: !!lock, permanent: !!lock, updatedAt: new Date().toISOString() };
+    if (this.adminTok) {
+      const code = this.code;
+      this.lastWrite = Date.now();
+      fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'layout', layout }) })
+        .then(r => (r.ok ? r.json() : Promise.reject()))
+        .then(() => { this.setState({ admNote: { code, text: lock ? 'Layout saved and made permanent.' : 'Draft layout saved — not yet visible to the unit.' } }); this.loadAdmin(); })
+        .catch(() => this.setState({ admMsg: 'Could not save the layout for ' + (this.NICUS()[code] || code) + '.' }));
+      this.code = ''; this.API = '/api/data'; this.remote = false;
+      this.setState({ view: { t: 'grid' }, ed: null, pin: null, confirm: null, data: { rooms: {} } });
+      window.scrollTo(0, 0);
+      return;
+    }
+    this.sendOp({ op: 'layout', layout });
+    this.setState({ view: { t: 'grid' }, ed: null, pin: null });
+    window.scrollTo(0, 0);
+  }
+  exampleLayout() {
+    const beds = [];
+    for (let i = 0; i < 20; i++) beds.push({ k: String(i + 1), label: `ICN-${i + 1}`, cx: (i % 10) * 2 + 1, cy: i < 10 ? 2 : 6, bay: null });
+    return { name: '', cols: 26, rows: 13, prefix: 'ICN', beds, bays: [], sketch: '', opacity: 0.4, locked: true, pin: '', updatedAt: new Date().toISOString() };
+  }
+  lastActivity() {
+    let t = 0; const rooms = this.state.data.rooms || {};
+    Object.keys(rooms).forEach(k => (rooms[k] || []).forEach(e => { const v = new Date(e.ts).getTime(); if (v > t) t = v; }));
+    const L = this.layoutOf(); if (L && L.updatedAt) t = Math.max(t, new Date(L.updatedAt).getTime());
+    return t || Date.now();
+  }
+  loadSample() {
+    const beds = this.beds().slice(0, 6), now = Date.now();
+    const plan = [
+      { mode: 'HFOV', s: { map: '14', amp: '30', hz: '9' }, f: [38, 52], h: [8, 79, 13], rr: 22, r6: 41, r8: 9 },
+      { mode: 'SIMV', s: { rate: '35', pip: '20', peep: '6' }, f: [30, 44], h: [11, 82, 7], rr: 18, r6: 33, r8: 5 },
+      { mode: 'CPAP', s: { press: '6' }, f: [21, 30], h: [6, 88, 6], rr: 12, r6: 26, r8: 3 },
+      { mode: 'HFNC', s: { flow: '4' }, f: [21, 28], h: [4, 91, 5], rr: 9, r6: 19, r8: 2 },
+      { mode: 'NC', s: { flow: '0.5' }, f: [21, 25], h: [3, 93, 4], rr: 7, r6: 14, r8: 1 },
+      { mode: 'RA', s: {}, f: null, h: [2, 96, 2], rr: 4, r6: 8, r8: 0 }
+    ];
+    beds.forEach((b, i) => {
+      const p = plan[i % plan.length];
+      [16, 8].forEach((back, j) => {
+        const entry = { id: `${now}${i}${j}`, ts: new Date(now - back * 3600000).toISOString(), init: 'RT', intv: 8, mode: p.mode, s: { ...p.s }, f: p.f, target: 'std', h: j === 0 ? p.h : [p.h[0] + 3, p.h[1] - 4, p.h[2] + 1], rr: p.rr + (j ? 5 : 0), r6: p.r6, r8: p.r8, md: false, iv: '' };
+        this.sendOp({ op: 'add', room: b.k, entry });
+      });
+    });
+    this.setState({ unit: false });
+  }
+  layoutVals(view) {
+    const px = v => v + 'px', cell = this.cell();
+    const e = this.state.ed, L = this.layoutOf(), beds = this.beds();
+    const bedStyle = k => {
+      const latest = this.entriesOf(k)[0];
+      if (!latest) return { bg: '#EDF0F2', bd: '#C9D2D9', tx: '#5A6B7A', mode: 'Empty' };
+      const M = this.modeView(latest);
+      return { bg: M.bg, bd: M.bd, tx: M.tx, mode: M.label };
+    };
+    const mapCell = 46;
+    const bays = (L && L.bays) || [];
+    const geom = this.geom();
+    const xs = beds.map(b => b.cx).concat(bays.map(y => y.x0), bays.map(y => y.x1));
+    const ys = beds.map(b => b.cy).concat(bays.map(y => y.y0), bays.map(y => y.y1));
+    const mnX = xs.length ? Math.min(...xs) : 0, mxX = xs.length ? Math.max(...xs) : 0;
+    const mnY = ys.length ? Math.min(...ys) : 0, mxY = ys.length ? Math.max(...ys) : 0;
+    const mapBeds = beds.map(b => {
+      const st = bedStyle(b.k), occ = this.entriesOf(b.k).length > 0;
+      return {
+        l: px((b.cx - mnX) * mapCell + 2), t: px((b.cy - mnY) * mapCell + 2), w: px(mapCell - 5), h: px(mapCell - 5),
+        bg: st.bg, bd: st.bd, tx: st.tx, label: b.label, mode: st.mode, title: `${b.label} · ${st.mode}`,
+        click: () => { this.setState({ map: false }); if (occ) this.openRoom(b.k); else this.openEditor(b.k); }
+      };
+    });
+    const tool = e ? e.tool : 'arrange';
+    const sel = e ? e.sel : [];
+    const one = e && sel.length === 1 ? e.beds.find(b => b.k === sel[0]) : null;
+    const d = e && e.drag ? e.drag : null;
+    const moving = !!(d && d.mode === 'move');
+    const mdx = moving ? d.x1 - d.x0 : 0, mdy = moving ? d.y1 - d.y0 : 0;
+    const dx0 = d ? Math.min(d.x0, d.x1) : 0, dx1 = d ? Math.max(d.x0, d.x1) : 0;
+    const dy0 = d ? Math.min(d.y0, d.y1) : 0, dy1 = d ? Math.max(d.y0, d.y1) : 0;
+    const hov = e && e.hover ? this.bedAt(e.beds, e.hover.x, e.hover.y) : null;
+    const toolDefs = [
+      ['arrange', 'Arrange', '\u2196', 'Click a bed to select it \u00b7 drag it to move \u00b7 double-click to rename \u00b7 Delete removes.'],
+      ['add', 'Add beds', '+', 'Drag across empty cells to drop a run. A single click adds one bed and opens its name.'],
+      ['bay', 'Bay', '\u25ad', 'Drag a dashed outline around the beds that share an open bay.'],
+      ['erase', 'Erase', '\u00d7', 'Click a bed to remove it, or drag across several.']
+    ];
+    const eraserCur = 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\'><g transform=\'rotate(-40 12 14)\'><rect x=\'3\' y=\'9\' width=\'16\' height=\'9\' rx=\'2\' fill=\'%23ffffff\' stroke=\'%23C43A3A\' stroke-width=\'2\'/><rect x=\'3\' y=\'14\' width=\'16\' height=\'4\' fill=\'%23F6CFCF\' stroke=\'%23C43A3A\' stroke-width=\'2\'/></g></svg>") 4 16, crosshair';
+    let cursor = 'crosshair';
+    if (tool === 'arrange') cursor = moving ? 'grabbing' : (hov ? 'grab' : 'default');
+    else if (tool === 'erase') cursor = eraserCur;
+    this.cursorNow = cursor;
+    if (this.hitEl) this.hitEl.style.cursor = cursor;
+    const canUndo = !!(e && e.hp > 0), canRedo = !!(e && e.hp < e.hist.length - 1);
+    const commitEdit = () => {
+      const st = this.state.ed; if (!st || !st.editK) return;
+      const v = (st.editV || '').trim();
+      this.edCommit({ beds: st.beds.map(b => (b.k === st.editK ? { ...b, label: v || b.label } : b)), editK: null, editV: '' });
+    };
+    const eBed = e && e.editK ? e.beds.find(b => b.k === e.editK) : null;
+    const editL = eBed ? Math.max(0, Math.min((e.cols - 2) * cell, eBed.cx * cell - cell / 2)) : 0;
+    
+    const p = this.state.pin;
+    const act = this.lastActivity();
+    const daysIdle = Math.floor((Date.now() - act) / 86400000);
+    const left = Math.max(0, 30 - daysIdle);
+    return {
+      inApp: view.t !== 'welcome' && view.t !== 'setup' && view.t !== 'directory' && view.t !== 'admin',
+      hasCodeChip: false,
+      hasUnitName: !!this.code && view.t !== 'directory' && view.t !== 'admin', unitName: (L && L.name) || this.NICUS()[this.code] || '',
+      showIds: false, hideIds: true,
+      showTrial: false,
+      trialText: `Trial unit ${this.code} · bed labels only, no patient identifiers · clears after 30 days idle (${left} left)`,
+      isWelcome: view.t === 'welcome', isSetup: view.t === 'setup',
+      isDirectory: view.t === 'directory', isAdmin: view.t === 'admin',
+      dirLoading: !!this.state.dirLoading,
+      nicuTiles: Object.keys(this.NICUS()).map(c => {
+        const info = (this.state.dir || []).find(u => u.code === c);
+        const open = info ? !!info.open : null;
+        const sel = this.state.gate && this.state.gate.code === c;
+        return {
+          name: this.NICUS()[c],
+          status: open === false ? 'Not open yet' : (sel ? 'Enter the password below' : 'Sign in →'),
+          stTx: open === false ? '#98510F' : '#0E7490',
+          bg: sel ? '#EAF4F7' : '#FFFFFF', bd: sel ? '#0E7490' : '#E2E8EE',
+          click: () => this.setState({ gate: { code: c, name: this.NICUS()[c], pw: '', err: open === false ? this.NICUS()[c] + ' is not open yet — the administrator has not set its password.' : '' } })
+        };
+      }),
+      gateOpen: !!this.state.gate,
+      gateName: (this.state.gate && this.state.gate.name) || '',
+      gatePw: (this.state.gate && this.state.gate.pw) || '',
+      onGatePw: ev => { const v = ev.target.value; this.setState(st => ({ gate: { ...st.gate, pw: v, err: '' } })); },
+      gateKey: ev => { if (ev.key === 'Enter') { ev.preventDefault(); this.signIn(); } },
+      gateBtn: this.state.gate && this.state.gate.busy ? 'Checking…' : 'Sign in',
+      gateHasErr: !!(this.state.gate && this.state.gate.err),
+      gateErr: (this.state.gate && this.state.gate.err) || '',
+      gateCancel: () => this.setState({ gate: null }),
+      gateSubmit: () => this.signIn(),
+      joinHasErr: !!this.state.joinErr, joinErr: this.state.joinErr || '',
+      admStore: this.state.admStore || '',
+      admDenied: !!this.state.admMsg, admMsg: this.state.admMsg || '',
+      admHasUnits: !!(this.state.adm && this.state.adm.length),
+      admUnits: (this.state.adm || []).map(u => {
+        const pw = this.state.admPw && this.state.admPw.code === u.code ? this.state.admPw : null;
+        const note = this.state.admNote && this.state.admNote.code === u.code ? this.state.admNote.text : '';
+        const lay = u.permanent ? ['Permanent · ' + u.beds + ' beds', '#E6F5EA', '#136B31'] : u.hasLayout ? ['Draft · ' + u.beds + ' beds · not live', '#FCF0E2', '#98510F'] : ['Not built yet', '#EDF0F2', '#4A5560'];
+        return {
+          code: u.code, name: u.name || this.NICUS()[u.code] || u.code,
+          layStatus: lay[0], layBg: lay[1], layTx: lay[2],
+          pwStatus: u.hasPassword ? 'Set · ' + this.fmtDateFull(u.passwordSetAt || new Date().toISOString()) : 'Not set — NICU closed',
+          pwBg: u.hasPassword ? '#E6F5EA' : '#FBE8E8', pwTx: u.hasPassword ? '#136B31' : '#A32222',
+          dataLine: (u.occupied || 0) + ' occupied · ' + (u.entries || 0) + ' entries' + (u.lastTs ? ' · last ' + this.fmtDateFull(u.lastTs) : ''),
+          editLabel: u.permanent ? 'Edit layout' : u.hasLayout ? 'Continue layout' : 'Build layout',
+          edit: () => this.adminEditLayout(u.code),
+          pwLabel: u.hasPassword ? 'Change password' : 'Set password',
+          pw: () => this.setState({ admPw: { code: u.code, v: '', err: '' }, admNote: null }),
+          pwOpen: !!pw, pwV: pw ? pw.v : '',
+          onPwV: ev => { const v = ev.target.value; this.setState(st => ({ admPw: { ...st.admPw, v, err: '' } })); },
+          pwHasErr: !!(pw && pw.err), pwErr: (pw && pw.err) || '',
+          pwCancel: () => this.setState({ admPw: null }),
+          pwSave: () => this.adminSavePassword(u.code),
+          open: () => this.adminOpen(u.code),
+          exp: () => this.adminExport(u.code),
+          hasNote: !!note, note
+        };
+      }),
+      admRefresh: () => this.loadAdmin(),
+      admGateOpen: !!this.state.admGate,
+      admPin: (this.state.admGate && this.state.admGate.pin) || '',
+      onAdmPin: ev => { const v = ev.target.value.replace(/[^0-9]/g, '').slice(0, 6); this.setState(st => ({ admGate: { ...st.admGate, pin: v, err: '' } })); },
+      admGateErr: !!(this.state.admGate && this.state.admGate.err),
+      admGateMsg: (this.state.admGate && this.state.admGate.err) || '',
+      admGateSubmit: () => {
+        const g = this.state.admGate; if (!g) return;
+        if (this.admCool && Date.now() < this.admCool) {
+          const mins = Math.ceil((this.admCool - Date.now()) / 60000);
+          this.setState({ admGate: { ...g, err: `Locked out — try again in ${mins} min.` } });
+          return;
+        }
+        if (!/^\d{6}$/.test(g.pin)) { this.setState({ admGate: { ...g, err: 'The PIN is six digits.' } }); return; }
+        this.admPin = g.pin;
+        fetch('/api/data?directory&' + this.adminQS())
+          .then(r => r.json().then(j => ({ ok: r.ok, j })))
+          .then(({ ok, j }) => {
+            if (ok && j && j.admin) {
+              this.admTries = 0;
+              this.rememberAdmin();
+              this.setState({ adm: j.units || [], admGate: null, admMsg: '' });
+              fetch('/api/data?whoami').then(r2 => (r2.ok ? r2.json() : null)).then(w => {
+                if (w) this.setState({ admStore: w.host + ' · store ' + w.store });
+              }).catch(() => {});
+              return;
+            }
+            this.admTries = (this.admTries || 0) + 1;
+            this.admPin = '';
+            if (this.admTries >= 3) { this.admCool = Date.now() + 300000; this.admTries = 0; this.setState({ admGate: { pin: '', err: 'Three wrong attempts — locked out for five minutes.' } }); return; }
+            this.setState({ admGate: { pin: '', err: 'That PIN was not accepted.' } });
+          })
+          .catch(() => this.setState({ admGate: { ...g, err: 'Could not reach the server.' } }));
+      },
+      exitAdminView: () => { try { localStorage.removeItem('owl_admin_view'); localStorage.removeItem('owl_unit'); } catch (e) {} window.location.href = '/?admin=' + encodeURIComponent((this.adm && this.adm.tok) || ''); },
+      joinCode: this.state.join,
+      onJoinCode: ev => this.setState({ join: ev.target.value }),
+      edTitle: (L ? 'Edit layout · ' : 'Build layout · ') + (this.NICUS()[this.code] || ''),
+      edSummary: e ? `${e.beds.length} bed${e.beds.length === 1 ? '' : 's'}${e.bays.length ? ' \u00b7 ' + e.bays.length + ' bay' + (e.bays.length === 1 ? '' : 's') : ''} \u00b7 ${e.cols}\u00d7${e.rows} grid` : '',
+      edTools: toolDefs.map(([k, label, icon, hint]) => ({
+        label, icon, hint,
+        pick: () => { this.dragNow = null; this.edSet({ tool: k, drag: null, editK: null, err: '' }); },
+        bg: tool === k ? '#0E7490' : '#FFFFFF', bd: tool === k ? '#0E7490' : '#C9D2D9', tx: tool === k ? '#FFFFFF' : '#3D4C59'
+      })),
+      edHint: (toolDefs.find(t => t[0] === tool) || toolDefs[0])[3],
+      edHitRef: el => { this.hitEl = el; if (el) el.style.cursor = this.cursorNow || 'default'; },
+      edUndo: () => this.edStep(-1), edRedo: () => this.edStep(1),
+      edUndoTx: canUndo ? '#3D4C59' : '#C2CBD3', edUndoCur: canUndo ? 'pointer' : 'default',
+      edRedoTx: canRedo ? '#3D4C59' : '#C2CBD3', edRedoCur: canRedo ? 'pointer' : 'default',
+      edW: e ? px(e.cols * cell) : '0px', edH: e ? px(e.rows * cell) : '0px',
+      edCellPx: px(cell),
+      edDown: ev => this.edDown(ev),
+      edMove: ev => this.edMove(ev),
+      edDbl: ev => this.edDbl(ev),
+      edLeave: () => this.edSet({ hover: null }),
+      edBeds: e ? e.beds.map(b => {
+        const on = sel.indexOf(b.k) >= 0;
+        const mv = moving && on;
+        const cx = b.cx + (mv ? mdx : 0), cy = b.cy + (mv ? mdy : 0);
+        const del = tool === 'erase' && ((hov && hov.k === b.k && !d) || (d && d.mode === 'erase' && b.cx >= dx0 && b.cx <= dx1 && b.cy >= dy0 && b.cy <= dy1));
+        return {
+          l: px(cx * cell + 2), t: px(cy * cell + 2), w: px(cell - 5), h: px(cell - 5), label: b.label,
+          bg: del ? '#FBE8E8' : (on ? '#0E7490' : '#FFFFFF'),
+          bd: del ? '#C43A3A' : (on ? '#0E7490' : '#7FA8B8'),
+          tx: del ? '#A32222' : (on ? '#FFFFFF' : '#16232E')
+        };
+      }) : [],
+      edBays: e ? e.bays.map(y => ({ l: px(y.x0 * cell), t: px(y.y0 * cell), w: px((y.x1 - y.x0 + 1) * cell), h: px((y.y1 - y.y0 + 1) * cell), name: y.name })) : [],
+      edHasDrag: !!d && d.mode !== 'move',
+      edDL: px(dx0 * cell), edDT: px(dy0 * cell), edDW: px((dx1 - dx0 + 1) * cell), edDH: px((dy1 - dy0 + 1) * cell),
+      edDragBd: d && d.mode === 'erase' ? '#C43A3A' : '#0E7490',
+      edDragBg: d && d.mode === 'erase' ? 'rgba(196,58,58,0.14)' : 'rgba(14,116,144,0.14)',
+      edEditing: !!eBed,
+      edEditL: px(editL), edEditT: eBed ? px(eBed.cy * cell + 2) : '0px', edEditW: px(cell * 2), edEditH: px(cell - 5),
+      edEditV: (e && e.editV) || '',
+      edEditRef: el => { if (el && !el.__owlFocus) { el.__owlFocus = true; setTimeout(() => { el.focus(); el.select(); }, 0); } },
+      onEdEditV: ev => this.edSet({ editV: ev.target.value }),
+      onEdEditKey: ev => {
+        if (ev.key === 'Enter') { ev.preventDefault(); commitEdit(); }
+        else if (ev.key === 'Escape') { ev.preventDefault(); this.edSet({ editK: null, editV: '' }); }
+      },
+      onEdEditDone: () => commitEdit(),
+      edHasSketch: !!(e && e.sketch), edOpacity: e ? e.opacity : 0.4,
+      edSketchEl: e && e.sketch ? React.createElement('img', { src: e.sketch, alt: '', style: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', objectFit: 'contain', opacity: e.opacity, pointerEvents: 'none' } }) : null,
+      edSketchLabel: e && e.sketch ? 'Replace floorplan image' : 'Upload a PNG or JPG floorplan',
+      edPickSketch: () => this.pickSketch(),
+      edClearSketch: () => this.edSet({ sketch: '' }),
+      onEdOpacity: ev => this.edSet({ opacity: Number(ev.target.value) }),
+      edName: (e && e.name) || '', onEdName: ev => this.edSet({ name: ev.target.value }),
+      edPrefix: (e && e.prefix) || '', onEdPrefix: ev => this.edSet({ prefix: ev.target.value }),
+      edNext: (e && e.next) || '1', onEdNext: ev => this.edSet({ next: ev.target.value.replace(/[^0-9]/g, '') }),
+      edSample: e ? (e.prefix ? `${e.prefix}-${Math.max(1, Number(e.next) || 1)}` : String(Math.max(1, Number(e.next) || 1))) : '',
+      edRun: (e && e.run) || '6', onEdRun: ev => this.edSet({ run: ev.target.value.replace(/[^0-9]/g, '') }),
+      edSeedRun: () => this.seedRun(),
+      edUShape: () => this.uShape(),
+      edSelCount: sel.length ? `${sel.length} bed${sel.length === 1 ? '' : 's'}` : 'nothing selected',
+      edHasSel: sel.length > 0, edHasOne: !!one, edNoSel: !sel.length,
+      edRename: one ? one.label : '',
+      onEdRename: ev => { const v = ev.target.value; this.edSet({ beds: e.beds.map(b => (b.k === one.k ? { ...b, label: v } : b)) }); },
+      edBayName: (e && e.bayName) || '', onEdBayName: ev => this.edSet({ bayName: ev.target.value }),
+      edGroupBay: () => {
+        if (!e || !sel.length) return;
+        const g = e.beds.filter(b => sel.indexOf(b.k) >= 0);
+        const bay = { id: 'y' + Date.now().toString(36), name: e.bayName || `Bay ${e.bays.length + 1}`, x0: Math.min(...g.map(b => b.cx)), y0: Math.min(...g.map(b => b.cy)), x1: Math.max(...g.map(b => b.cx)), y1: Math.max(...g.map(b => b.cy)) };
+        this.edCommit({ bays: e.bays.concat([bay]), bayName: '', sel: [] });
+      },
+      edHasBays: !!(e && e.bays.length),
+      edBayList: e ? e.bays.map(y => ({
+        name: y.name, n: `${e.beds.filter(b => b.cx >= y.x0 && b.cx <= y.x1 && b.cy >= y.y0 && b.cy <= y.y1).length} beds`,
+        del: () => this.edCommit({ bays: e.bays.filter(v => v.id !== y.id) })
+      })) : [],
+      edCols: e ? String(e.cols) : '', onEdCols: ev => this.edSet({ cols: Math.max(4, Math.min(40, Number(ev.target.value) || 16)) }),
+      edRows: e ? String(e.rows) : '', onEdRows: ev => this.edSet({ rows: Math.max(3, Math.min(24, Number(ev.target.value) || 9)) }),
+      edHasErr: !!(e && e.err), edErr: (e && e.err) || '',
+      edCancel: () => { if (this.adminTok) { this.code = ''; this.API = '/api/data'; this.remote = false; this.setState({ ed: null, view: { t: 'grid' }, data: { rooms: {} } }); return; } this.setState({ ed: null, view: { t: 'grid' } }); },
+      edSaveDraft: () => this.saveLayout(false, null),
+      edLock: () => {
+        if (!e || !e.beds.length) { this.edSet({ err: 'Place at least one bed before making it permanent.' }); return; }
+        this.setState({ confirm: { type: 'permanent', title: 'Make this layout permanent?', msg: 'The ' + (this.NICUS()[this.code] || '') + ' board, reports and map switch to these ' + e.beds.length + ' beds now. The unit cannot change it; you can still edit it here later.', btn: 'Make permanent', bg: '#0E7490' } });
+      },
+      pinOpen: !!p,      pinOpen: !!p, pinNeeds2: !!(p && p.mode === 'lock'),
+      pinTitle: p && p.mode === 'lock' ? 'Lock this layout' : 'Unlock the layout',
+      pinMsg: p && p.mode === 'lock'
+        ? 'Set a 4-digit PIN. The layout then sits in the background and informs the whole app; editing it later asks for this PIN.'
+        : 'Enter the 4-digit PIN set when this layout was locked.',
+      pin1: (p && p.v1) || '', pin2: (p && p.v2) || '',
+      onPin1: ev => { const v = ev.target.value.replace(/[^0-9]/g, '').slice(0, 4); this.setState(s => ({ pin: { ...s.pin, v1: v, err: '' } })); },
+      onPin2: ev => { const v = ev.target.value.replace(/[^0-9]/g, '').slice(0, 4); this.setState(s => ({ pin: { ...s.pin, v2: v, err: '' } })); },
+      pinHasErr: !!(p && p.err), pinErr: (p && p.err) || '',
+      pinBtn: p && p.mode === 'lock' ? 'Lock layout' : 'Unlock',
+      cancelPin: () => this.setState({ pin: null }),
+      submitPin: () => {
+        const s = this.state.pin; if (!s) return;
+        if (s.mode === 'lock') {
+          if (!/^\d{4}$/.test(s.v1)) { this.setState({ pin: { ...s, err: 'Use exactly four digits.' } }); return; }
+          if (s.v1 !== s.v2) { this.setState({ pin: { ...s, err: 'The two PINs do not match.' } }); return; }
+          this.saveLayout(true, s.v1);
+        } else {
+          if (!L || s.v1 !== (L.pin || '')) { this.setState({ pin: { ...s, err: 'That PIN does not match.' } }); return; }
+          this.startSetup();
+        }
+      },
+      hasMap: beds.length > 0 && (view.t === 'grid' || view.t === 'room' || view.t === 'archive'),
+      mapStrip: beds.slice(0, 44).map(b => { const latest = this.entriesOf(b.k)[0]; return { color: latest ? this.modeView(latest).solid : '#D5DEE6' }; }),
+      openMap: () => this.setState({ map: true }),
+      closeMap: () => this.setState({ map: false }),
+      mapOpen: !!this.state.map,
+      mapTitle: (L && L.name) || 'Unit map',
+      mapW: px((mxX - mnX + 1) * mapCell), mapH: px((mxY - mnY + 1) * mapCell),
+      mapBeds,
+      mapBays: bays.map(y => ({ l: px((y.x0 - mnX) * mapCell), t: px((y.y0 - mnY) * mapCell), w: px((y.x1 - y.x0 + 1) * mapCell), h: px((y.y1 - y.y0 + 1) * mapCell), name: y.name })),
+      unitOpen: !!this.state.unit,
+      openUnit: () => this.setState({ unit: true, copied: false }),
+      closeUnit: () => this.setState({ unit: false }),
+      openMapFromUnit: () => this.setState({ unit: false, map: true }),
+      layoutStatus: L ? (L.permanent ? 'Permanent layout · set by the administrator' : 'Standard 20-bed layout') : 'Standard 20-bed layout',
+      layoutDetail: L ? `${L.beds.length} beds${L.bays && L.bays.length ? ', ' + L.bays.length + ' bay' + (L.bays.length === 1 ? '' : 's') : ''} · last saved ${this.fmtDateFull(L.updatedAt || new Date().toISOString())}` : 'Draw your unit once and everything else follows it.',
+      editLayout: () => { if (L && L.locked && L.pin) this.setState({ unit: false, pin: { mode: 'unlock', v1: '', v2: '', err: '' } }); else this.startSetup(); },
+      isListed: !!(L && L.listed === true),
+      listedLabel: L && L.listed === true ? 'Listed on the OWL home page' : 'Private — not listed',
+      listedHelp: L && L.listed === true
+        ? 'Visitors see your unit name and a bed-occupancy bar. Entry still needs your code.'
+        : 'Your unit is reachable only by its code. Nobody browsing the site can see it exists.',
+      listedBg: L && L.listed === true ? '#0E7490' : '#DCE3E9',
+      listedBd: L && L.listed === true ? '#0E7490' : '#C9D2D9',
+      listedX: L && L.listed === true ? '18px' : '2px',
+      toggleListed: () => {
+        if (!L) return;
+        this.sendOp({ op: 'layout', layout: { ...L, listed: !(L.listed === true), updatedAt: new Date().toISOString() } });
+      },
+      feedbackHref: 'mailto:sangoram+histogram@gmail.com?subject=' + encodeURIComponent('OWL feedback' + (this.code ? ' — ' + (this.NICUS()[this.code] || this.code) : '')),
+      hasCode: !!this.code, noCode: !this.code, unitCode: this.code,
+      isAdminView: !!this.adminView,
+      copyLabel: this.state.copied ? 'Copied' : 'Copy',
+      copyCode: () => { try { navigator.clipboard.writeText(this.code); } catch (er) {} this.setState({ copied: true }); },
+      leaveUnit: () => { try { localStorage.removeItem('owl_unit'); localStorage.removeItem('owl_pass:' + this.code); localStorage.removeItem('owl_admin_view'); } catch (er) {} window.location.href = '/'; },
+      loadSample: () => this.loadSample()
+    };
+  }
 
   sprintStyle(e) {
     const M = this.modes(), sp = e.sp;
@@ -886,7 +2044,8 @@ class Component extends DCLogic {
       if (d.rooms[k]) { d.rooms[to] = d.rooms[k]; delete d.rooms[k]; }
       if (d.meta[k]) { d.meta[to] = d.meta[k]; delete d.meta[k]; }
     }
-    else if (op.op === 'import') { d.rooms = op.data.rooms || {}; d.meta = op.data.meta || {}; d.archives = op.data.archives || {}; }
+    else if (op.op === 'import') { d.rooms = op.data.rooms || {}; d.meta = op.data.meta || {}; d.archives = op.data.archives || {}; if (op.data.layout) d.layout = op.data.layout; }
+    else if (op.op === 'layout') { d.layout = op.layout; }
   }
   sendOp(op) {
     this.setState(s => {
@@ -896,7 +2055,7 @@ class Component extends DCLogic {
     });
     if (this.remote) {
       this.lastWrite = Date.now();
-      fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(op) })
+      fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/json', ...this.hdrs() }, body: JSON.stringify(op) })
         .then(r => (r.ok ? r.json() : null)).then(j => { if (j && j.rooms) this.setState({ data: j }); }).catch(() => {});
     }
   }
@@ -957,6 +2116,25 @@ class Component extends DCLogic {
       hasSeg: !!seg, seg: seg || [],
       init: e.init || '—'
     };
+  }
+  tally(es) {
+    // Time-weighted roll-up of every histogram on this bed: each entry counts for the hours
+    // it represents, so an 8 h and a 4 h histogram are not treated as equal. Band positions
+    // (under / in target / over) are used as logged, whatever each entry's target range was.
+    let w = 0; const acc = [0, 0, 0]; let n = 0;
+    (es || []).forEach(e => {
+      if (!e || !e.h || e.mode === 'RANF') return;
+      const h = e.intv != null ? Number(e.intv) : 8;
+      if (!(h > 0)) return;
+      w += h; n++;
+      acc[0] += h * e.h[0]; acc[1] += h * e.h[1]; acc[2] += h * e.h[2];
+    });
+    if (!w) return { has: false, b: 0, i: 0, a: 0, hrs: 0, n: 0 };
+    const pc = v => Math.round(v / w);
+    let b = pc(acc[0]), i = pc(acc[1]), a = pc(acc[2]);
+    const drift = 100 - (b + i + a);
+    if (drift) i += drift;
+    return { has: true, b, i, a, hrs: Math.round(w * 10) / 10, n };
   }
   bandsFor(latest, prev) {
     if (!latest || !latest.h) return null;
@@ -1087,6 +2265,7 @@ class Component extends DCLogic {
   }
   doConfirm() {
     const c = this.state.confirm; if (!c) return;
+    if (c.type === 'permanent') { this.setState({ confirm: null }); this.saveLayout(true, null); return; }
     if (c.type === 'reset') { this.sendOp({ op: 'archive', room: c.room, aid: Date.now() + '' + Math.floor(Math.random() * 1000) }); this.setState({ confirm: null, view: { t: 'grid' } }); return; }
     if (c.type === 'del') { this.sendOp({ op: 'del', room: c.room, id: c.id }); }
     if (c.type === 'delArchive') { this.sendOp({ op: 'delArchive', id: c.aid }); }
@@ -1095,18 +2274,20 @@ class Component extends DCLogic {
 
   renderVals() {
     const MODES = this.modes(), TG = this.targets(), pfx = this.prefix(), N = this.count(), rrLbl = 'RR>' + this.rrT();
-    const view = this.state.view, f = this.state.form;
+    const bedKeys = this.sortedBedKeys();
+    const view = this.viewNow(), f = this.state.form;
     const now = new Date();
     const todayStr = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][now.getDay()]} · ${this.mos()[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
     const live = [], ranf = [], empty = [], counts = {};
-    for (let n = N; n >= 1; n--) {
+    for (const n of bedKeys) {
       const es = this.entriesOf(n), latest = es[0];
-      const label = `${pfx}-${n}`;
+      const label = this.bedLabel(n);
       if (!latest) { empty.push({ label, start: () => this.openEditor(n) }); continue; }
       counts[latest.mode] = (counts[latest.mode] || 0) + 1;
       if (latest.mode === 'RANF') { ranf.push({ label, ago: this.ago(latest.ts), open: () => this.openRoom(n) }); continue; }
       const prev = es[1] || null, M = this.modeView(latest), T = this.targetOf(latest);
       const band = this.bandsFor(latest, prev);
+      const tal = this.tally(es);
       const pT = prev && prev.h && prev.mode !== 'RANF' ? this.targetOf(prev) : null;
       const pTgtDiff = !!(pT && (pT.lo !== T.lo || pT.hi !== T.hi));
       live.push({
@@ -1116,6 +2297,7 @@ class Component extends DCLogic {
         curSet: this.concise(latest), curMeta: `${this.fmtWhen(latest.ts)}${latest.init ? ' · ' + latest.init : ''}`,
         hasPrev: !!prev, prevSet: prev ? this.concise(prev) : '', prevMeta: prev ? `${this.fmtWhen(prev.ts)}${prev.init ? ' · ' + prev.init : ''}` : '',
         isSprint: latest.mode === 'SPRINT', sprintLine: latest.mode === 'SPRINT' ? this.sprintLine(latest) : '',
+        hasTally: tal.has, tB: tal.b + '%', tI: tal.i + '%', tA: tal.a + '%', tHrs: tal.hrs + ' h · ' + tal.n + (tal.n === 1 ? ' entry' : ' entries'),
         hasHisto: !!band,
         gridCols: band ? `34px repeat(${band.n},1fr)` : '34px repeat(4,1fr)',
         cols: band ? band.cols : [], hasPrevBand: !!band && band.hasPrevBand,
@@ -1131,7 +2313,7 @@ class Component extends DCLogic {
     if (empty.length) legend.push({ label: 'Empty', color: '#C9D2D9', count: empty.length });
 
     // room detail
-    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvCols: [], rvGridCols: '76px repeat(4,1fr)', rvHasPrevBand: false, rvHasCmpTgtNote: false, rvCmpTgtNote: '', rvALbl: 'NOW', rvPLbl: '—', rvAWhen: '', scrubPosA: 0, scrubPosP: 0, onScrubA: () => {}, onScrubP: () => {}, rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9', rvMove: () => {}, rvCurLeg: '', rvPrevLeg: '', rvIsSprint: false, rvSprintLine: '', rvHasScrub: false, scrubMax: 0, scrubPos: 0, onScrub: () => {}, rvCmpWhen: '', rvHNow: [], rvHasHCmp: false, rvHCmp: [], rvHNowTxt: '', rvHCmpTxt: '' };
+    let rv = { rvLabel: '', rvBg: '#FFFFFF', rvBd: '#E2E8EE', rvTx: '#3D4C59', rvSolid: '#8895A0', rvModeLabel: '', rvTarget: '', rvAgo: '', rvHasLatest: false, rvHasHisto: false, rvCols: [], rvGridCols: '76px repeat(4,1fr)', rvHasPrevBand: false, rvHasCmpTgtNote: false, rvCmpTgtNote: '', rvALbl: 'NOW', rvPLbl: '—', rvAWhen: '', scrubPosA: 0, scrubPosP: 0, onScrubA: () => {}, onScrubP: () => {}, rvCount: 0, rvEntries: [], rvIsEmpty: true, rvHasEntries: false, rvAdd: () => {}, rvReset: () => {}, rvName: '', rvMrn: '', onName: () => {}, onMrn: () => {}, rvComp: '', rvCompBg: '#EDF0F2', rvCompTx: '#4A5560', rvCompBd: '#C9D2D9', rvMove: () => {}, rvCurLeg: '', rvPrevLeg: '', rvIsSprint: false, rvSprintLine: '', rvHasScrub: false, scrubMax: 0, scrubPos: 0, onScrub: () => {}, rvCmpWhen: '', rvHNow: [], rvHasHCmp: false, rvHCmp: [], rvHNowTxt: '', rvHCmpTxt: '', rvTalHas: false, rvTalB: '', rvTalI: '', rvTalA: '', rvTalHrs: '', rvTalBar: [] };
     if (view.t === 'room') {
       const n = view.r, es = this.entriesOf(n), latest = es[0] || null;
       const len = es.length;
@@ -1159,8 +2341,12 @@ class Component extends DCLogic {
       const segNow = this.segs(aE), segCmp = this.segs(pE);
       const cT = pE && pE.h && pE.mode !== 'RANF' ? this.targetOf(pE) : null;
       const cmpTgtDiff = !!(aE && cT && (cT.lo !== Ta.lo || cT.hi !== Ta.hi));
+      const rvTal = this.tally(es);
       rv = {
-        rvLabel: `${pfx}-${n}`,
+        rvTalHas: rvTal.has, rvTalB: rvTal.b + '%', rvTalI: rvTal.i + '%', rvTalA: rvTal.a + '%',
+        rvTalHrs: rvTal.hrs + ' h logged \u00b7 ' + rvTal.n + (rvTal.n === 1 ? ' entry' : ' entries'),
+        rvTalBar: [{ w: rvTal.b + '%', bg: '#3E97CE' }, { w: rvTal.i + '%', bg: '#33A35C' }, { w: rvTal.a + '%', bg: '#D14848' }],
+        rvLabel: `${this.bedLabel(n)}`,
         rvBg: M ? M.bg : '#FFFFFF', rvBd: M ? M.bd : '#E2E8EE', rvTx: M ? M.tx : '#3D4C59', rvSolid: M ? M.solid : '#8895A0',
         rvModeLabel: M ? M.label : '', rvTarget: latest && latest.mode !== 'RANF' ? `${T.lo}–${T.hi}%` : '—',
         rvAgo: latest ? this.ago(latest.ts) : '', rvHasLatest: !!latest,
@@ -1259,7 +2445,7 @@ class Component extends DCLogic {
         { name: 'Custom', range: f.tLo !== '' && f.tHi !== '' ? `${f.tLo}–${f.tHi}%` : 'set…', bg: isCustom ? '#0E7490' : '#FFFFFF', tx: isCustom ? '#FFFFFF' : '#3D4C59', bd: isCustom ? '#0E7490' : '#C9D2D9', pick: () => this.setState(s => ({ form: { ...s.form, target: 'custom' } })) }
       ];
       ed = {
-        eTitle: f.editId ? `Edit entry — ${pfx}-${f.room}` : `New entry — ${pfx}-${f.room}`,
+        eTitle: f.editId ? `Edit entry — ${this.bedLabel(f.room)}` : `New entry — ${this.bedLabel(f.room)}`,
         saveLabel: f.editId ? 'Save changes' : 'Save entry',
         eTs: f.ts, eInit: f.init, eIntv: f.intv, onIntv: this.uf('intv'),
         modeChips,
@@ -1293,11 +2479,11 @@ class Component extends DCLogic {
     // PDF report
     const rptRooms = [], rptPages = [];
     if (view.t === 'report') {
-      for (let n = N; n >= 1; n--) {
+      for (const n of bedKeys) {
         const es = this.entriesOf(n); if (!es.length) continue;
         const latest = es[0], prev = es[1] || null, M = this.modeView(latest), T = this.targetOf(latest);
         rptRooms.push({
-          label: `${pfx}-${n}`, solid: M.solid, support: this.modeShort(latest),
+          label: `${this.bedLabel(n)}`, solid: M.solid, support: this.modeShort(latest),
           fio2: latest.f ? (latest.f[0] === latest.f[1] ? latest.f[0] + '%' : `${latest.f[0]}–${latest.f[1]}%`) : '21%',
           tgt: latest.mode === 'RANF' ? '—' : `${T.lo}–${T.hi}%`,
           cur: latest.h ? `${latest.h[0]} / ${latest.h[1]} / ${latest.h[2]} · ${latest.rr != null ? latest.rr : '–'}%` : '—',
@@ -1307,7 +2493,7 @@ class Component extends DCLogic {
         if (!view.full) continue;
         const meta = (this.state.data.meta || {})[String(n)] || {};
         rptPages.push({
-          label: `${pfx}-${n}`, solid: M.solid, modeLabel: M.label,
+          label: `${this.bedLabel(n)}`, solid: M.solid, modeLabel: M.label,
           name: meta.name || '—', mrn: meta.mrn || '—', count: es.length,
           rows: es.map((e, ix) => this.entryRow(e, es[ix + 1]))
         });
@@ -1322,7 +2508,7 @@ class Component extends DCLogic {
       const es = (ar.entries || []).slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
       const open = this.state.arOpen === id;
       return {
-        label: `${pfx}-${ar.room}`,
+        label: `${this.bedLabel(ar.room)}`,
         when: ar.archivedAt ? this.fmtDateFull(ar.archivedAt) : '—',
         name: (ar.meta && ar.meta.name) || '—', mrn: (ar.meta && ar.meta.mrn) || '—',
         count: es.length,
@@ -1335,21 +2521,21 @@ class Component extends DCLogic {
           const blob = new Blob([JSON.stringify(ar, null, 2)], { type: 'application/json' });
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
-          a.download = `nicu-archive-${pfx}-${ar.room}-${(ar.archivedAt || '').slice(0, 10)}.json`;
+          a.download = `nicu-archive-${this.bedLabel(ar.room)}-${(ar.archivedAt || '').slice(0, 10)}.json`;
           a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
         },
-        delA: () => this.setState({ confirm: { type: 'delArchive', aid: id, label: `${pfx}-${ar.room} (archived ${ar.archivedAt ? this.fmtDateFull(ar.archivedAt) : ''})` } })
+        delA: () => this.setState({ confirm: { type: 'delArchive', aid: id, label: `${this.bedLabel(ar.room)} (archived ${ar.archivedAt ? this.fmtDateFull(ar.archivedAt) : ''})` } })
       };
     });
 
     const mv = this.state.move;
     let moveTargets = [];
     if (mv) {
-      for (let n = N; n >= 1; n--) {
+      for (const n of bedKeys) {
         if (n === mv.from) continue;
         const occ = this.entriesOf(n).length > 0;
         moveTargets.push({
-          label: `${pfx}-${n}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
+          label: `${this.bedLabel(n)}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
           bg: occ ? '#EDF0F2' : '#FFFFFF', tx: occ ? '#B4BEC7' : '#0E7490', bd: occ ? '#E2E8EE' : '#9CC3CF',
           pick: () => { this.sendOp({ op: 'move', room: mv.from, to: n }); this.setState({ move: null, view: { t: 'room', r: n } }); }
         });
@@ -1358,10 +2544,10 @@ class Component extends DCLogic {
     const rs = this.state.restore;
     let restoreTargets = [];
     if (rs) {
-      for (let n = N; n >= 1; n--) {
+      for (const n of bedKeys) {
         const occ = this.entriesOf(n).length > 0;
         restoreTargets.push({
-          label: `${pfx}-${n}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
+          label: `${this.bedLabel(n)}`, dis: occ, cur: occ ? 'not-allowed' : 'pointer',
           bg: occ ? '#EDF0F2' : '#FFFFFF', tx: occ ? '#B4BEC7' : '#0E7490', bd: occ ? '#E2E8EE' : '#9CC3CF',
           pick: () => { this.sendOp({ op: 'restoreArchive', id: rs.id, to: n }); this.setState({ restore: null, view: { t: 'room', r: n } }); }
         });
@@ -1371,9 +2557,10 @@ class Component extends DCLogic {
 
     const c = this.state.confirm;
     return {
-      moveOpen: !!mv, moveFrom: mv ? `${pfx}-${mv.from}` : '', moveTargets,
+      ...this.layoutVals(view),
+      moveOpen: !!mv, moveFrom: mv ? `${this.bedLabel(mv.from)}` : '', moveTargets,
       cancelMove: () => this.setState({ move: null }),
-      restoreOpen: !!rs, restoreFrom: rsAr ? `${pfx}-${rsAr.room} archive` : 'archive', restoreTargets,
+      restoreOpen: !!rs, restoreFrom: rsAr ? `${this.bedLabel(rsAr.room)} archive` : 'archive', restoreTargets,
       cancelRestore: () => this.setState({ restore: null }),
       isArchive: view.t === 'archive',
       arLabel: arKeys.length ? `Archive (${arKeys.length})` : 'Archive',
@@ -1431,10 +2618,10 @@ class Component extends DCLogic {
       closeEditor: () => this.setState({ form: null, err: '' }),
       swallow: ev => ev.stopPropagation(),
       confirmOpen: !!c,
-      cTitle: c ? (c.type === 'reset' ? `Archive & clear ${pfx}-${c.room}?` : (c.type === 'delArchive' ? 'Delete archived bundle?' : 'Delete this entry?')) : '',
-      cMsg: c ? (c.type === 'reset' ? 'Every entry and the patient info move to the Archive (button in the header), identified by room and archive date. The room clears for a new patient.' : (c.type === 'delArchive' ? `The archived data for ${c.label || ''} will be permanently deleted. Export it first if you need a copy.` : `The entry from ${c.when || ''} will be permanently deleted.`)) : '',
-      cBtn: c ? (c.type === 'reset' ? 'Archive & clear' : 'Delete') : '',
-      cBtnBg: c && c.type === 'reset' ? '#0E7490' : '#B42318',
+      cTitle: c && c.type === 'permanent' ? c.title : c ? (c.type === 'reset' ? `Archive & clear ${this.bedLabel(c.room)}?` : (c.type === 'delArchive' ? 'Delete archived bundle?' : 'Delete this entry?')) : '',
+      cMsg: c && c.type === 'permanent' ? c.msg : c ? (c.type === 'reset' ? 'Every entry and the patient info move to the Archive (button in the header), identified by room and archive date. The room clears for a new patient.' : (c.type === 'delArchive' ? `The archived data for ${c.label || ''} will be permanently deleted. Export it first if you need a copy.` : `The entry from ${c.when || ''} will be permanently deleted.`)) : '',
+      cBtn: c && c.type === 'permanent' ? c.btn : c ? (c.type === 'reset' ? 'Archive & clear' : 'Delete') : '',
+      cBtnBg: c && (c.type === 'reset' || c.type === 'permanent') ? '#0E7490' : '#B42318',
       doConfirm: () => this.doConfirm(),
       cancelConfirm: () => this.setState({ confirm: null })
     };
