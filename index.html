@@ -63,6 +63,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           </sc-for>
         </sc-if>
         <sc-if value="{{ inApp }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ openFeedback }}" title="Send a suggestion or report a problem" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Feedback</button>
         <button onClick="{{ openUnit }}" title="Unit map and sign-out" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Unit</button>
         <button onClick="{{ exportJson }}" title="Download a JSON backup of all data" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Backup</button>
         <button onClick="{{ importJson }}" title="Restore from a JSON backup" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px" style-hover="border-color:#0E7490;color:#0E7490">Import</button>
@@ -167,7 +168,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
       </div>
       <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:0 2px 8px">
         <span style="font-size:11.5px;color:#7A8A98">Questions, or something that would make this work better on your unit?</span>
-        <a href="{{ feedbackHref }}" style="min-height:34px;display:inline-flex;align-items:center;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;text-decoration:none;padding:0 12px">Give feedback</a>
+        <button onClick="{{ openFeedback }}" style="min-height:34px;display:inline-flex;align-items:center;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#0E7490;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Give feedback</button>
       </div>
     </div>
   </sc-if>
@@ -532,7 +533,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           </label>
           </sc-if>
           <sc-if value="{{ hideIds }}" hint-placeholder-val="{{ false }}">
-            <div style="flex:2;min-width:200px;font-size:11.5px;font-weight:600;color:{{ rvTx }};background:rgba(255,255,255,0.6);border-radius:8px;padding:7px 10px;line-height:1.4">Trial unit — bed labels only. No patient identifiers are stored.</div>
+            <div style="flex:2;min-width:200px;font-size:11.5px;font-weight:600;color:{{ rvTx }};background:rgba(255,255,255,0.6);border-radius:8px;padding:7px 10px;line-height:1.4">Bed labels only — no patient identifiers are stored.</div>
           </sc-if>
           <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-start">
             <span style="font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:{{ rvTx }}">Compliance</span>
@@ -1117,7 +1118,7 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
           <div><button onClick="{{ leaveUnit }}" title="Sign out of this NICU on this device" style="min-height:34px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 12px">Switch NICU / sign out</button></div>
         </div>
         <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap">
-          <a href="{{ feedbackHref }}" style="min-height:40px;display:inline-flex;align-items:center;color:#0E7490;font-size:12px;font-weight:700;text-decoration:underline">Give feedback</a>
+          <button onClick="{{ openFeedbackFromUnit }}" style="min-height:40px;display:inline-flex;align-items:center;background:none;border:none;color:#0E7490;font-size:12px;font-weight:700;text-decoration:underline;cursor:pointer;padding:0">Give feedback</button>
           <button onClick="{{ closeUnit }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">Done</button>
         </div>
       </div>
@@ -1139,6 +1140,32 @@ input:focus,select:focus{outline:2px solid #0E7490;outline-offset:0}
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <button onClick="{{ cancelPin }}" style="min-height:40px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:9px;color:#3D4C59;font-size:13px;font-weight:600;cursor:pointer;padding:0 14px">Cancel</button>
           <button onClick="{{ submitPin }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">{{ pinBtn }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ fbOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeFeedback }}" style="position:fixed;inset:0;z-index:125;background:rgba(22,35,46,0.5);display:flex;align-items:center;justify-content:center;padding:16px">
+      <div data-screen-label="Feedback" onClick="{{ swallow }}" style="background:#FFFFFF;width:min(480px,100%);max-height:90vh;overflow-y:auto;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:11px;box-shadow:0 18px 44px rgba(22,35,46,0.3)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:16px;font-weight:700">Feedback on OWL</div>
+          <div style="flex:1"></div>
+          <button onClick="{{ closeFeedback }}" style="min-height:32px;background:#FFFFFF;border:1px solid #C9D2D9;border-radius:8px;color:#3D4C59;font-size:12px;font-weight:700;cursor:pointer;padding:0 10px">Close</button>
+        </div>
+        <div style="font-size:12.5px;color:#5A6B7A;line-height:1.5">What worked, what got in the way, what’s missing. Goes to Dr. Sangoram. <strong style="color:#98510F">Please don’t include patient identifiers.</strong></div>
+        <textarea value="{{ fbText }}" onChange="{{ onFbText }}" placeholder="Your comments" rows="6" style="font-family:inherit;font-size:14.5px;line-height:1.45;color:#16232E;border:1px solid #C9D2D9;border-radius:10px;padding:10px 12px;resize:vertical;box-sizing:border-box;width:100%"></textarea>
+        <input value="{{ fbName }}" onChange="{{ onFbName }}" placeholder="Your name / role (optional)" style="font-size:14px;border:1px solid #C9D2D9;border-radius:9px;padding:9px 11px;min-height:40px;box-sizing:border-box;width:100%">
+        <button onClick="{{ onFbCtx }}" style="display:flex;align-items:flex-start;gap:9px;background:none;border:none;cursor:pointer;text-align:left;padding:2px 0">
+          <span style="width:19px;height:19px;flex:none;border-radius:5px;border:2px solid {{ fbCtxBd }};background:{{ fbCtxBg }};color:#FFFFFF;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">{{ fbCtxGlyph }}</span>
+          <span style="font-size:12.5px;color:#3D4C59;line-height:1.4">Include screen context <span style="color:#7A8A98">({{ fbCtxText }})</span></span>
+        </button>
+        <sc-if value="{{ fbHasErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;font-weight:700;color:#A32222">{{ fbErr }}</div></sc-if>
+        <sc-if value="{{ fbSent }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;font-weight:700;color:#136B31;background:#E6F5EA;border:1px solid #6BC488;border-radius:8px;padding:8px 11px">Thanks — feedback sent.</div></sc-if>
+        <sc-if value="{{ fbFailed }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;font-weight:700;color:#98510F;background:#FCF0E2;border:1px solid #E0A268;border-radius:8px;padding:8px 11px">Couldn’t send from here. Use “Email instead” — it opens a pre-filled email.</div></sc-if>
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;flex-wrap:wrap">
+          <a href="{{ feedbackHref }}" style="font-size:12.5px;font-weight:700;color:#0E7490;text-decoration:underline">Email instead</a>
+          <button onClick="{{ sendFeedback }}" style="min-height:40px;background:#0E7490;border:1px solid #0E7490;border-radius:9px;color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;padding:0 16px">{{ fbSendLabel }}</button>
         </div>
       </div>
     </div>
@@ -1326,6 +1353,22 @@ class Component extends DCLogic {
         a.click();
       })
       .catch(() => this.setState({ admMsg: 'Could not export ' + code + '.' }));
+  }
+  fbContext(view) {
+    const nm = this.NICUS()[this.code] || '';
+    if (!nm) return 'Home page';
+    const v = view || this.state.view || {};
+    const where = v.t === 'room' && v.r != null ? 'bed ' + this.bedLabel(v.r) : v.t === 'archive' ? 'archive' : v.t === 'report' ? 'report' : 'unit board';
+    return nm + ' · ' + where + (this.adminView ? ' · admin view' : '');
+  }
+  async sendFeedback(view) {
+    const st = this.state, text = String(st.fbText || '').trim();
+    if (!text) { this.setState({ fbErr: 'Write a comment first.' }); return; }
+    this.setState({ fbState: 'sending', fbErr: '' });
+    const data = { 'form-name': 'feedback', 'bot-field': '', name: st.fbName || '', comments: text, context: st.fbCtx ? this.fbContext(view) : (this.NICUS()[this.code] || ''), page: location.host + ' · ' + new Date().toISOString() };
+    const body = Object.keys(data).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k])).join('&');
+    try { const r = await fetch('/feedback-form.html', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }); if (!r.ok) throw 0; this.setState({ fbState: 'sent', fbText: '' }); }
+    catch (e) { this.setState({ fbState: 'failed' }); }
   }
   signIn() {
     const g = this.state.gate; if (!g) return;
@@ -1928,7 +1971,20 @@ class Component extends DCLogic {
         if (!L) return;
         this.sendOp({ op: 'layout', layout: { ...L, listed: !(L.listed === true), updatedAt: new Date().toISOString() } });
       },
-      feedbackHref: 'mailto:sangoram+histogram@gmail.com?subject=' + encodeURIComponent('OWL feedback' + (this.code ? ' — ' + (this.NICUS()[this.code] || this.code) : '')),
+      feedbackHref: 'mailto:sangoram+histogram@gmail.com?subject=' + encodeURIComponent('OWL feedback' + (this.code ? ' — ' + (this.NICUS()[this.code] || this.code) : '')) + '&body=' + encodeURIComponent((this.state.fbText || '') + '\n\n— ' + (this.state.fbName || 'anonymous') + (this.state.fbCtx ? '\nContext: ' + this.fbContext(view) : '') + '\nSent from ' + location.host),
+      fbOpen: !!this.state.fbOpen,
+      openFeedback: () => this.setState({ fbOpen: true, fbState: '', fbErr: '' }),
+      openFeedbackFromUnit: () => this.setState({ unit: false, fbOpen: true, fbState: '', fbErr: '' }),
+      closeFeedback: () => this.setState({ fbOpen: false }),
+      fbText: this.state.fbText || '', onFbText: ev => { const v = ev.target.value; this.setState(st => ({ fbText: v, fbErr: '', fbState: st.fbState === 'sent' ? '' : st.fbState })); },
+      fbName: this.state.fbName || '', onFbName: ev => this.setState({ fbName: ev.target.value }),
+      onFbCtx: () => this.setState(st => ({ fbCtx: !st.fbCtx })),
+      fbCtxGlyph: this.state.fbCtx ? '\u2713' : '', fbCtxBg: this.state.fbCtx ? '#0E7490' : '#FFFFFF', fbCtxBd: this.state.fbCtx ? '#0E7490' : '#C9D2D9',
+      fbCtxText: this.fbContext(view),
+      fbHasErr: !!this.state.fbErr, fbErr: this.state.fbErr || '',
+      fbSent: this.state.fbState === 'sent', fbFailed: this.state.fbState === 'failed',
+      fbSendLabel: this.state.fbState === 'sending' ? 'Sending\u2026' : 'Send feedback',
+      sendFeedback: () => this.sendFeedback(view),
       hasCode: !!this.code, noCode: !this.code, unitCode: this.code,
       isAdminView: !!this.adminView,
       copyLabel: this.state.copied ? 'Copied' : 'Copy',
