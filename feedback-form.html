@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>OWL feedback form (for Netlify form detection)</title></head>
+<body>
+<!-- Netlify reads this static form at deploy time so the app's in-page Feedback box can post to it. -->
+<form name="feedback" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="feedback">
+  <input name="bot-field">
+  <input name="name">
+  <textarea name="comments"></textarea>
+  <input name="context">
+  <input name="page">
+</form>
+</body></html>
